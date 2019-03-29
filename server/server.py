@@ -1,5 +1,5 @@
 from flask import jsonify, request
-from models import User, Message, Feed, Blacklisted
+from models import User, Message, Feed, Blacklisted, Comment
 from __init__ import app, db, jwt
 from flask_jwt_extended import jwt_required, get_raw_jwt, get_jwt_identity
 
@@ -12,7 +12,13 @@ def reset_db():
 @app.route('/feed')
 def get_feed():
     feed = Feed.query.all()
-    return '', 200
+    return jsonify(feed), 200
+
+
+@app.route('/comments/<PostID>')
+def get_feed(PostID):
+    comments = Comment.query.filter_by(post=PostID).all()
+    return jsonify(comments), 200
 
 
 @app.route('/user/login', methods=["POST"])

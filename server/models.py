@@ -34,6 +34,20 @@ class Post(db.Model):
         self.reactions = reaction
         self.reactions_id = reaction.id
 
+    def serialize(self):
+        return{
+            'id': self.id,
+            'author': self.author,
+            'content': self.content,
+            'timestamp': self.timestamp,
+            'downvotes_0': self.reactions.downvotes_0,
+            'downvotes_1': self.reactions.downvotes_1,
+            'downvotes_2': self.reactions.downvotes_2,
+            'upvotes_0': self.reactions.upvotes_0,
+            'upvotes_1': self.reactions.upvotes_1,
+            'upvotes_2': self.reactions.upvotes_2,
+        }
+
 
 class Reactions(db.Model):
     id = db.Column(db.String, unique=True, primary_key=True)
@@ -57,6 +71,7 @@ class Reactions(db.Model):
 class Feed(db.Model):
     post = db.Column(db.String, db.ForeignKey('post.id'), unique=True, primary_key=True)
 
+
 class Comment(db.Model):
     id = db.Column(db.String, unique=True, primary_key=True)
     author = db.Column(db.String, db.ForeignKey('user.id'), unique=True)
@@ -76,6 +91,17 @@ class Comment(db.Model):
         self.content = content
         self.parent = parent
         self.post = post
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'author': self.author,
+            'upvotes': self.upvotes,
+            'downvotes': self.downvotes,
+            'timestamp': self.timestamp,
+            'content': self.content,
+            'parent': self.parent
+        }
 
 
 class UserPreference(db.Model):
