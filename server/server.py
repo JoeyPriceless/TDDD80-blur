@@ -1,18 +1,14 @@
 from flask import jsonify, request
-from models import User, Message, Blacklisted
+from models import User
 from __init__ import app, db, jwt
 from flask_jwt_extended import jwt_required, get_raw_jwt, get_jwt_identity
 
 
-# initiate DB
-@app.route('/init')
-def init_db():
+def reset_db():
     db.drop_all()
     db.create_all()
-    return '', 200
 
 
-# get feed
 @app.route('/feed')
 def get_feed():
     return '', 200

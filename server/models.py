@@ -5,13 +5,13 @@ import datetime
 
 class User(db.Model):
     id = db.Column(db.String, unique=True, primary_key=True)
-    user = db.Column(db.String, unique=True, nullable=False)
+    username = db.Column(db.String, unique=True, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False)
     picture_path = db.Column(db.String)
 
     def __init__(self, username, email, picture_path=None):
         self.id = uuid.uuid4().hex
-        self.user = username
+        self.username = username
         self.email = email
         if  picture_path:
             self.picture_path = picture_path
@@ -19,21 +19,20 @@ class User(db.Model):
 
 class Post(db.Model):
     id = db.Column(db.String, unique=True, primary_key=True)
-    author = db.Column(db.String, db.ForeignKey('user.id'), unique=True)
+    author = db.Column(db.String, db.ForeignKey('user.id'))
     content = db.Column(db.String, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
-    reactions = db.Column(db.String, db.ForeignKey('reactions.id'), unique=True, nullable=False)
+    reactions_id = db.Column(db.String, db.ForeignKey('reactions.id'), unique=True, nullable=False)
+    reactions = db.relationship('Reactions', uselist=False, backref='post')
 
     def __init__(self, author, content):
         self.id = uuid.uuid4().hex
         self.author = author
         self.content = content
-        self.timestamp = datetime.datetime
-        # TODO how to do this correctly?
+        self.timestamp = datetime.datetime.now()
         reaction = Reactions()
-        db.session.add(reaction)
-        db.session.commit()
-        self.reactions = reaction.id
+        self.reactions = reaction
+        self.reactions_id = reaction.id
 
 
 class Reactions(db.Model):
@@ -56,7 +55,7 @@ class Reactions(db.Model):
 
 
 class Feed(db.Model):
-    post = db.Column(db.String, db.ForeignKey('post.id'), unique=True)
+    post = db.Column(db.String, db.ForeignKey('post.id'), unique=True, primary_key=True)
 
 class Comment(db.Model):
     id = db.Column(db.String, unique=True, primary_key=True)
