@@ -35,6 +35,16 @@ class TestStringMethods(unittest.TestCase):
         reaction = reaction_table.one()
         self.assertEqual(reaction.post[0], post_1)
 
+        db.session.add(FeedObject(post_1))
+        db.session.add(FeedObject(post_2))
+        db.session.commit()
+
+        feed = FeedObject.query.all()
+        self.assertEqual(len(feed), 2)
+
+    def test_2_add_comments(self):
+        pass
+
 
 server.reset_db()
 if __name__ == '__main__':
