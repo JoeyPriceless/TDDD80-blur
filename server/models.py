@@ -50,7 +50,7 @@ class Post(db.Model):
 
 
 class Reactions(db.Model):
-    id = db.Column(db.String, unique=True, primary_key=True)
+    id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
     upvotes_0 = db.Column(db.Integer, nullable=False)
     upvotes_1 = db.Column(db.Integer, nullable=False)
     upvotes_2 = db.Column(db.Integer, nullable=False)
@@ -59,7 +59,6 @@ class Reactions(db.Model):
     downvotes_2 = db.Column(db.Integer, nullable=False)
 
     def __init__(self):
-        self.id = uuid.uuid4().hex
         self.upvotes_0 = 0
         self.upvotes_1 = 0
         self.upvotes_2 = 0
@@ -68,8 +67,16 @@ class Reactions(db.Model):
         self.downvotes_2 = 0
 
 
-class Feed(db.Model):
-    post = db.Column(db.String, db.ForeignKey('post.id'), unique=True, primary_key=True)
+class FeedObject(db.Model):
+    __tablename__ = "Feed"
+    id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
+    post_id = db.Column(db.String, db.ForeignKey('post.id'), unique=True)
+    post = db.relationship('Post', backref='feed')
+
+    def __init__(self, post):
+        self.post = post
+        self.post_id = post.id
+
 
 
 class Comment(db.Model):
@@ -87,7 +94,7 @@ class Comment(db.Model):
         self.author = author
         self.upvotes = 0
         self.downvotes = 0
-        self.timestamp = datetime.datetime
+        self.timestamp = datetime.datetime.now()
         self.content = content
         self.parent = parent
         self.post = post
@@ -105,13 +112,12 @@ class Comment(db.Model):
 
 
 class UserPreference(db.Model):
-    id = db.Column(db.String, unique=True, primary_key=True)
+    id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
     user = db.Column(db.String, db.ForeignKey('user.id'), unique=True)
     language = db.Column(db.String)
     locale = db.Column(db.String)
 
     def __init__(self, user, language="eng", locale="se"):
-        self.id = uuid.uuid4().hex
         self.user = user
         self.language = language
         self.locale = locale
