@@ -2,6 +2,7 @@ from __init__ import db, app
 import uuid
 import datetime
 
+
 class User(db.Model):
     id = db.Column(db.String, unique=True, primary_key=True)
     user = db.Column(db.String, unique=True, nullable=False)
