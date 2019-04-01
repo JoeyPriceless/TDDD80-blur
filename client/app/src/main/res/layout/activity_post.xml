@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    tools:context=".activities.PostActivity">
+
+    <LinearLayout
+        android:id="@+id/postHeaderLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        android:weightSum="100"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/authorPicture"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="30"
+            app:srcCompat="@color/colorAccent" />
+
+        <LinearLayout
+            android:id="@+id/postTitleLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="70"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/postTitleText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Username can be super duper long"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/postTimeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:34 - 1 April 2019" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/postContentText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat mas"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/postHeaderLayout" />
+
+    <LinearLayout
+        android:id="@+id/postButtonLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/postContentText">
+
+        <Button
+            android:id="@+id/reactButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="React" />
+
+        <Button
+            android:id="@+id/commentButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Comments" />
+
+        <Button
+            android:id="@+id/favoriteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Favorites" />
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/postButtonLayout" />
+</android.support.constraint.ConstraintLayout>
