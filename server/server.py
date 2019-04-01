@@ -1,5 +1,5 @@
 from flask import jsonify, request
-from models import User, Message, Feed, Blacklisted, Comment
+from models import User, FeedObject, Blacklisted, Comment, Post, Reactions, UserPreference
 from __init__ import app, db, jwt
 from flask_jwt_extended import jwt_required, get_raw_jwt, get_jwt_identity
 
@@ -11,16 +11,103 @@ def reset_db():
 
 @app.route('/feed')
 def get_feed():
-    feed = Feed.query.all()
+    feed = FeedObject.query.all()
+    if feed.equals(None):
+        return "Feed empty! Requested resource not found.", 403
     return jsonify(feed), 200
 
 
-@app.route('/comments/<PostID>')
-def get_feed(PostID):
-    comments = Comment.query.filter_by(post=PostID).all()
+@app.route('/comments/<postid>')
+def get_comments(postid):
+    comments = Comment.query.filter_by(post=postid).all()
+    if comments.equals(None):
+        post = Post.query.filter_by(id=postid).one()
+        if post.equals(None):
+            return "Given post ID doesn't exist. Requested resource not found.", 403
+        return "Requested post has no comments.", 200
     return jsonify(comments), 200
 
 
+@app.route('/post/<postid>')
+def get_post(postid):
+    post = Post.query.filter_by(id=postid).one()
+    if post.equals(None):
+        return "The given post ID doesn't exist. Requested resource not found.", 403
+    return jsonify(post), 200
+
+
+@app.route('/comments/chain/<commentid>')
+def get_comment_chain(commentid):
+    comments = []
+    comment = Comment.query.filter_by(id=commentid).one()
+    if comment.equals(None):
+        return "The given comment ID doesn't exist. Requested resource not found.", 403
+    while True:
+        comment = comment.child
+        if comment.equals(None):
+            break
+        comments.append(comment)
+    if len(comments) == 0:
+        return "The given comment has no children. Requested resource not found.", 403
+    return jsonify(comments), 200
+
+
+@app.route('/reactions/<postid>')
+def get_reactions(postid):
+    reactions = Reactions.querry.filter_by(post_id=postid).one()
+    if reactions.equals(None):
+        return "The given post ID doesn't exist. Requested resource not found.", 403
+    return jsonify(reactions), 200
+
+
+@app.route('/user/<userid>')
+def get_user(userid):
+    user = User.query.filter_by(id=userid)
+    if user.equals(None):
+        return "The given user ID doesn't exist. Requested resource not found.", 403
+    return jsonify(user), 200
+
+
+@app.route('/user/pref/')
+@jwt_required
+def get_user_preference():
+    userid = get_raw_jwt()['user_id']
+    prefs = UserPreference.query.filter_by(user=userid)
+    if prefs.equals(None):
+        return "The token user ID doesn't exist. Requested resource not found.", 403
+    return jsonify(prefs), 200
+
+
+@app.route('/post', methods=['POST'])
+@jwt_required
+def post_comment():
+    return None
+
+
+@app.route('/comment', methods=['POST'])
+@jwt_required
+def post_comment():
+    return None
+
+
+@app.route('/post/react', methods=['POST'])
+@jwt_required
+def react_to_post():
+    reaction = request.json['reaction']
+    reaction = request.json['reaction']
+    reaction = request.json['reaction']
+    reaction = request.json['reaction']
+    userid = get_raw_jwt()['user_id']
+    return None
+
+
+@app.route('/comment/react', methods=['POST'])
+@jwt_required
+def react_to_comment():
+    reaction =
+    return None
+
+# TODO Formate login logout functions with new models.
 @app.route('/user/login', methods=["POST"])
 def login():
     email = request.json['email']

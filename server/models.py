@@ -13,7 +13,7 @@ class User(db.Model):
         self.id = uuid.uuid4().hex
         self.username = username
         self.email = email
-        if  picture_path:
+        if picture_path:
             self.picture_path = picture_path
 
 
@@ -30,7 +30,7 @@ class Post(db.Model):
         self.author = author
         self.content = content
         self.timestamp = datetime.datetime.now()
-        reaction = Reactions()
+        reaction = PostReaction()
         self.reactions = reaction
         self.reactions_id = reaction.id
 
@@ -40,31 +40,37 @@ class Post(db.Model):
             'author': self.author,
             'content': self.content,
             'timestamp': self.timestamp,
-            'downvotes_0': self.reactions.downvotes_0,
-            'downvotes_1': self.reactions.downvotes_1,
-            'downvotes_2': self.reactions.downvotes_2,
-            'upvotes_0': self.reactions.upvotes_0,
-            'upvotes_1': self.reactions.upvotes_1,
-            'upvotes_2': self.reactions.upvotes_2,
         }
 
 
-class Reactions(db.Model):
+class PostReaction(db.Model):
     id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
-    upvotes_0 = db.Column(db.Integer, nullable=False)
-    upvotes_1 = db.Column(db.Integer, nullable=False)
-    upvotes_2 = db.Column(db.Integer, nullable=False)
-    downvotes_0 = db.Column(db.Integer, nullable=False)
-    downvotes_1 = db.Column(db.Integer, nullable=False)
-    downvotes_2 = db.Column(db.Integer, nullable=False)
+    post_id = db.Column(db.String, db.ForeignKey('post.id'), unique=True, nullable=False)
+    user_id = db.Column(db.String, db.ForeignKey('user.id'), unique=True, nullable=False)
+    vote_type = db.Column(db.Integer, nullable=False)
 
-    def __init__(self):
-        self.upvotes_0 = 0
-        self.upvotes_1 = 0
-        self.upvotes_2 = 0
-        self.downvotes_0 = 0
-        self.downvotes_1 = 0
-        self.downvotes_2 = 0
+    def __init__(self, post_id, user_id, vote_type):
+        self.post_id = post_id
+        self.user_id = user_id
+        if vote_type > 6 or vote_type < 0:
+            self.vote_type = 0
+        else:
+            self.vote_type = vote_type
+
+
+class CommentReaction(db.Model):
+    id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
+    comment_id = db.Column(db.String, db.ForeignKey('post.id'), unique=True, nullable=False)
+    user_id = db.Column(db.String, db.ForeignKey('user.id'), unique=True, nullable=False)
+    vote_type = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, post_id, user_id, vote_type):
+        self.post_id = post_id
+        self.user_id = user_id
+        if vote_type > 1 or vote_type < 0:
+            self.vote_type = 0
+        else:
+            self.vote_type = vote_type
 
 
 class FeedObject(db.Model):
@@ -78,7 +84,6 @@ class FeedObject(db.Model):
         self.post_id = post.id
 
 
-
 class Comment(db.Model):
     id = db.Column(db.String, unique=True, primary_key=True)
     author = db.Column(db.String, db.ForeignKey('user.id'), unique=True)
@@ -86,7 +91,7 @@ class Comment(db.Model):
     downvotes = db.Column(db.Integer, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
     content = db.Column(db.String, nullable=False)
-    parent = db.Column(db.String, db.ForeignKey('comment.id'))
+    parent = db.relationship('Comment', backref='child')
     post = db.Column(db.String, db.ForeignKey('post.id'))
 
     def __init__(self, author, content, parent, post):
@@ -121,3 +126,11 @@ class UserPreference(db.Model):
         self.user = user
         self.language = language
         self.locale = locale
+
+
+class Blacklisted(db.Model):
+    id = db.Column(db.Integer, unique=True, autoincrement=True, primary_key=True)
+    token_identifier = db.Column(db.String, unique=True)
+
+    def __init__(self, token_identifier):
+        self.token_identifier = token_identifier
