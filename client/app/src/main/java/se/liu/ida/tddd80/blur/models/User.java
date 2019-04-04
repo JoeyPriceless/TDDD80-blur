@@ -7,7 +7,7 @@ public class User {
     private String username;
     private String email;
     @SerializedName("picture_path")
-    private String picturePath;
+    private String picturePath = null;
 
     public String getId() {
         return id;
@@ -25,17 +25,18 @@ public class User {
         return picturePath;
     }
 
-    public User(String id, String username, String email, String picturePath) {
-        this.id = id;
+    public void setPicturePath(String picturePath) {
+        this.picturePath = picturePath;
+    }
+
+    public User(String username, String email) {
         this.username = username;
         this.email = email;
-        this.picturePath = picturePath;
     }
 
     public User(String id, String username, String email) {
         this.id = id;
         this.username = username;
         this.email = email;
-        this.picturePath = null;
     }
 }
