@@ -9,6 +9,22 @@ public class User {
     @SerializedName("picture_path")
     private String picturePath;
 
+    public String getId() {
+        return id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPicturePath() {
+        return picturePath;
+    }
+
     public User(String id, String username, String email, String picturePath) {
         this.id = id;
         this.username = username;

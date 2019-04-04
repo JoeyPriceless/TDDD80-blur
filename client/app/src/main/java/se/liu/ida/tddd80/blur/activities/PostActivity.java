@@ -3,9 +3,11 @@ package se.liu.ida.tddd80.blur.activities;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import se.liu.ida.tddd80.blur.R;
+import se.liu.ida.tddd80.blur.models.Post;
 
 
 public class PostActivity extends AppCompatActivity {
+	private Post post;
 
 	@Override protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
