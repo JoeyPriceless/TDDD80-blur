@@ -1,7 +1,8 @@
 package se.liu.ida.tddd80.blur.activities;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.models.Post;
 

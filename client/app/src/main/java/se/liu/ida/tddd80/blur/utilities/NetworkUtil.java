@@ -5,8 +5,11 @@ import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
+import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
@@ -26,9 +29,9 @@ public class NetworkUtil {
     }
 
     // For GET, DELETE
-    private void requestJson(String url, int method, Response.Listener<String> responseListener,
-                             Response.ErrorListener errorListener) {
-        if (method == Request.Method.POST || method == Request.Method.PUT) {
+    private void requestJson(String url, int method, Listener<String> responseListener,
+                             ErrorListener errorListener) {
+        if (method == Method.POST || method == Method.PUT) {
             requestJson(url, method, responseListener, errorListener);
             String errorMsg = "GET or DELETE request sent without map";
             Log.w(this.getClass().getSimpleName(), errorMsg);
@@ -40,9 +43,9 @@ public class NetworkUtil {
   	}
 
   	// POST, PUT need a mapping
-  	private void requestJson(String url, int method, Response.Listener<String> responseListener,
-                             Response.ErrorListener errorListener, final Map<String, String> params) {
-        if (method == Request.Method.GET || method == Request.Method.DELETE) {
+  	private void requestJson(String url, int method, Listener<String> responseListener,
+                             ErrorListener errorListener, final Map<String, String> params) {
+        if (method == Method.GET || method == Method.DELETE) {
             requestJson(url, method, responseListener, errorListener);
             Log.w(this.getClass().getSimpleName(), "GET or DELETE request sent to wrong method.");
         }
@@ -57,14 +60,14 @@ public class NetworkUtil {
         queue.add(stringRequest);
     }
 
-  	public void createUser(User user, String password, Response.Listener<String> responseListener,
-                           Response.ErrorListener errorListener) {
+  	public void createUser(User user, String password, Listener<String> responseListener,
+                           ErrorListener errorListener) {
         Map<String, String> params = new HashMap<>();
         params.put("username", user.getUsername());
         params.put("email", user.getEmail());
         params.put("password", password);
 
-        requestJson(Url.build(Url.CREATE_USER), Request.Method.POST, responseListener,
+        requestJson(Url.build(Url.CREATE_USER), Method.POST, responseListener,
                     errorListener, params);
     }
 
