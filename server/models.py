@@ -22,17 +22,15 @@ class Post(db.Model):
     author = db.Column(db.String, db.ForeignKey('user.id'))
     content = db.Column(db.String, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
-    reactions_id = db.Column(db.String, db.ForeignKey('reactions.id'), unique=True, nullable=False)
-    reactions = db.relationship('Reactions', uselist=False, backref='post')
 
     def __init__(self, author, content):
         self.id = uuid.uuid4().hex
         self.author = author
         self.content = content
         self.timestamp = datetime.datetime.now()
-        reaction = PostReaction()
-        self.reactions = reaction
-        self.reactions_id = reaction.id
+
+    def get_reactions(self):
+        return PostReaction.querry.filter_by(post_id=self.id).all()
 
     def serialize(self):
         return{
@@ -103,6 +101,9 @@ class Comment(db.Model):
         self.content = content
         self.parent = parent
         self.post = post
+
+    def get_reactions(self):
+        return CommentReaction.querry.filter_by(comment_id=self.id).all()
 
     def serialize(self):
         return {
