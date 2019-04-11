@@ -16,6 +16,13 @@ class User(db.Model):
         if picture_path:
             self.picture_path = picture_path
 
+    def serialize(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email,
+        }
+
 
 class Post(db.Model):
     id = db.Column(db.String, unique=True, primary_key=True)
@@ -31,6 +38,15 @@ class Post(db.Model):
 
     def get_reactions(self):
         return PostReaction.querry.filter_by(post_id=self.id).all()
+
+    def kill_children(self, db):
+        comments = Comment.querry.filter_by(post_id=self.id).all()
+        for comment in comments:
+            comment.kill_children(db)
+        reactions = PostReaction.querry.filter_by(post_id=self.id).all()
+        db.session.delete(comments)
+        db.session.delete(reactions)
+        db.session.commit()
 
     def serialize(self):
         return{
@@ -55,6 +71,14 @@ class PostReaction(db.Model):
         else:
             self.vote_type = vote_type
 
+    def serialize(self):
+        return {
+            'id': self.id,
+            'post_id': self.post_id,
+            'user_id': self.user_id,
+            'vote_type': self.vote_type,
+        }
+
 
 class CommentReaction(db.Model):
     id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
@@ -70,6 +94,14 @@ class CommentReaction(db.Model):
         else:
             self.vote_type = vote_type
 
+    def serialize(self):
+        return {
+            'id': self.id,
+            'comment_id': self.comment_id,
+            'user_id': self.user_id,
+            'vote_type': self.vote_type,
+        }
+
 
 class FeedObject(db.Model):
     __tablename__ = "Feed"
@@ -81,6 +113,12 @@ class FeedObject(db.Model):
         self.post = post
         self.post_id = post.id
 
+    def serialize(self):
+        return {
+            'id': self.id,
+            'post': self.post,
+        }
+
 
 class Comment(db.Model):
     id = db.Column(db.String, unique=True, primary_key=True)
@@ -90,9 +128,9 @@ class Comment(db.Model):
     timestamp = db.Column(db.DateTime, nullable=False)
     content = db.Column(db.String, nullable=False)
     parent = db.relationship('Comment', backref='child')
-    post = db.Column(db.String, db.ForeignKey('post.id'))
+    post_id = db.Column(db.String, db.ForeignKey('post.id'))
 
-    def __init__(self, author, content, parent, post):
+    def __init__(self, author, content, parent, post_id):
         self.id = uuid.uuid4().hex
         self.author = author
         self.upvotes = 0
@@ -100,7 +138,7 @@ class Comment(db.Model):
         self.timestamp = datetime.datetime.now()
         self.content = content
         self.parent = parent
-        self.post = post
+        self.post_id = post_id
 
     def get_reactions(self):
         return CommentReaction.querry.filter_by(comment_id=self.id).all()
@@ -113,7 +151,7 @@ class Comment(db.Model):
             'downvotes': self.downvotes,
             'timestamp': self.timestamp,
             'content': self.content,
-            'parent': self.parent
+            'parent': self.parent,
         }
 
 

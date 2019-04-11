@@ -1,10 +1,9 @@
-import requests
 import unittest
-import json
 from models import *
 import server
 
 URL_ROOT = "http://127.0.0.1:5000/"
+
 
 class TestStringMethods(unittest.TestCase):
 

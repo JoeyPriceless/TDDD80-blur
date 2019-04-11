@@ -13,7 +13,7 @@ def reset_db():
 def get_feed():
     feed = FeedObject.query.all()
     if feed.equals(None):
-        return "Feed empty! Requested resource not found.", 403
+        return "Feed empty! Requested resource not found.", 404
     return jsonify(feed), 200
 
 
@@ -23,7 +23,7 @@ def get_comments(postid):
     if comments.equals(None):
         post = Post.query.filter_by(id=postid).one()
         if post.equals(None):
-            return "Given post ID doesn't exist. Requested resource not found.", 403
+            return "Given post ID doesn't exist. Requested resource not found.", 404
         return "Requested post has no comments.", 200
     return jsonify(comments), 200
 
@@ -32,7 +32,7 @@ def get_comments(postid):
 def get_post(postid):
     post = Post.query.filter_by(id=postid).one()
     if post.equals(None):
-        return "The given post ID doesn't exist. Requested resource not found.", 403
+        return "The given post ID doesn't exist. Requested resource not found.", 404
     return jsonify(post), 200
 
 
@@ -41,14 +41,14 @@ def get_comment_chain(commentid):
     comments = []
     comment = Comment.query.filter_by(id=commentid).one()
     if comment.equals(None):
-        return "The given comment ID doesn't exist. Requested resource not found.", 403
+        return "The given comment ID doesn't exist. Requested resource not found.", 404
     while True:
         comment = comment.child
         if comment.equals(None):
             break
         comments.append(comment)
     if len(comments) == 0:
-        return "The given comment has no children. Requested resource not found.", 403
+        return "The given comment has no children. Requested resource not found.", 404
     return jsonify(comments), 200
 
 
@@ -56,7 +56,7 @@ def get_comment_chain(commentid):
 def get_reactions(postid):
     reactions = PostReaction.querry.filter_by(post_id=postid).all()
     if reactions.equals(None):
-        return "The given post ID doesn't exist. Requested resource not found.", 403
+        return "The given post ID doesn't exist. Requested resource not found.", 404
     return jsonify(reactions), 200
 
 
@@ -64,7 +64,7 @@ def get_reactions(postid):
 def get_user(userid):
     user = User.query.filter_by(id=userid)
     if user.equals(None):
-        return "The given user ID doesn't exist. Requested resource not found.", 403
+        return "The given user ID doesn't exist. Requested resource not found.", 404
     return jsonify(user), 200
 
 
@@ -74,7 +74,7 @@ def get_user_preference():
     userid = get_raw_jwt()['user_id']
     prefs = UserPreference.query.filter_by(user=userid)
     if prefs.equals(None):
-        return "The token user ID doesn't exist. Requested resource not found.", 403
+        return "The token user ID doesn't exist. Requested resource not found.", 404
     return jsonify(prefs), 200
 
 
@@ -122,6 +122,16 @@ def react_to_comment():
     db.session.add(comment_reaction)
     db.session.commit()
     return str(comment_reaction.id)
+
+
+@app.route('/post/delete/<postid>')
+@jwt_required
+def react_to_comment(postid):
+    post = Post.querry.filter_by(id=get_post).one()
+    if post is None:
+        return "The given post ID doesn't exist. Requested resource not found.", 404
+    if post.author != get_raw_jwt()['user_id']:
+        return "User is not author of specified post. Permission denied.", 403
 
 # TODO Formate login logout functions with new models.
 @app.route('/user/login', methods=["POST"])
