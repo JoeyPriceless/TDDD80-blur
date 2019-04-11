@@ -3,11 +3,8 @@ package se.liu.ida.tddd80.blur.utilities;
 import android.content.Context;
 import android.util.Log;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.StringRequest;
@@ -75,18 +72,18 @@ public class NetworkUtil {
         ROOT("http://127.0.0.1:5000"),
         CREATE_USER("/user");
 
-        private String adress;
+        private String address;
 
-        Url(String adress) {
-            this.adress = adress;
+        Url(String address) {
+            this.address = address;
         }
 
         public static String build(Url... urls) {
-            StringBuilder adress = new StringBuilder(Url.ROOT.adress);
+            StringBuilder address = new StringBuilder(Url.ROOT.address);
             for (Url url : urls) {
-                adress.append(url.adress);
+                address.append(url.address);
             }
-            return adress.toString();
+            return address.toString();
         }
     }
 }
