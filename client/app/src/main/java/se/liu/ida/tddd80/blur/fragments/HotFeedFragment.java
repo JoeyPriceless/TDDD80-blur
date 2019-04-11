@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import se.liu.ida.tddd80.blur.R;
 
 public class HotFeedFragment extends Fragment {
 	@Override public void onCreate(@Nullable final Bundle savedInstanceState) {

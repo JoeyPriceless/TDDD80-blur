@@ -11,6 +11,7 @@ import com.android.volley.VolleyError;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import se.liu.ida.tddd80.blur.models.User;
@@ -29,6 +30,8 @@ public class NetworkTests {
         String password = "password123";
 
         User user = new User(username, email);
+
+        MockitoAnnotations.initMocks(context);
         NetworkUtil netUtil = new NetworkUtil(context);
 
         netUtil.createUser(user, password, new Listener<String>() {
