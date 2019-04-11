@@ -1,5 +1,5 @@
 from flask import jsonify, request
-from models import User, FeedObject, Blacklisted, Comment, Post, Reactions, UserPreference
+from models import User, FeedObject, Blacklisted, Comment, Post, UserPreference, PostReaction, CommentReaction
 from __init__ import app, db, jwt
 from flask_jwt_extended import jwt_required, get_raw_jwt, get_jwt_identity
 
@@ -52,9 +52,9 @@ def get_comment_chain(commentid):
     return jsonify(comments), 200
 
 
-@app.route('/reactions/<postid>')
+@app.route('/post/reactions/<postid>')
 def get_reactions(postid):
-    reactions = Reactions.querry.filter_by(post_id=postid).one()
+    reactions = PostReaction.querry.filter_by(post_id=postid).all()
     if reactions.equals(None):
         return "The given post ID doesn't exist. Requested resource not found.", 403
     return jsonify(reactions), 200
@@ -80,32 +80,48 @@ def get_user_preference():
 
 @app.route('/post', methods=['POST'])
 @jwt_required
-def post_comment():
-    return None
+def post_post():
+    content = request.json['content']
+    user_id = get_raw_jwt()['user_id']
+    post = Post(user_id, content)
+    db.session.add(post)
+    db.session.commit()
+    return str(post.id)
 
 
 @app.route('/comment', methods=['POST'])
 @jwt_required
 def post_comment():
-    return None
+    content = request.json['content']
+    user_id = get_raw_jwt()['user_id']
+    comment = Comment(user_id, content)
+    db.session.add(comment)
+    db.session.commit()
+    return str(comment.id)
 
 
 @app.route('/post/react', methods=['POST'])
 @jwt_required
 def react_to_post():
     reaction = request.json['reaction']
-    reaction = request.json['reaction']
-    reaction = request.json['reaction']
-    reaction = request.json['reaction']
-    userid = get_raw_jwt()['user_id']
-    return None
+    post_id = request.json['post']
+    user_id = get_raw_jwt()['user_id']
+    post_reaction = PostReaction(post_id, user_id, reaction)
+    db.session.add(post_reaction)
+    db.session.commit()
+    return str(post_reaction.id)
 
 
 @app.route('/comment/react', methods=['POST'])
 @jwt_required
 def react_to_comment():
-    reaction =
-    return None
+    reaction = request.json['reaction']
+    comment_id = request.json['comment']
+    user_id = get_raw_jwt()['user_id']
+    comment_reaction = CommentReaction(comment_id, user_id, reaction)
+    db.session.add(comment_reaction)
+    db.session.commit()
+    return str(comment_reaction.id)
 
 # TODO Formate login logout functions with new models.
 @app.route('/user/login', methods=["POST"])
