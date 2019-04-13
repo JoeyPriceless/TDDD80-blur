@@ -328,3 +328,4 @@ fabric.properties
 .idea/
 *.db
 .secret
+workspace.xml
