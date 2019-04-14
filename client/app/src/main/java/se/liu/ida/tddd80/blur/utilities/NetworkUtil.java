@@ -11,18 +11,35 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import se.liu.ida.tddd80.blur.models.Feed;
+import se.liu.ida.tddd80.blur.models.FeedType;
+import se.liu.ida.tddd80.blur.models.Post;
 import se.liu.ida.tddd80.blur.models.User;
 
+// Singleton Volley class as recommended in docs.
 public class NetworkUtil {
+    private static NetworkUtil instance;
     private RequestQueue queue;
     private Gson gson;
 
-    public NetworkUtil(Context context) {
-        this.queue = Volley.newRequestQueue(context);
+    private NetworkUtil(Context context) {
+        // Application context to make it last throughout app lifetime.
+        this.queue = Volley.newRequestQueue(context.getApplicationContext());
         this.gson = new Gson();
+    }
+
+    public static NetworkUtil getInstance(Context context) {
+        if (instance == null) {
+            instance = new NetworkUtil(context);
+        }
+        return instance;
     }
 
     // For GET, DELETE
@@ -66,6 +83,12 @@ public class NetworkUtil {
 
         requestJson(Url.build(Url.CREATE_USER), Method.POST, responseListener,
                     errorListener, params);
+    }
+
+    public Feed getFeed(FeedType type, Listener<String> responseListener, ErrorListener
+            errorListener) {
+        // TODO fetch from server
+        return new Feed(type);
     }
 
     private enum Url {

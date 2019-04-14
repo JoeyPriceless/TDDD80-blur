@@ -3,6 +3,7 @@ package se.liu.ida.tddd80.blur;
 import android.content.Context;
 import android.util.Log;
 
+import com.android.volley.Network;
 import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
@@ -31,8 +32,7 @@ public class NetworkTests {
 
         User user = new User(username, email);
 
-        MockitoAnnotations.initMocks(context);
-        NetworkUtil netUtil = new NetworkUtil(context);
+        NetworkUtil netUtil = NetworkUtil.getInstance(context);
 
         netUtil.createUser(user, password, new Listener<String>() {
             @Override
