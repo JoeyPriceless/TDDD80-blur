@@ -26,7 +26,7 @@ public class PostActivity extends AppCompatActivity {
 
         User user = new User(username, email);
 
-        NetworkUtil netUtil = new NetworkUtil(this);
+        NetworkUtil netUtil = NetworkUtil.getInstance(this);
 
         netUtil.createUser(user, password, new Response.Listener<String>() {
             @Override

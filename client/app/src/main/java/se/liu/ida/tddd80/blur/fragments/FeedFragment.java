@@ -32,8 +32,9 @@ public class FeedFragment extends Fragment {
     private static final String ARG_FEED_NAME = "feedName";
 
     private FeedType mFeedType;
-    private FeedAdapter adapter;
-    private NetworkUtil netUtil = NetworkUtil.getInstance(getContext());
+    private FeedAdapter mAdapter;
+    private NetworkUtil mNetUtil;
+    private RecyclerView rv;
 
     private OnFragmentInteractionListener mListener;
 
@@ -53,9 +54,10 @@ public class FeedFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mFeedType = (FeedType)getArguments().get(ARG_FEED_NAME);
+            mFeedType = FeedType.valueOf((String)getArguments().get(ARG_FEED_NAME));
         }
-        netUtil.getFeed(mFeedType, new ResponseListener(), new ResponseErrorListener());
+        mNetUtil = NetworkUtil.getInstance(getContext());
+        mNetUtil.getFeed(mFeedType, new ResponseListener(), new ResponseErrorListener());
     }
 
     @Override
@@ -63,8 +65,7 @@ public class FeedFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View inflatedView = inflater.inflate(R.layout.fragment_feed, container, false);
-        RecyclerView rv = inflatedView.findViewById(R.id.recyclerview_feed);
-        rv.setAdapter(adapter);
+        rv = inflatedView.findViewById(R.id.recyclerview_feed);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
         return inflatedView;
     }
@@ -111,7 +112,8 @@ public class FeedFragment extends Fragment {
     private class ResponseListener implements Response.Listener<String> {
         @Override
         public void onResponse(String response) {
-            adapter = new FeedAdapter(Feed.fromJson(response));
+            mAdapter = new FeedAdapter(Feed.fromJson(response));
+            rv.setAdapter(mAdapter);
         }
     }
 
