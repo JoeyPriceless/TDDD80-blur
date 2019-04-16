@@ -151,7 +151,7 @@ def login():
 def create_user():
     username = request.json['username']
     email = request.json['email']
-    if User.query.filter_by(user=username).scalar() is not None:
+    if User.query.filter_by(username=username).scalar() is not None:
         return 'Username already exists', 409
     if User.query.filter_by(email=email).scalar() is not None:
         return 'Email already exists', 409
