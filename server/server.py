@@ -126,8 +126,8 @@ def react_to_comment():
 
 @app.route('/post/delete/<postid>')
 @jwt_required
-def react_to_comment(postid):
-    post = Post.querry.filter_by(id=get_post).one()
+def delete_post(postid):
+    post = Post.query.filter_by(id=get_post).one()
     if post is None:
         return "The given post ID doesn't exist. Requested resource not found.", 404
     if post.author != get_raw_jwt()['user_id']:

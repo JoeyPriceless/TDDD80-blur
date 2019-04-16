@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="658300f0-9a5f-46aa-a03e-616027adc246" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/heroku_instructions.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -93,8 +91,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="526">
-              <caret line="184" column="62" selection-start-line="184" selection-start-column="62" selection-end-line="184" selection-end-column="62" />
+            <state relative-caret-position="444">
+              <caret line="128" column="15" selection-start-line="128" selection-start-column="15" selection-end-line="128" selection-end-column="15" />
               <folding>
                 <element signature="e#0#34#0" expanded="true" />
               </folding>
@@ -120,6 +118,7 @@
       <find>User</find>
       <find>reactions</find>
       <find>get_f</find>
+      <find>post/</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -248,7 +247,7 @@
       <workItem from="1553867843452" duration="8431000" />
       <workItem from="1554367100942" duration="3625000" />
       <workItem from="1554990387475" duration="2204000" />
-      <workItem from="1555163840995" duration="6033000" />
+      <workItem from="1555163840995" duration="6439000" />
     </task>
     <servers />
   </component>
@@ -285,7 +284,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="30480000" />
+    <option name="totallyTimeSpent" value="30886000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="33" width="1550" height="838" extended-state="6" />
@@ -423,8 +422,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="526">
-          <caret line="184" column="62" selection-start-line="184" selection-start-column="62" selection-end-line="184" selection-end-column="62" />
+        <state relative-caret-position="444">
+          <caret line="128" column="15" selection-start-line="128" selection-start-column="15" selection-end-line="128" selection-end-column="15" />
           <folding>
             <element signature="e#0#34#0" expanded="true" />
           </folding>
