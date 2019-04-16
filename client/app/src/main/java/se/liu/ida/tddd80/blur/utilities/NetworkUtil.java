@@ -11,16 +11,11 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import se.liu.ida.tddd80.blur.models.Feed;
 import se.liu.ida.tddd80.blur.models.FeedType;
-import se.liu.ida.tddd80.blur.models.Post;
 import se.liu.ida.tddd80.blur.models.User;
 
 // Singleton Volley class as recommended in docs.
@@ -92,7 +87,7 @@ public class NetworkUtil {
     }
 
     private enum Url {
-        ROOT("http://127.0.0.1:5000"),
+        ROOT("https://tddd80-server.herokuapp.com"),
         CREATE_USER("/user");
 
         private String address;

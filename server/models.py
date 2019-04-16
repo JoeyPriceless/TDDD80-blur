@@ -37,13 +37,13 @@ class Post(db.Model):
         self.timestamp = datetime.datetime.now()
 
     def get_reactions(self):
-        return PostReaction.querry.filter_by(post_id=self.id).all()
+        return PostReaction.query.filter_by(post_id=self.id).all()
 
     def kill_children(self, db):
-        comments = Comment.querry.filter_by(post_id=self.id).all()
+        comments = Comment.query.filter_by(post_id=self.id).all()
         for comment in comments:
             comment.kill_children(db)
-        reactions = PostReaction.querry.filter_by(post_id=self.id).all()
+        reactions = PostReaction.query.filter_by(post_id=self.id).all()
         db.session.delete(comments)
         db.session.delete(reactions)
         db.session.commit()
@@ -107,10 +107,10 @@ class FeedObject(db.Model):
     __tablename__ = "Feed"
     id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
     post_id = db.Column(db.String, db.ForeignKey('post.id'), unique=True)
-    post = db.relationship('Post', backref='feed')
+    #post = db.relationship('Post', backref='feed')
 
     def __init__(self, post):
-        self.post = post
+        #self.post = post
         self.post_id = post.id
 
     def serialize(self):
@@ -127,7 +127,7 @@ class Comment(db.Model):
     downvotes = db.Column(db.Integer, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
     content = db.Column(db.String, nullable=False)
-    parent = db.relationship('Comment', backref='child')
+    #parent = db.relationship('Comment', backref='child')
     post_id = db.Column(db.String, db.ForeignKey('post.id'))
 
     def __init__(self, author, content, parent, post_id):
@@ -137,11 +137,11 @@ class Comment(db.Model):
         self.downvotes = 0
         self.timestamp = datetime.datetime.now()
         self.content = content
-        self.parent = parent
+        #self.parent = parent
         self.post_id = post_id
 
     def get_reactions(self):
-        return CommentReaction.querry.filter_by(comment_id=self.id).all()
+        return CommentReaction.query.filter_by(comment_id=self.id).all()
 
     def serialize(self):
         return {

@@ -157,7 +157,7 @@ def create_user():
         return 'Email already exists', 409
     password = request.json['password']
     # TODO make sure credentials are created in User constructor.
-    user = User(username, email, password)
+    user = User(username, email)
     db.session.add(user)
     db.session.commit()
     return str(user.id), 200
