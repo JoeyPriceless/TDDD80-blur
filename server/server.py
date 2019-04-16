@@ -8,7 +8,6 @@ def reset_db():
     db.drop_all()
     db.create_all()
 
-
 @app.route('/feed')
 def get_feed():
     feed = FeedObject.query.all()
@@ -181,5 +180,6 @@ def check_if_token_in_blacklist(decrypted_token):
 
 
 if __name__ == '__main__':
+    db.create_all()
     app.run()
     jwt.token_in_blacklist_loader(check_if_token_in_blacklist)

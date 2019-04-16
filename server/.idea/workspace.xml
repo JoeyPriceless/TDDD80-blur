@@ -41,7 +41,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2329">
+            <state relative-caret-position="1836">
               <caret line="139" column="9" selection-start-line="139" selection-start-column="9" selection-end-line="139" selection-end-column="9" />
             </state>
           </provider>
@@ -91,8 +91,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="234">
-              <caret line="157" column="39" lean-forward="true" selection-start-line="157" selection-start-column="39" selection-end-line="157" selection-end-column="39" />
+            <state relative-caret-position="523">
+              <caret line="182" column="19" selection-start-line="182" selection-start-column="19" selection-end-line="182" selection-end-column="19" />
               <folding>
                 <element signature="e#0#34#0" expanded="true" />
               </folding>
@@ -122,8 +122,9 @@
       <find>querry</find>
       <find>child</find>
       <find>user.</find>
-      <find>backref</find>
       <find>user</find>
+      <find>backref</find>
+      <find>reset_db</find>
     </findStrings>
     <replaceStrings>
       <replace>query</replace>
@@ -255,7 +256,7 @@
       <workItem from="1553867843452" duration="8431000" />
       <workItem from="1554367100942" duration="3625000" />
       <workItem from="1554990387475" duration="2204000" />
-      <workItem from="1555163840995" duration="7739000" />
+      <workItem from="1555163840995" duration="7978000" />
     </task>
     <servers />
   </component>
@@ -292,7 +293,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="32186000" />
+    <option name="totallyTimeSpent" value="32425000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="33" width="1550" height="838" extended-state="6" />
@@ -311,7 +312,7 @@
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="7" visible="true" weight="0.38613862" />
+      <window_info anchor="bottom" id="Terminal" order="7" weight="0.38613862" />
       <window_info anchor="bottom" id="Event Log" order="8" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="9" show_stripe_button="false" />
       <window_info anchor="bottom" id="Docker" order="10" show_stripe_button="false" />
@@ -423,15 +424,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2329">
+        <state relative-caret-position="1836">
           <caret line="139" column="9" selection-start-line="139" selection-start-column="9" selection-end-line="139" selection-end-column="9" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="234">
-          <caret line="157" column="39" lean-forward="true" selection-start-line="157" selection-start-column="39" selection-end-line="157" selection-end-column="39" />
+        <state relative-caret-position="523">
+          <caret line="182" column="19" selection-start-line="182" selection-start-column="19" selection-end-line="182" selection-end-column="19" />
           <folding>
             <element signature="e#0#34#0" expanded="true" />
           </folding>
