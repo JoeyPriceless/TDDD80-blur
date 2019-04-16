@@ -1,0 +1,8 @@
+In order to update Heroku's git, run the following command from the root directory.
+git subtree push --prefix server heroku master
+
+Deployment (turns of after 30 min inactivity):
+heroku ps:scale web=1
+
+Lathund:
+https://www.ida.liu.se/~TDDD80/laborationer/server/heroku_commands.sv.shtml

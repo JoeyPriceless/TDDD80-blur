@@ -182,3 +182,4 @@ def check_if_token_in_blacklist(decrypted_token):
 
 if __name__ == '__main__':
     app.run()
+    jwt.token_in_blacklist_loader(check_if_token_in_blacklist)
