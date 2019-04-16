@@ -7,6 +7,8 @@ import android.util.Log;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
+import org.json.JSONObject;
+
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.models.Post;
 import se.liu.ida.tddd80.blur.models.User;
@@ -28,10 +30,10 @@ public class PostActivity extends AppCompatActivity {
 
         NetworkUtil netUtil = NetworkUtil.getInstance(this);
 
-        netUtil.createUser(user, password, new Response.Listener<String>() {
+        netUtil.createUser(user, password, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(String response) {
-                Log.i(getClass().getSimpleName(), "Create user successful. Response: " + response);
+            public void onResponse(JSONObject response) {
+                Log.i(getClass().getSimpleName(), "Create user successful. Response: " + response.toString());
             }
         }, new Response.ErrorListener() {
             @Override

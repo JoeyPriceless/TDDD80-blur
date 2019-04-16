@@ -148,7 +148,7 @@ def login():
 
 @app.route('/user', methods=["POST"])
 def create_user():
-    username = request.json['username']
+    username = request. json['username']
     email = request.json['email']
     if User.query.filter_by(username=username).scalar() is not None:
         return 'Username already exists', 409
@@ -180,6 +180,8 @@ def check_if_token_in_blacklist(decrypted_token):
 
 
 if __name__ == '__main__':
+    # TODO remove drop_all.
+    db.drop_all()
     db.create_all()
     app.run()
     jwt.token_in_blacklist_loader(check_if_token_in_blacklist)

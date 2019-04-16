@@ -7,9 +7,13 @@ import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +42,7 @@ public class NetworkUtil {
     }
 
     // For GET, DELETE
-    private void requestJson(String url, int method, Listener<String> responseListener,
+    private void requestJson(String url, int method, Listener<JSONObject> responseListener,
                              ErrorListener errorListener) {
         if (method == Method.POST || method == Method.PUT) {
             requestJson(url, method, responseListener, errorListener);
@@ -46,30 +50,25 @@ public class NetworkUtil {
             Log.w(this.getClass().getSimpleName(), errorMsg);
         }
 
-  		StringRequest stringRequest = new StringRequest(method, url, responseListener,
+  		JsonObjectRequest jsonRequest = new JsonObjectRequest(method, url, null, responseListener,
                 errorListener);
-  		queue.add(stringRequest);
+  		queue.add(jsonRequest);
   	}
 
   	// POST, PUT need a mapping
-  	private void requestJson(String url, int method, Listener<String> responseListener,
-                             ErrorListener errorListener, final Map<String, String> params) {
+  	private void requestJson(String url, int method, Listener<JSONObject> responseListener,
+                             ErrorListener errorListener, final Map<String, String> data) {
         if (method == Method.GET || method == Method.DELETE) {
             requestJson(url, method, responseListener, errorListener);
             Log.w(this.getClass().getSimpleName(), "GET or DELETE request sent to wrong method.");
         }
 
-        StringRequest stringRequest = new StringRequest(method, url, responseListener,
-                errorListener) {
-            @Override
-            protected Map<String, String> getParams() {
-                return params;
-            }
-        };
-        queue.add(stringRequest);
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(method, url, new JSONObject(data),
+                responseListener, errorListener);
+        queue.add(jsonRequest);
     }
 
-  	public void createUser(User user, String password, Listener<String> responseListener,
+  	public void createUser(User user, String password, Listener<JSONObject> responseListener,
                            ErrorListener errorListener) {
         Map<String, String> params = new HashMap<>();
         params.put("username", user.getUsername());
