@@ -127,6 +127,7 @@ class FeedObject(db.Model):
     post_id = db.Column(db.String, db.ForeignKey('post.id'), unique=True)
     post = db.relationship('Post', backref='feed')
 
+
     def __init__(self, post, type):
         self.type = self.FEED_HOT
         self.post = post
