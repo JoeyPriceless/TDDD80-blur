@@ -63,7 +63,7 @@ def get_reactions(postid):
 
 @app.route('/user/<userid>')
 def get_user(userid):
-    user = User.query.filter_by(id=userid)
+    user = User.query.filter_by(id=userid).one()
     if user is None:
         return "The given user ID doesn't exist. Requested resource not found.", 404
     return jsonify(user), 200
@@ -73,7 +73,7 @@ def get_user(userid):
 @jwt_required
 def get_user_preference():
     userid = get_raw_jwt()['user_id']
-    prefs = UserPreference.query.filter_by(user=userid)
+    prefs = UserPreference.query.filter_by(user=userid).one()
     if prefs.equals(None):
         return "The token user ID doesn't exist. Requested resource not found.", 404
     return jsonify(prefs), 200
