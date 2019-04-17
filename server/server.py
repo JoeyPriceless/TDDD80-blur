@@ -8,6 +8,7 @@ from flask_jwt_extended import jwt_required, get_raw_jwt, get_jwt_identity
 def reset_db():
     db.drop_all()
     db.create_all()
+    db.session.commit()
 
 @app.route('/feed')
 def get_feed():
@@ -201,5 +202,6 @@ if __name__ == '__main__':
     # TODO remove drop_all.
     db.drop_all()
     db.create_all()
+    db.session.commit()
     app.run()
     jwt.token_in_blacklist_loader(check_if_token_in_blacklist)
