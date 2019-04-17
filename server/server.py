@@ -1,7 +1,8 @@
 from flask import jsonify, request
-from models import User, FeedObject, Blacklisted, Comment, Post, UserPreference, PostReaction, CommentReaction
+from models import User, FeedObject, Blacklisted, Comment, Post, UserPreference, PostReaction, CommentReaction,\
+    UserCredentials
 from __init__ import app, db, jwt
-from flask_jwt_extended import jwt_required, get_raw_jwt, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_raw_jwt
 
 
 def reset_db():
@@ -13,7 +14,7 @@ def reset_db():
 @app.route('/feed')
 def get_feed():
     feed = FeedObject.query.all()
-    if feed.equals(None):
+    if feed is None:
         return plain_response("Feed empty! Requested resource not found."), 404
     return jsonify(feed), 200
 
@@ -21,9 +22,9 @@ def get_feed():
 @app.route('/comments/<postid>')
 def get_comments(postid):
     comments = Comment.query.filter_by(post=postid).all()
-    if comments.equals(None):
+    if comments is None:
         post = Post.query.filter_by(id=postid).one()
-        if post.equals(None):
+        if post is None:
             return plain_response("Given post ID doesn't exist. Requested resource not found."), 404
         return plain_response("Requested post has no comments."), 200
     return jsonify(comments), 200
@@ -32,19 +33,20 @@ def get_comments(postid):
 @app.route('/post/<postid>')
 def get_post(postid):
     post = Post.query.filter_by(id=postid).one()
-    if post.equals(None):
+    if post is None:
         return plain_response("The given post ID doesn't exist. Requested resource not found."), 404
     return jsonify(post.serialize()), 200
+
 
 @app.route('/comments/chain/<commentid>')
 def get_comment_chain(commentid):
     comments = []
     comment = Comment.query.filter_by(id=commentid).one()
-    if comment.equals(None):
+    if comment is None:
         return plain_response("The given comment ID doesn't exist. Requested resource not found."), 404
     while True:
         comment = comment.child
-        if comment.equals(None):
+        if comment is None:
             break
         comments.append(comment)
     if len(comments) == 0:
@@ -55,7 +57,7 @@ def get_comment_chain(commentid):
 @app.route('/post/reactions/<postid>')
 def get_reactions(postid):
     reactions = PostReaction.querry.filter_by(post_id=postid).all()
-    if reactions.equals(None):
+    if reactions is None:
         return plain_response("The given post ID doesn't exist. Requested resource not found."), 404
     return jsonify(reactions), 200
 
@@ -73,7 +75,7 @@ def get_user(userid):
 def get_user_preference():
     userid = get_raw_jwt()['user_id']
     prefs = UserPreference.query.filter_by(user=userid).one()
-    if prefs.equals(None):
+    if prefs is None:
         return plain_response("The token user ID doesn't exist. Requested resource not found."), 404
     return jsonify(prefs), 200
 
@@ -93,8 +95,10 @@ def post_post():
 @jwt_required
 def post_comment():
     content = request.json['content']
+    parent = request.json['parent']
+    post_id = request.json['post_id']
     user_id = get_raw_jwt()['user_id']
-    comment = Comment(user_id, content)
+    comment = Comment(user_id, content, parent, post_id)
     db.session.add(comment)
     db.session.commit()
     return plain_response(comment.id)
@@ -127,7 +131,7 @@ def react_to_comment():
 @app.route('/post/delete/<postid>')
 @jwt_required
 def delete_post(postid):
-    post = Post.query.filter_by(id=get_post).one()
+    post = Post.query.filter_by(id=postid).one()
     if post is None:
         return plain_response("The given post ID doesn't exist. Requested resource not found."), 404
     if post.author != get_raw_jwt()['user_id']:
@@ -175,7 +179,9 @@ def create_user():
     password = request.json['password']
     # TODO make sure credentials are created in User constructor.
     user = User(username, email)
+    credentials = UserCredentials(user, password)
     db.session.add(user)
+    db.session.add(credentials)
     db.session.commit()
     return plain_response(user.id), 200
 
@@ -187,7 +193,7 @@ def logout():
     blacklisted = Blacklisted(jti)
     db.session.add(blacklisted)
     db.session.commit()
-    return '', 200
+    return plain_response(''), 200
 
 
 @jwt.token_in_blacklist_loader
@@ -199,6 +205,10 @@ def check_if_token_in_blacklist(decrypted_token):
 
 def plain_response(string):
     return jsonify({"response": string})
+
+
+def serialize_list(lst):
+    return [element.serialize() for element in lst]
 
 
 if __name__ == '__main__':

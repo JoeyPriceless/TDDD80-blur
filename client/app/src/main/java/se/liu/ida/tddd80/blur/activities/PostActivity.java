@@ -1,5 +1,6 @@
 package se.liu.ida.tddd80.blur.activities;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -13,33 +14,29 @@ import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.models.Post;
 import se.liu.ida.tddd80.blur.models.User;
 import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
+import se.liu.ida.tddd80.blur.utilities.StringUtil;
 
 
 public class PostActivity extends AppCompatActivity {
+    private final String TAG = getClass().getSimpleName();
 	private Post post;
 
 	@Override protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_post);
-
-        String username = "testuser";
-        String email = "test@test.com";
-        String password = "password123";
-
-        User user = new User(username, email);
-
-        NetworkUtil netUtil = NetworkUtil.getInstance(this);
-
-        netUtil.createUser(user, password, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                Log.i(getClass().getSimpleName(), "Create user successful. Response: " + response.toString());
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.i(getClass().getSimpleName(), "Create user unsuccessful. Error: " + error);
-            }
-        });
 	}
+
+	private class userResponseListener implements Response.Listener<JSONObject> {
+        @Override
+        public void onResponse(JSONObject response) {
+
+        }
+    }
+
+    private class userResponseErrorListener implements Response.ErrorListener {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+
+        }
+    }
 }

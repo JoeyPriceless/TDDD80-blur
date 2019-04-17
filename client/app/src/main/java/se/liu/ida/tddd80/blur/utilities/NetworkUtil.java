@@ -8,7 +8,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -20,6 +19,8 @@ import java.util.Map;
 
 import se.liu.ida.tddd80.blur.models.Feed;
 import se.liu.ida.tddd80.blur.models.FeedType;
+import se.liu.ida.tddd80.blur.models.Post;
+import se.liu.ida.tddd80.blur.models.ReactionType;
 import se.liu.ida.tddd80.blur.models.User;
 
 // Singleton Volley class as recommended in docs.
@@ -75,19 +76,64 @@ public class NetworkUtil {
         params.put("email", user.getEmail());
         params.put("password", password);
 
-        requestJson(Url.build(Url.CREATE_USER), Method.POST, responseListener,
+        requestJson(Url.build(Url.USER_CREATE), Method.POST, responseListener,
                     errorListener, params);
     }
 
-    public Feed getFeed(FeedType type, Listener<String> responseListener, ErrorListener
+    public void getUser(String id, Listener<JSONObject> responseListener,
+                        ErrorListener errorListener) {
+        String url = Url.build(Url.USER_GET).concat(id);
+        requestJson(url, Method.GET, responseListener, errorListener);
+    }
+
+    public void createPost(Post post, Listener<JSONObject> responseListener,
+                               ErrorListener errorListener) {
+        Map<String, String> params = new HashMap<>();
+            params.put("content", post.getContent());
+            params.put("user_id", post.getAuthor().getId());
+        requestJson(Url.build(Url.POST_CREATE), Method.POST, responseListener,
+                            errorListener, params);
+    }
+
+    public void getPost(String id, Listener<JSONObject> responseListener,
+                            ErrorListener errorListener) {
+        String url = Url.build(Url.POST_GET).concat(id);
+        requestJson(url, Method.GET, responseListener, errorListener);
+    }
+
+    public void getReactions(String postId, Listener<JSONObject> responseListener,
+                                ErrorListener errorListener) {
+        String url = Url.build(Url.POST_REACTIONS_GET).concat(postId);
+        requestJson(url, Method.GET, responseListener, errorListener);
+    }
+
+    public void reactToPost(Post post, ReactionType reaction, Listener<JSONObject> responseListener,
+                                    ErrorListener errorListener) {
+        Map<String, String> params = new HashMap<>();
+                    params.put("post_id", post.getId());
+                    params.put("user_id", post.getAuthor().getId());
+                    params.put("reaction", String.valueOf(reaction.ordinal()));
+        requestJson(Url.build(Url.POST_REACTIONS_ADD), Method.POST, responseListener,
+                                    errorListener, params);
+    }
+
+    public void getFeed(FeedType type, Listener<JSONObject> responseListener, ErrorListener
             errorListener) {
-        // TODO fetch from server
-        return new Feed(type);
+        String url = Url.build(Url.FEED_GET).concat(type.toString().toLowerCase());
+        requestJson(url, Method.GET, responseListener, errorListener);
     }
 
     private enum Url {
         ROOT("https://tddd80-server.herokuapp.com"),
-        CREATE_USER("/user");
+        USER_CREATE("/user"),
+        USER_GET("/user/"),
+        POST_CREATE("/post"),
+        POST_GET("/post/"),
+        POST_REACTIONS_ADD("/post/reactions"),
+        POST_REACTIONS_GET("/post/reactions/"),
+        FEED_GET("/feed/");
+
+
 
         private String address;
 
