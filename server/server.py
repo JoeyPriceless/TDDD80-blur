@@ -4,6 +4,7 @@ from __init__ import app, db, jwt
 from flask_jwt_extended import jwt_required, get_raw_jwt, get_jwt_identity
 
 
+
 def reset_db():
     db.drop_all()
     db.create_all()
@@ -116,7 +117,7 @@ def react_to_post():
 def react_to_comment():
     reaction = request.json['reaction']
     comment_id = request.json['comment']
-    user_id = get_raw_jwt()['user_id']
+    user_id = get_raw_jwt()['user']
     comment_reaction = CommentReaction(comment_id, user_id, reaction)
     db.session.add(comment_reaction)
     db.session.commit()
@@ -131,6 +132,23 @@ def delete_post(postid):
         return "The given post ID doesn't exist. Requested resource not found.", 404
     if post.author != get_raw_jwt()['user_id']:
         return "User is not author of specified post. Permission denied.", 403
+    post.kill_children(db)
+    db.session.delete(post)
+    db.session.commit()
+
+
+@app.route('/comment/delete/<commentid>')
+@jwt_required
+def delete_comment(commentid):
+    comment = Comment.querry.filter_by(id=commentid).one()
+    if comment is None:
+        return "The given post ID doesn't exist. Requested resource not found.", 404
+    if comment.author != get_raw_jwt()['user_id']:
+        return "User is not author of specified post. Permission denied.", 403
+    comment.kill_children(db)
+    db.session.delete(comment)
+    db.session.push()
+
 
 # TODO Formate login logout functions with new models.
 @app.route('/user/login', methods=["POST"])

@@ -1,6 +1,9 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
+from rq import Queue
+from redis import Redis
+
 import os
 
 
@@ -25,3 +28,7 @@ app.config['JWT_BLACKLIST_ENABLED'] = True
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
+
+redis_conn = Redis()
+q = Queue(connection=redis_conn)
+

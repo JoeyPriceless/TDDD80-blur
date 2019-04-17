@@ -43,10 +43,16 @@ class Post(db.Model):
         comments = Comment.query.filter_by(post_id=self.id).all()
         for comment in comments:
             comment.kill_children(db)
-        reactions = PostReaction.query.filter_by(post_id=self.id).all()
-        db.session.delete(comments)
-        db.session.delete(reactions)
+        # TODO: TAKE A LOOK AT THIS
+        db.session.query(Comment).filter(Comment.id == self.id).delete()
+        db.session.query(PostReaction).filter(PostReaction.post_id == self.id).delete()
         db.session.commit()
+        
+    def reaction_count(self, reaction_type):
+        sq = db.session.query(PostReaction).count(PostReaction.post_id).label('count') \
+            .group_by(PostReaction.post_id).subquery()
+        result = db.session.query(Post, sq.c.count)\
+            .join(sq, sq.c.post_id == Post.id, sq.c.reaction_type == reaction_type).all()
 
     def serialize(self):
         return{
@@ -61,22 +67,22 @@ class PostReaction(db.Model):
     id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
     post_id = db.Column(db.String, db.ForeignKey('post.id'), unique=True, nullable=False)
     user_id = db.Column(db.String, db.ForeignKey('user.id'), unique=True, nullable=False)
-    vote_type = db.Column(db.Integer, nullable=False)
+    reaction_type = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, post_id, user_id, vote_type):
+    def __init__(self, post_id, user_id, reaction_type):
         self.post_id = post_id
         self.user_id = user_id
-        if vote_type > 6 or vote_type < 0:
-            self.vote_type = 0
+        if reaction_type > 6 or reaction_type < 0:
+            self.reaction_type = 0
         else:
-            self.vote_type = vote_type
+            self.reaction_type = reaction_type
 
     def serialize(self):
         return {
             'id': self.id,
             'post_id': self.post_id,
             'user_id': self.user_id,
-            'vote_type': self.vote_type,
+            'reaction_type': self.reaction_type,
         }
 
 
@@ -84,22 +90,22 @@ class CommentReaction(db.Model):
     id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
     comment_id = db.Column(db.String, db.ForeignKey('post.id'), unique=True, nullable=False)
     user_id = db.Column(db.String, db.ForeignKey('user.id'), unique=True, nullable=False)
-    vote_type = db.Column(db.Integer, nullable=False)
+    reaction_type = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, post_id, user_id, vote_type):
+    def __init__(self, post_id, user_id, reaction_type):
         self.post_id = post_id
         self.user_id = user_id
-        if vote_type > 1 or vote_type < 0:
-            self.vote_type = 0
+        if reaction_type > 1 or reaction_type < 0:
+            self.reaction_type = 0
         else:
-            self.vote_type = vote_type
+            self.reaction_type = reaction_type
 
     def serialize(self):
         return {
             'id': self.id,
             'comment_id': self.comment_id,
             'user_id': self.user_id,
-            'vote_type': self.vote_type,
+            'reaction_type': self.reaction_type,
         }
 
 
@@ -142,6 +148,10 @@ class Comment(db.Model):
 
     def get_reactions(self):
         return CommentReaction.query.filter_by(comment_id=self.id).all()
+
+    def kill_children(self, db):
+        db.session.query(CommentReaction).filter(CommentReaction.id == self.id).delete()
+        db.session.commit()
 
     def serialize(self):
         return {
