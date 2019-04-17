@@ -120,17 +120,22 @@ class CommentReaction(db.Model):
 
 class FeedObject(db.Model):
     __tablename__ = "feed"
+    FEED_HOT = "HOT"
+
     id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
+    type = db.Column(db.String, nullable=False)
     post_id = db.Column(db.String, db.ForeignKey('post.id'), unique=True)
     post = db.relationship('Post', backref='feed')
 
-    def __init__(self, post):
+    def __init__(self, post, type):
+        self.type = self.FEED_HOT
         self.post = post
         self.post_id = post.id
 
     def serialize(self):
         return {
             'id': self.id,
+            'type': self.type,
             'post': self.post,
         }
 
