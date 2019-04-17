@@ -29,6 +29,10 @@ public class NetworkUtil {
     private RequestQueue queue;
     private Gson gson;
 
+    public Gson getGson() {
+        return gson;
+    }
+
     private NetworkUtil(Context context) {
         // Application context to make it last throughout app lifetime.
         this.queue = Volley.newRequestQueue(context.getApplicationContext());
@@ -101,6 +105,12 @@ public class NetworkUtil {
         requestJson(url, Method.GET, responseListener, errorListener);
     }
 
+    public void getPostWithExtras(String id, Listener<JSONObject> responseListener,
+                                ErrorListener errorListener) {
+        String url = Url.build(Url.POST_GET_EXTRAS).concat(id);
+        requestJson(url, Method.GET, responseListener, errorListener);
+    }
+
     public void getReactions(String postId, Listener<JSONObject> responseListener,
                                 ErrorListener errorListener) {
         String url = Url.build(Url.POST_REACTIONS_GET).concat(postId);
@@ -129,6 +139,7 @@ public class NetworkUtil {
         USER_GET("/user/"),
         POST_CREATE("/post"),
         POST_GET("/post/"),
+        POST_GET_EXTRAS("post/extras/"),
         POST_REACTIONS_ADD("/post/reactions"),
         POST_REACTIONS_GET("/post/reactions/"),
         FEED_GET("/feed/");

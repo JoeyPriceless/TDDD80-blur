@@ -1,16 +1,23 @@
 package se.liu.ida.tddd80.blur.models;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.time.LocalDateTime;
 
 public class Post {
     private String id;
     private User author;
     private String content;
+    @SerializedName("timestamp")
     private LocalDateTime timeCreated; // Check json compatibility
     private Reactions reactions;
 
     public User getAuthor() {
         return author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
     }
 
     public String getContent() {

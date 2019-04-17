@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Blur</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- Intent extras -->
+    <string name="extra_post_id">POST_ID</string>
 </resources>
