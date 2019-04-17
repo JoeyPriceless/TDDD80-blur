@@ -37,6 +37,18 @@ def get_post(postid):
         return plain_response("The given post ID doesn't exist. Requested resource not found."), 404
     return jsonify(post.serialize()), 200
 
+app.route('/post/extras/<postid>')
+def get_post_with_extras(postid):
+    post = Post.query.filter_by(id=postid).one()
+    author = User.query.filter_by(id=post.author_id).one()
+    reactions = get_reactions(postid)
+
+    # serialized for easier gson handling according to https://stackoverflow.com/a/39320732/4400799
+    return jsonify({
+        'post': post.serialize(),
+        'author': author.serialize(),
+        'reactions': reactions
+    }), 200
 
 @app.route('/comments/chain/<commentid>')
 def get_comment_chain(commentid):
