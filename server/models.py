@@ -2,6 +2,8 @@ from __init__ import db, app
 import uuid
 import datetime
 
+from werkzeug.security import check_password_hash
+
 
 class User(db.Model):
     id = db.Column(db.String, unique=True, primary_key=True)
@@ -179,6 +181,7 @@ class UserPreference(db.Model):
 
 class UserCredentials(db.Model):
     id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
+    user_id = db.Column(db.String, db.ForeignKey('user.id'), unique=True)
     user = db.relationship('User', backref='usercredentials')
     password = db.Column(db.String, nullable=False)
 
