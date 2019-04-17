@@ -64,7 +64,7 @@ def get_reactions(postid):
 @app.route('/user/<userid>')
 def get_user(userid):
     user = User.query.filter_by(id=userid)
-    if user.equals(None):
+    if user is None:
         return "The given user ID doesn't exist. Requested resource not found.", 404
     return jsonify(user), 200
 

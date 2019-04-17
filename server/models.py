@@ -110,7 +110,7 @@ class CommentReaction(db.Model):
 
 
 class FeedObject(db.Model):
-    __tablename__ = "Feed"
+    __tablename__ = "feed"
     id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
     post_id = db.Column(db.String, db.ForeignKey('post.id'), unique=True)
     #post = db.relationship('Post', backref='feed')
