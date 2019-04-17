@@ -34,7 +34,7 @@ def get_post(postid):
     post = Post.query.filter_by(id=postid).one()
     if post.equals(None):
         return "The given post ID doesn't exist. Requested resource not found.", 404
-    return jsonify(post), 200
+    return jsonify(post.serialize()), 200
 
 
 @app.route('/comments/chain/<commentid>')
@@ -66,7 +66,7 @@ def get_user(userid):
     user = User.query.filter_by(id=userid).one()
     if user is None:
         return "The given user ID doesn't exist. Requested resource not found.", 404
-    return jsonify(user), 200
+    return jsonify(user.serialize()), 200
 
 
 @app.route('/user/pref/')
