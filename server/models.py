@@ -1,8 +1,9 @@
-from __init__ import db, app
+from __init__ import db
 import uuid
 import datetime
 
-from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_jwt_extended import create_access_token
 
 
 class User(db.Model):
@@ -17,6 +18,11 @@ class User(db.Model):
         self.email = email
         if picture_path:
             self.picture_path = picture_path
+
+    def generate_auth_token(self):
+        expires = datetime.timedelta(weeks=1)
+        token = create_access_token(self.id, expires_delta=expires)
+        return {'token': token}
 
     def serialize(self):
         return {
@@ -41,20 +47,21 @@ class Post(db.Model):
     def get_reactions(self):
         return PostReaction.query.filter_by(post_id=self.id).all()
 
-    def kill_children(self, db):
+    def kill_children(self, temp_db):
         comments = Comment.query.filter_by(post_id=self.id).all()
         for comment in comments:
-            comment.kill_children(db)
+            comment.kill_children(temp_db)
         # TODO: TAKE A LOOK AT THIS
-        db.session.query(Comment).filter(Comment.id == self.id).delete()
-        db.session.query(PostReaction).filter(PostReaction.post_id == self.id).delete()
-        db.session.commit()
+        temp_db.session.query(Comment).filter(Comment.id == self.id).delete()
+        temp_db.session.query(PostReaction).filter(PostReaction.post_id == self.id).delete()
+        temp_db.session.commit()
         
     def reaction_count(self, reaction_type):
         sq = db.session.query(PostReaction).count(PostReaction.post_id).label('count') \
             .group_by(PostReaction.post_id).subquery()
         result = db.session.query(Post, sq.c.count)\
-            .join(sq, sq.c.post_id == Post.id, sq.c.reaction_type == reaction_type).all()
+            .join(sq, sq.c.post_id == self.id, sq.c.reaction_type == reaction_type).all()
+        return result
 
     def serialize(self):
         return{
@@ -115,10 +122,10 @@ class FeedObject(db.Model):
     __tablename__ = "feed"
     id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
     post_id = db.Column(db.String, db.ForeignKey('post.id'), unique=True)
-    #post = db.relationship('Post', backref='feed')
+    post = db.relationship('Post', backref='feed')
 
     def __init__(self, post):
-        #self.post = post
+        self.post = post
         self.post_id = post.id
 
     def serialize(self):
@@ -135,7 +142,7 @@ class Comment(db.Model):
     downvotes = db.Column(db.Integer, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
     content = db.Column(db.String, nullable=False)
-    #parent = db.relationship('Comment', backref='child')
+    parent = db.relationship('Comment', backref='child')
     post_id = db.Column(db.String, db.ForeignKey('post.id'))
 
     def __init__(self, author, content, parent, post_id):
@@ -145,15 +152,15 @@ class Comment(db.Model):
         self.downvotes = 0
         self.timestamp = datetime.datetime.now()
         self.content = content
-        #self.parent = parent
+        self.parent = parent
         self.post_id = post_id
 
     def get_reactions(self):
         return CommentReaction.query.filter_by(comment_id=self.id).all()
 
-    def kill_children(self, db):
-        db.session.query(CommentReaction).filter(CommentReaction.id == self.id).delete()
-        db.session.commit()
+    def kill_children(self, temp_db):
+        temp_db.session.query(CommentReaction).filter(CommentReaction.id == self.id).delete()
+        temp_db.session.commit()
 
     def serialize(self):
         return {
@@ -186,13 +193,13 @@ class UserCredentials(db.Model):
     password = db.Column(db.String, nullable=False)
 
     def __init__(self, user, password):
+        self.user_id = user.id
         self.user = user
         # TODO: Hash password and stuff
-        self.password = password
+        self.password = generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.password, password)
-
 
 
 class Blacklisted(db.Model):
