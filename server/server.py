@@ -4,17 +4,17 @@ from __init__ import app, db, jwt
 from flask_jwt_extended import jwt_required, get_raw_jwt, get_jwt_identity
 
 
-
 def reset_db():
     db.drop_all()
     db.create_all()
     db.session.commit()
 
+
 @app.route('/feed')
 def get_feed():
     feed = FeedObject.query.all()
     if feed.equals(None):
-        return "Feed empty! Requested resource not found.", 404
+        return plain_response("Feed empty! Requested resource not found."), 404
     return jsonify(feed), 200
 
 
@@ -24,8 +24,8 @@ def get_comments(postid):
     if comments.equals(None):
         post = Post.query.filter_by(id=postid).one()
         if post.equals(None):
-            return "Given post ID doesn't exist. Requested resource not found.", 404
-        return "Requested post has no comments.", 200
+            return plain_response("Given post ID doesn't exist. Requested resource not found."), 404
+        return plain_response("Requested post has no comments."), 200
     return jsonify(comments), 200
 
 
@@ -33,23 +33,22 @@ def get_comments(postid):
 def get_post(postid):
     post = Post.query.filter_by(id=postid).one()
     if post.equals(None):
-        return "The given post ID doesn't exist. Requested resource not found.", 404
+        return plain_response("The given post ID doesn't exist. Requested resource not found."), 404
     return jsonify(post.serialize()), 200
-
 
 @app.route('/comments/chain/<commentid>')
 def get_comment_chain(commentid):
     comments = []
     comment = Comment.query.filter_by(id=commentid).one()
     if comment.equals(None):
-        return "The given comment ID doesn't exist. Requested resource not found.", 404
+        return plain_response("The given comment ID doesn't exist. Requested resource not found."), 404
     while True:
         comment = comment.child
         if comment.equals(None):
             break
         comments.append(comment)
     if len(comments) == 0:
-        return "The given comment has no children. Requested resource not found.", 404
+        return plain_response("The given comment has no children. Requested resource not found."), 404
     return jsonify(comments), 200
 
 
@@ -57,7 +56,7 @@ def get_comment_chain(commentid):
 def get_reactions(postid):
     reactions = PostReaction.querry.filter_by(post_id=postid).all()
     if reactions.equals(None):
-        return "The given post ID doesn't exist. Requested resource not found.", 404
+        return plain_response("The given post ID doesn't exist. Requested resource not found."), 404
     return jsonify(reactions), 200
 
 
@@ -65,7 +64,7 @@ def get_reactions(postid):
 def get_user(userid):
     user = User.query.filter_by(id=userid).one()
     if user is None:
-        return "The given user ID doesn't exist. Requested resource not found.", 404
+        return plain_response("The given user ID doesn't exist. Requested resource not found."), 404
     return jsonify(user.serialize()), 200
 
 
@@ -75,7 +74,7 @@ def get_user_preference():
     userid = get_raw_jwt()['user_id']
     prefs = UserPreference.query.filter_by(user=userid).one()
     if prefs.equals(None):
-        return "The token user ID doesn't exist. Requested resource not found.", 404
+        return plain_response("The token user ID doesn't exist. Requested resource not found."), 404
     return jsonify(prefs), 200
 
 
@@ -87,7 +86,7 @@ def post_post():
     post = Post(user_id, content)
     db.session.add(post)
     db.session.commit()
-    return str(post.id)
+    return plain_response(post.id)
 
 
 @app.route('/comment', methods=['POST'])
@@ -98,7 +97,7 @@ def post_comment():
     comment = Comment(user_id, content)
     db.session.add(comment)
     db.session.commit()
-    return str(comment.id)
+    return plain_response(comment.id)
 
 
 @app.route('/post/react', methods=['POST'])
@@ -110,7 +109,7 @@ def react_to_post():
     post_reaction = PostReaction(post_id, user_id, reaction)
     db.session.add(post_reaction)
     db.session.commit()
-    return str(post_reaction.id)
+    return plain_response(post_reaction.id)
 
 
 @app.route('/comment/react', methods=['POST'])
@@ -122,7 +121,7 @@ def react_to_comment():
     comment_reaction = CommentReaction(comment_id, user_id, reaction)
     db.session.add(comment_reaction)
     db.session.commit()
-    return str(comment_reaction.id)
+    return plain_response(comment_reaction.id)
 
 
 @app.route('/post/delete/<postid>')
@@ -130,9 +129,9 @@ def react_to_comment():
 def delete_post(postid):
     post = Post.query.filter_by(id=get_post).one()
     if post is None:
-        return "The given post ID doesn't exist. Requested resource not found.", 404
+        return plain_response("The given post ID doesn't exist. Requested resource not found."), 404
     if post.author != get_raw_jwt()['user_id']:
-        return "User is not author of specified post. Permission denied.", 403
+        return plain_response("User is not author of specified post. Permission denied."), 403
     post.kill_children(db)
     db.session.delete(post)
     db.session.commit()
@@ -143,9 +142,9 @@ def delete_post(postid):
 def delete_comment(commentid):
     comment = Comment.querry.filter_by(id=commentid).one()
     if comment is None:
-        return "The given post ID doesn't exist. Requested resource not found.", 404
+        return plain_response("The given post ID doesn't exist. Requested resource not found."), 404
     if comment.author != get_raw_jwt()['user_id']:
-        return "User is not author of specified post. Permission denied.", 403
+        return plain_response("User is not author of specified post. Permission denied."), 403
     comment.kill_children(db)
     db.session.delete(comment)
     db.session.push()
@@ -162,23 +161,23 @@ def login():
         value['user_id'] = user.id
         return jsonify(value)
     else:
-        return 'Incorrect password or email', 409
+        return plain_response('Incorrect password or email'), 409
 
 
 @app.route('/user', methods=["POST"])
 def create_user():
-    username = request. json['username']
+    username = request.json['username']
     email = request.json['email']
     if User.query.filter_by(username=username).scalar() is not None:
-        return 'Username already exists', 409
+        return plain_response('Username already exists'), 409
     if User.query.filter_by(email=email).scalar() is not None:
-        return 'Email already exists', 409
+        return plain_response('Email already exists'), 409
     password = request.json['password']
     # TODO make sure credentials are created in User constructor.
     user = User(username, email)
     db.session.add(user)
     db.session.commit()
-    return str(user.id), 200
+    return plain_response(user.id), 200
 
 
 @app.route('/user/logout', methods=["POST"])
@@ -196,6 +195,10 @@ def check_if_token_in_blacklist(decrypted_token):
     jti = decrypted_token['jti']
     result = Blacklisted.query.filter_by(token_identifier=jti).scalar()
     return result is not None
+
+
+def plain_response(string):
+    return jsonify({"response": string})
 
 
 if __name__ == '__main__':

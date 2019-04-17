@@ -177,6 +177,21 @@ class UserPreference(db.Model):
         self.locale = locale
 
 
+class UserCredentials(db.Model):
+    id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
+    user = db.relationship('User', backref='usercredentials')
+    password = db.Column(db.String, nullable=False)
+
+    def __init__(self, user, password):
+        self.user = user
+        # TODO: Hash password and stuff
+        self.password = password
+
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
+
+
+
 class Blacklisted(db.Model):
     id = db.Column(db.Integer, unique=True, autoincrement=True, primary_key=True)
     token_identifier = db.Column(db.String, unique=True)
