@@ -188,12 +188,16 @@ def login():
     email = request.json['email']
     password = request.json['password']
     user = User.query.filter_by(email=email).scalar()
-    if user is not None and user.check_password(password):
+    if user is not None:
+        credentials = UserCredentials.query.filter_by(user_id=user.id).scalar()
+    else:
+        return plain_response('Incorrect password or email'), 409
+    if credentials is not None and credentials.check_password(password):
         value = user.generate_auth_token()
         value['user_id'] = user.id
         return jsonify(value)
     else:
-        return plain_response('Incorrect password or email'), 409
+        return plain_response('Incorrect password or email'), 500
 
 
 @app.route('/user/logout', methods=["POST"])
