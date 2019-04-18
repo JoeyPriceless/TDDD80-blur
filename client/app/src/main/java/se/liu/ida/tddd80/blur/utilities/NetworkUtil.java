@@ -10,14 +10,12 @@ import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import se.liu.ida.tddd80.blur.models.Feed;
 import se.liu.ida.tddd80.blur.models.FeedType;
 import se.liu.ida.tddd80.blur.models.Post;
 import se.liu.ida.tddd80.blur.models.ReactionType;
@@ -28,9 +26,14 @@ public class NetworkUtil {
     private static NetworkUtil instance;
     private RequestQueue queue;
     private Gson gson;
+    private String token;
 
     public Gson getGson() {
         return gson;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     private NetworkUtil(Context context) {
@@ -46,21 +49,29 @@ public class NetworkUtil {
         return instance;
     }
 
-    // For GET, DELETE
+    private Map<String, String> getHeadersAuth() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "application/json");
+        // Only send authorization if there is a token.
+        if (token != null && token.isEmpty())
+            headers.put("Authorization", "Bearer ".concat(token));
+        return headers;
+    }
+
+    // For methods without body (GET, DELETE)
     private void requestJson(String url, int method, Listener<JSONObject> responseListener,
                              ErrorListener errorListener) {
-        if (method == Method.POST || method == Method.PUT) {
-            requestJson(url, method, responseListener, errorListener);
-            String errorMsg = "GET or DELETE request sent without map";
-            Log.w(this.getClass().getSimpleName(), errorMsg);
-        }
-
   		JsonObjectRequest jsonRequest = new JsonObjectRequest(method, url, null, responseListener,
-                errorListener);
+                errorListener) {
+            @Override
+            public Map<String, String> getHeaders() {
+                return getHeadersAuth();
+            }
+        };
   		queue.add(jsonRequest);
   	}
 
-  	// POST, PUT need a mapping
+  	// For methods with body (POST, PUT)
   	private void requestJson(String url, int method, Listener<JSONObject> responseListener,
                              ErrorListener errorListener, final Map<String, String> data) {
         if (method == Method.GET || method == Method.DELETE) {
@@ -69,8 +80,26 @@ public class NetworkUtil {
         }
 
         JsonObjectRequest jsonRequest = new JsonObjectRequest(method, url, new JSONObject(data),
-                responseListener, errorListener);
+                responseListener, errorListener) {
+            @Override
+            public Map<String, String> getHeaders() {
+                return getHeadersAuth();
+            }
+        };
         queue.add(jsonRequest);
+    }
+
+    public void login(User user, String password, Listener<JSONObject> responseListener,
+                       ErrorListener errorListener) {
+        Map<String, String> params = new HashMap<>();
+        params.put("email", user.getEmail());
+        params.put("password", password);
+
+        requestJson(Url.build(Url.USER_LOGIN), Method.POST, responseListener, errorListener, params);
+    }
+
+    public void logout(Listener<JSONObject> responseListener, ErrorListener errorListener) {
+        requestJson(Url.build(Url.USER_LOGOUT), Method.POST, responseListener, errorListener);
     }
 
   	public void createUser(User user, String password, Listener<JSONObject> responseListener,
@@ -86,8 +115,7 @@ public class NetworkUtil {
 
     public void getUser(String id, Listener<JSONObject> responseListener,
                         ErrorListener errorListener) {
-        String url = Url.build(Url.USER_GET).concat(id);
-        requestJson(url, Method.GET, responseListener, errorListener);
+        requestJson(Url.build(Url.USER_GET, id), Method.GET, responseListener, errorListener);
     }
 
     public void createPost(Post post, Listener<JSONObject> responseListener,
@@ -101,20 +129,18 @@ public class NetworkUtil {
 
     public void getPost(String id, Listener<JSONObject> responseListener,
                             ErrorListener errorListener) {
-        String url = Url.build(Url.POST_GET).concat(id);
-        requestJson(url, Method.GET, responseListener, errorListener);
+        requestJson(Url.build(Url.POST_GET, id), Method.GET, responseListener, errorListener);
     }
 
     public void getPostWithExtras(String id, Listener<JSONObject> responseListener,
                                 ErrorListener errorListener) {
-        String url = Url.build(Url.POST_GET_EXTRAS).concat(id);
-        requestJson(url, Method.GET, responseListener, errorListener);
+        requestJson(Url.build(Url.POST_GET_EXTRAS, id), Method.GET, responseListener, errorListener);
     }
 
     public void getReactions(String postId, Listener<JSONObject> responseListener,
                                 ErrorListener errorListener) {
-        String url = Url.build(Url.POST_REACTIONS_GET).concat(postId);
-        requestJson(url, Method.GET, responseListener, errorListener);
+        requestJson(Url.build(Url.POST_REACTIONS_GET, postId), Method.GET, responseListener,
+                errorListener);
     }
 
     public void reactToPost(Post post, ReactionType reaction, Listener<JSONObject> responseListener,
@@ -129,22 +155,21 @@ public class NetworkUtil {
 
     public void getFeed(FeedType type, Listener<JSONObject> responseListener, ErrorListener
             errorListener) {
-        String url = Url.build(Url.FEED_GET).concat(type.toString().toLowerCase());
-        requestJson(url, Method.GET, responseListener, errorListener);
+        requestJson(Url.build(Url.FEED_GET, type.toString().toLowerCase()), Method.GET, responseListener, errorListener);
     }
 
     private enum Url {
         ROOT("https://tddd80-server.herokuapp.com"),
+        USER_LOGIN("/user/login"),
+        USER_LOGOUT("/user/logout"),
         USER_CREATE("/user"),
         USER_GET("/user/"),
         POST_CREATE("/post"),
         POST_GET("/post/"),
-        POST_GET_EXTRAS("post/extras/"),
+        POST_GET_EXTRAS("/post/extras/"),
         POST_REACTIONS_ADD("/post/reactions"),
         POST_REACTIONS_GET("/post/reactions/"),
         FEED_GET("/feed/");
-
-
 
         private String address;
 
@@ -152,12 +177,19 @@ public class NetworkUtil {
             this.address = address;
         }
 
-        public static String build(Url... urls) {
+
+
+        public static String build(Object... elements) {
             StringBuilder address = new StringBuilder(Url.ROOT.address);
-            for (Url url : urls) {
-                address.append(url.address);
+            for (Object o : elements) {
+                address.append(o.toString());
             }
             return address.toString();
+        }
+
+        @Override
+        public String toString() {
+            return address;
         }
     }
 }
