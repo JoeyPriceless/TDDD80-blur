@@ -40,7 +40,7 @@ def get_post(postid):
 def get_post_with_extras(postid):
     post = Post.query.filter_by(id=postid).one()
     author = User.query.filter_by(id=post.author_id).one()
-    reactions = get_reactions(postid)
+    reactions = serialize_list(PostReaction.query.filter_by(post_id=postid).all())
 
     # serialized for easier gson handling according to https://stackoverflow.com/a/39320732/4400799
     return jsonify({
