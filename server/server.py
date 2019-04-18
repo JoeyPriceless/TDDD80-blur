@@ -84,7 +84,7 @@ def get_user(userid):
 @app.route('/user/pref/')
 @jwt_required
 def get_user_preference():
-    userid = get_raw_jwt()['user_id']
+    userid = get_raw_jwt()['identity']
     prefs = UserPreference.query.filter_by(user=userid).one()
     if prefs is None:
         return plain_response("The token user ID doesn't exist. Requested resource not found."), 404
@@ -95,7 +95,7 @@ def get_user_preference():
 @jwt_required
 def create_post():
     content = request.json['content']
-    user_id = get_raw_jwt()['user_id']
+    user_id = get_raw_jwt()['identity']
     post = Post(user_id, content)
     db.session.add(post)
     db.session.commit()
@@ -108,7 +108,7 @@ def post_comment():
     content = request.json['content']
     parent = request.json['parent']
     post_id = request.json['post_id']
-    user_id = get_raw_jwt()['user_id']
+    user_id = get_raw_jwt()['identity']
     # TODO: Needs to be able to handle posting comments without a parent comment.
     comment = Comment(user_id, content, parent, post_id)
     db.session.add(comment)
@@ -121,7 +121,7 @@ def post_comment():
 def react_to_post():
     reaction = int(request.json['reaction'])
     post_id = request.json['post_id']
-    user_id = get_raw_jwt()['user_id']
+    user_id = get_raw_jwt()['identity']
     post_reaction = PostReaction(post_id, user_id, reaction)
     db.session.add(post_reaction)
     db.session.commit()
@@ -146,7 +146,7 @@ def delete_post(postid):
     post = Post.query.filter_by(id=postid).one()
     if post is None:
         return plain_response("The given post ID doesn't exist. Requested resource not found."), 404
-    if post.author != get_raw_jwt()['user_id']:
+    if post.author != get_raw_jwt()['identity']:
         return plain_response("User is not author of specified post. Permission denied."), 403
     post.kill_children(db)
     db.session.delete(post)
@@ -159,7 +159,7 @@ def delete_comment(commentid):
     comment = Comment.query.filter_by(id=commentid).one()
     if comment is None:
         return plain_response("The given post ID doesn't exist. Requested resource not found."), 404
-    if comment.author != get_raw_jwt()['user_id']:
+    if comment.author != get_raw_jwt()['identity']:
         return plain_response("User is not author of specified post. Permission denied."), 403
     comment.kill_children(db)
     db.session.delete(comment)
