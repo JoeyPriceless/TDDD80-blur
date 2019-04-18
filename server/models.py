@@ -142,8 +142,9 @@ class Comment(db.Model):
     downvotes = db.Column(db.Integer, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
     content = db.Column(db.String, nullable=False)
+    parent_id = db.Column(db.String, db.ForeignKey('comment.id'), unique=False)
     parent = db.relationship('Comment', backref='child')
-    post_id = db.Column(db.String, db.ForeignKey('post.id'))
+    post_id = db.Column(db.String, db.ForeignKey('post.id'), nullable=False)
 
     def __init__(self, author, content, parent, post_id):
         self.id = uuid.uuid4().hex

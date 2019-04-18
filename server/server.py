@@ -1,6 +1,5 @@
 from flask import jsonify, request
-from models import User, FeedObject, Blacklisted, Comment, Post, UserPreference, PostReaction, CommentReaction,\
-    UserCredentials
+from models import *
 from __init__ import app, db, jwt
 from flask_jwt_extended import jwt_required, get_raw_jwt
 
@@ -98,6 +97,7 @@ def post_comment():
     parent = request.json['parent']
     post_id = request.json['post_id']
     user_id = get_raw_jwt()['user_id']
+    # TODO: Needs to be able to handle posting comments without a parent comment.
     comment = Comment(user_id, content, parent, post_id)
     db.session.add(comment)
     db.session.commit()
@@ -154,7 +154,23 @@ def delete_comment(commentid):
     db.session.push()
 
 
-# TODO Formate login logout functions with new models.
+@app.route('/user', methods=["POST"])
+def create_user():
+    username = request.json['username']
+    email = request.json['email']
+    if User.query.filter_by(username=username).scalar() is not None:
+        return plain_response('Username already exists'), 409
+    if User.query.filter_by(email=email).scalar() is not None:
+        return plain_response('Email already exists'), 409
+    password = request.json['password']
+    user = User(username, email)
+    credentials = UserCredentials(user, password)
+    db.session.add(user)
+    db.session.add(credentials)
+    db.session.commit()
+    return plain_response(user.id), 200
+
+
 @app.route('/user/login', methods=["POST"])
 def login():
     email = request.json['email']
@@ -166,24 +182,6 @@ def login():
         return jsonify(value)
     else:
         return plain_response('Incorrect password or email'), 409
-
-
-@app.route('/user', methods=["POST"])
-def create_user():
-    username = request.json['username']
-    email = request.json['email']
-    if User.query.filter_by(username=username).scalar() is not None:
-        return plain_response('Username already exists'), 409
-    if User.query.filter_by(email=email).scalar() is not None:
-        return plain_response('Email already exists'), 409
-    password = request.json['password']
-    # TODO make sure credentials are created in User constructor.
-    user = User(username, email)
-    credentials = UserCredentials(user, password)
-    db.session.add(user)
-    db.session.add(credentials)
-    db.session.commit()
-    return plain_response(user.id), 200
 
 
 @app.route('/user/logout', methods=["POST"])
