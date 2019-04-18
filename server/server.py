@@ -36,7 +36,7 @@ def get_post(postid):
         return plain_response("The given post ID doesn't exist. Requested resource not found."), 404
     return jsonify(post.serialize()), 200
 
-app.route('/post/extras/<postid>')
+@app.route('/post/extras/<postid>')
 def get_post_with_extras(postid):
     post = Post.query.filter_by(id=postid).one()
     author = User.query.filter_by(id=post.author_id).one()
