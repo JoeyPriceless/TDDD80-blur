@@ -21,19 +21,24 @@ class TestServerFunctions(unittest.TestCase):
         print("Logged in with jwt token: " + self.token)
 
     def test_1_feed(self):
-        token = init_tests()[0]
+        if self.token is None:
+            self.test_0_login()
+
         pass
 
     def test_2_post(self):
-        token = init_tests()[0]
+        if self.token is None:
+            self.test_0_login()
         pass
 
     def test_3_comment(self):
-        token = init_tests()[0]
+        if self.token is None:
+            self.test_0_login()
         pass
 
     def test_4_deletion(self):
-        token = init_tests()[0]
+        if self.token is None:
+            self.test_0_login()
         pass
 
 

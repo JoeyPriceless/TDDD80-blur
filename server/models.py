@@ -150,7 +150,7 @@ class Comment(db.Model):
     timestamp = db.Column(db.DateTime, nullable=False)
     content = db.Column(db.String, nullable=False)
     parent_id = db.Column(db.String, db.ForeignKey('comment.id'), unique=False)
-    parent = db.relationship('Comment', backref='child')
+    children = db.relationship('Comment', backref=db.backref('parent', remote_side=[id]))
     post_id = db.Column(db.String, db.ForeignKey('post.id'), nullable=False)
 
     def __init__(self, author, content, parent, post_id):
