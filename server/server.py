@@ -70,7 +70,7 @@ def get_reactions(postid):
     reactions = PostReaction.query.filter_by(post_id=postid).all()
     if reactions is None:
         return plain_response("The given post ID doesn't exist. Requested resource not found."), 404
-    return serialize_list(reactions), 200
+    return jsonify(serialize_list(reactions)), 200
 
 
 @app.route('/user/<userid>')
@@ -222,7 +222,7 @@ def plain_response(string):
 
 
 def serialize_list(lst):
-    return jsonify([element.serialize() for element in lst])
+    return [element.serialize() for element in lst]
 
 
 if __name__ == '__main__':
