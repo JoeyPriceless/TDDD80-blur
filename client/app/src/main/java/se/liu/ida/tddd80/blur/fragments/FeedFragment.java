@@ -14,6 +14,8 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
+import org.json.JSONObject;
+
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.adapters.FeedAdapter;
 import se.liu.ida.tddd80.blur.models.Feed;
@@ -109,10 +111,10 @@ public class FeedFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-    private class ResponseListener implements Response.Listener<String> {
+    private class ResponseListener implements Response.Listener<JSONObject> {
         @Override
-        public void onResponse(String response) {
-            mAdapter = new FeedAdapter(Feed.fromJson(response));
+        public void onResponse(JSONObject response) {
+            //mAdapter = new FeedAdapter(Feed.fromJson(response));
             rv.setAdapter(mAdapter);
         }
     }

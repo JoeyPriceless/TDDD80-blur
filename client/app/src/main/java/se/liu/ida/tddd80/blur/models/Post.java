@@ -1,16 +1,23 @@
 package se.liu.ida.tddd80.blur.models;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.time.LocalDateTime;
 
 public class Post {
     private String id;
-    private String author;
+    private User author;
     private String content;
+    @SerializedName("timestamp")
     private LocalDateTime timeCreated; // Check json compatibility
     private Reactions reactions;
 
-    public String getAuthor() {
+    public User getAuthor() {
         return author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
     }
 
     public String getContent() {
@@ -21,12 +28,25 @@ public class Post {
         return timeCreated;
     }
 
-    public Post(String id, String author, String content, LocalDateTime timestamp,
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public Post(String id, User author, String content, LocalDateTime timestamp,
                 Reactions reactions) {
         this.id = id;
         this.author = author;
         this.content = content;
         this.timeCreated = timestamp;
         this.reactions = reactions;
+    }
+
+    public Post(User author, String content) {
+        this.author = author;
+        this.content = content;
     }
 }

@@ -10,12 +10,12 @@ def reset_db():
     db.session.commit()
 
 
-@app.route('/feed')
-def get_feed():
-    feed = FeedObject.query.all()
+@app.route('/feed/<type>')
+def get_feed_hot(type):
+    feed = FeedObject.query.filter_by(type=type).one()
     if feed is None:
         return plain_response("Feed empty! Requested resource not found."), 404
-    return jsonify(feed), 200
+    return jsonify(feed.serialize()), 200
 
 
 @app.route('/comments/<postid>')
@@ -36,6 +36,18 @@ def get_post(postid):
         return plain_response("The given post ID doesn't exist. Requested resource not found."), 404
     return jsonify(post.serialize()), 200
 
+app.route('/post/extras/<postid>')
+def get_post_with_extras(postid):
+    post = Post.query.filter_by(id=postid).one()
+    author = User.query.filter_by(id=post.author_id).one()
+    reactions = get_reactions(postid)
+
+    # serialized for easier gson handling according to https://stackoverflow.com/a/39320732/4400799
+    return jsonify({
+        'post': post.serialize(),
+        'author': author.serialize(),
+        'reactions': reactions
+    }), 200
 
 @app.route('/comments/chain/<commentid>')
 def get_comment_chain(commentid):
@@ -55,10 +67,10 @@ def get_comment_chain(commentid):
 
 @app.route('/post/reactions/<postid>')
 def get_reactions(postid):
-    reactions = PostReaction.querry.filter_by(post_id=postid).all()
+    reactions = PostReaction.query.filter_by(post_id=postid).all()
     if reactions is None:
         return plain_response("The given post ID doesn't exist. Requested resource not found."), 404
-    return jsonify(reactions), 200
+    return serialize_list(reactions), 200
 
 
 @app.route('/user/<userid>')
@@ -81,7 +93,7 @@ def get_user_preference():
 
 @app.route('/post', methods=['POST'])
 @jwt_required
-def post_post():
+def create_post():
     content = request.json['content']
     user_id = get_raw_jwt()['user_id']
     post = Post(user_id, content)
@@ -104,11 +116,11 @@ def post_comment():
     return plain_response(comment.id)
 
 
-@app.route('/post/react', methods=['POST'])
+@app.route('/post/reactions', methods=['POST'])
 @jwt_required
 def react_to_post():
-    reaction = request.json['reaction']
-    post_id = request.json['post']
+    reaction = int(request.json['reaction'])
+    post_id = request.json['post_id']
     user_id = get_raw_jwt()['user_id']
     post_reaction = PostReaction(post_id, user_id, reaction)
     db.session.add(post_reaction)
@@ -144,7 +156,7 @@ def delete_post(postid):
 @app.route('/comment/delete/<commentid>')
 @jwt_required
 def delete_comment(commentid):
-    comment = Comment.querry.filter_by(id=commentid).one()
+    comment = Comment.query.filter_by(id=commentid).one()
     if comment is None:
         return plain_response("The given post ID doesn't exist. Requested resource not found."), 404
     if comment.author != get_raw_jwt()['user_id']:
@@ -206,7 +218,7 @@ def plain_response(string):
 
 
 def serialize_list(lst):
-    return [element.serialize() for element in lst]
+    return jsonify([element.serialize() for element in lst])
 
 
 if __name__ == '__main__':

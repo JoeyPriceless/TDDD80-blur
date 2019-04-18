@@ -29,18 +29,19 @@ class User(db.Model):
             'id': self.id,
             'username': self.username,
             'email': self.email,
+            'picture': self.picture_path
         }
 
 
 class Post(db.Model):
     id = db.Column(db.String, unique=True, primary_key=True)
-    author = db.Column(db.String, db.ForeignKey('user.id'))
+    author_id = db.Column(db.String, db.ForeignKey('user.id'))
     content = db.Column(db.String, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
 
     def __init__(self, author, content):
         self.id = uuid.uuid4().hex
-        self.author = author
+        self.author_id = author
         self.content = content
         self.timestamp = datetime.datetime.now()
 
@@ -64,9 +65,9 @@ class Post(db.Model):
         return result
 
     def serialize(self):
-        return{
+        return {
             'id': self.id,
-            'author': self.author,
+            'author_id': self.author_id,
             'content': self.content,
             'timestamp': self.timestamp,
         }
@@ -120,17 +121,23 @@ class CommentReaction(db.Model):
 
 class FeedObject(db.Model):
     __tablename__ = "feed"
+    FEED_HOT = "HOT"
+
     id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
+    type = db.Column(db.String, nullable=False)
     post_id = db.Column(db.String, db.ForeignKey('post.id'), unique=True)
     post = db.relationship('Post', backref='feed')
 
-    def __init__(self, post):
+
+    def __init__(self, post, type):
+        self.type = self.FEED_HOT
         self.post = post
         self.post_id = post.id
 
     def serialize(self):
         return {
             'id': self.id,
+            'type': self.type,
             'post': self.post,
         }
 
