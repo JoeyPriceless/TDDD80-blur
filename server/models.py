@@ -43,7 +43,7 @@ class Post(db.Model):
         self.id = uuid.uuid4().hex
         self.author_id = author
         self.content = content
-        self.timestamp = datetime.datetime.now().isoformat()
+        self.timestamp = datetime.datetime.now()
 
     def get_reactions(self):
         return PostReaction.query.filter_by(post_id=self.id).all()
@@ -69,7 +69,7 @@ class Post(db.Model):
             'id': self.id,
             'author_id': self.author_id,
             'content': self.content,
-            'timestamp': {'time_created': self.timestamp}
+            'timestamp': {'time_created': self.timestamp.isoformat()}
         }
 
 
@@ -157,7 +157,7 @@ class Comment(db.Model):
         self.author = author
         self.upvotes = 0
         self.downvotes = 0
-        self.timestamp = datetime.datetime.now().isoformat()
+        self.timestamp = datetime.datetime.now()
         self.content = content
         self.parent = parent
         self.post_id = post_id
@@ -175,7 +175,7 @@ class Comment(db.Model):
             'author': self.author,
             'upvotes': self.upvotes,
             'downvotes': self.downvotes,
-            'timestamp': {'time_created': self.timestamp},
+            'timestamp': {'time_created': self.timestamp.isoformat()},
             'content': self.content,
             'parent': self.parent,
         }
