@@ -3,6 +3,8 @@ package se.liu.ida.tddd80.blur.models;
 import com.google.gson.annotations.SerializedName;
 
 public class User {
+    public static int USERNAME_MAX_LENGTH = 24;
+
     private String id;
     private String username;
     private String email;

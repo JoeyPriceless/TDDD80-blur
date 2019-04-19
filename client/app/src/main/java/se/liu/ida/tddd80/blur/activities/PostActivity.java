@@ -45,7 +45,7 @@ public class PostActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_post);
 		Intent intent = getIntent();
 		//String postId = intent.getStringExtra(getResources().getString(R.string.extra_post_id));
-        String postId = "05532a8ffd5b42f4b6d047e70530b67c";
+        String postId = "87370e447bbc4765a3a3f334379bbcba";
 
 		netUtil = NetworkUtil.getInstance(this);
 		netUtil.getPostWithExtras(postId, new postExtraResponseListener(), new postExtraErrorListener());
