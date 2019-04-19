@@ -69,7 +69,7 @@ class Post(db.Model):
             'id': self.id,
             'author_id': self.author_id,
             'content': self.content,
-            'timestamp': { 'time_created': self.timestamp }
+            'timestamp': {'time_created': self.timestamp}
         }
 
 
@@ -128,7 +128,6 @@ class FeedObject(db.Model):
     post_id = db.Column(db.String, db.ForeignKey('post.id'), unique=True)
     post = db.relationship('Post', backref='feed')
 
-
     def __init__(self, post, type):
         self.type = self.FEED_HOT
         self.post = post
@@ -176,7 +175,7 @@ class Comment(db.Model):
             'author': self.author,
             'upvotes': self.upvotes,
             'downvotes': self.downvotes,
-            'timestamp': self.timestamp,
+            'timestamp': {'time_created': self.timestamp},
             'content': self.content,
             'parent': self.parent,
         }
