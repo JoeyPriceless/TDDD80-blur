@@ -4,6 +4,7 @@ import datetime
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token
+from util import format_datetime
 
 
 class User(db.Model):
@@ -69,7 +70,7 @@ class Post(db.Model):
             'id': self.id,
             'author_id': self.author_id,
             'content': self.content,
-            'timestamp': {'time_created': self.timestamp.isoformat()}
+            'timestamp': {'time_created': format_datetime(self.timestamp)}
         }
 
 
@@ -175,7 +176,7 @@ class Comment(db.Model):
             'author': self.author,
             'upvotes': self.upvotes,
             'downvotes': self.downvotes,
-            'timestamp': {'time_created': self.timestamp.isoformat()},
+            'timestamp': {'time_created': format_datetime(self.timestamp)},
             'content': self.content,
             'parent': self.parent,
         }
