@@ -69,7 +69,7 @@ class Post(db.Model):
             'id': self.id,
             'author_id': self.author_id,
             'content': self.content,
-            'timestamp': self.timestamp,
+            'timestamp': { 'time_created': self.timestamp }
         }
 
 

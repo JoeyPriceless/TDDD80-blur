@@ -11,6 +11,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.JSONException;
@@ -59,7 +60,7 @@ public class PostActivity extends AppCompatActivity {
                 ((TextView)findViewById(R.id.textview_post_time)).setText(post.getFormatedTimeCreated());
                 ((TextView)findViewById(R.id.textview_post_content)).setText(post.getContent());
 
-            } catch (JSONException ex) {
+            } catch (JSONException | JsonSyntaxException ex) {
                 Log.e(TAG, ExceptionUtils.getStackTrace(ex));
                 Toast.makeText(PostActivity.this, "Could not parse response",
                         Toast.LENGTH_LONG).show();
