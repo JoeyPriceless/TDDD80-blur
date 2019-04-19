@@ -38,13 +38,13 @@ class Post(db.Model):
     id = db.Column(db.String, unique=True, primary_key=True)
     author_id = db.Column(db.String, db.ForeignKey('user.id'))
     content = db.Column(db.String, nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False)
+    time_created = db.Column(db.DateTime, nullable=False)
 
     def __init__(self, author, content):
         self.id = uuid.uuid4().hex
         self.author_id = author
         self.content = content
-        self.timestamp = datetime.datetime.now()
+        self.time_created = datetime.datetime.now()
 
     def get_reactions(self):
         return PostReaction.query.filter_by(post_id=self.id).all()
@@ -70,7 +70,9 @@ class Post(db.Model):
             'id': self.id,
             'author_id': self.author_id,
             'content': self.content,
-            'timestamp': {'time_created': format_datetime(self.timestamp)}
+            'time_created': {
+                'datetime': format_datetime(self.time_created)
+            }
         }
 
 
@@ -147,7 +149,7 @@ class Comment(db.Model):
     author = db.Column(db.String, db.ForeignKey('user.id'), unique=True)
     upvotes = db.Column(db.Integer, nullable=False)
     downvotes = db.Column(db.Integer, nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False)
+    time_created = db.Column(db.DateTime, nullable=False)
     content = db.Column(db.String, nullable=False)
     parent_id = db.Column(db.String, db.ForeignKey('comment.id'), unique=False)
     children = db.relationship('Comment', backref=db.backref('parent', remote_side=[id]))
@@ -158,7 +160,7 @@ class Comment(db.Model):
         self.author = author
         self.upvotes = 0
         self.downvotes = 0
-        self.timestamp = datetime.datetime.now()
+        self.time_created = datetime.datetime.now()
         self.content = content
         self.parent = parent
         self.post_id = post_id
@@ -176,7 +178,9 @@ class Comment(db.Model):
             'author': self.author,
             'upvotes': self.upvotes,
             'downvotes': self.downvotes,
-            'timestamp': {'time_created': format_datetime(self.timestamp)},
+            'time_created': {
+                'datetime': format_datetime(self.time_created)
+            },
             'content': self.content,
             'parent': self.parent,
         }

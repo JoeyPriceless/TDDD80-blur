@@ -14,7 +14,7 @@ public class Post {
     private String id;
     private User author;
     private String content;
-    @SerializedName("timestamp")
+    @SerializedName("time_created")
     private DateTime timeCreated; // Check json compatibility
     private Reactions reactions;
 
