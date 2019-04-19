@@ -226,8 +226,6 @@ def serialize_list(lst):
 
 
 if __name__ == '__main__':
-    # TODO remove drop_all.
-    db.drop_all()
     db.create_all()
     db.session.commit()
     app.run()
