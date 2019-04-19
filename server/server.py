@@ -5,7 +5,9 @@ from flask_jwt_extended import jwt_required, get_raw_jwt
 
 
 def reset_db():
+    print("Dropping all tables")
     db.drop_all()
+    print("Initializing all tables")
     db.create_all()
     db.session.commit()
 
@@ -15,7 +17,7 @@ def get_feed_hot(type):
     feed = FeedObject.query.filter_by(type=type).one()
     if feed is None:
         return plain_response("Feed empty! Requested resource not found."), 404
-    return jsonify(feed.serialize()), 200
+    return jsonify(feed.serialize())
 
 
 @app.route('/comments/<postid>')
@@ -25,8 +27,8 @@ def get_comments(postid):
         post = Post.query.filter_by(id=postid).one()
         if post is None:
             return plain_response("Given post ID doesn't exist. Requested resource not found."), 404
-        return plain_response("Requested post has no comments."), 200
-    return jsonify(comments), 200
+        return plain_response("Requested post has no comments.")
+    return jsonify(comments)
 
 
 @app.route('/post/<postid>')
@@ -34,7 +36,7 @@ def get_post(postid):
     post = Post.query.filter_by(id=postid).one()
     if post is None:
         return plain_response("The given post ID doesn't exist. Requested resource not found."), 404
-    return jsonify(post.serialize()), 200
+    return jsonify(post.serialize())
 
 @app.route('/post/extras/<postid>')
 def get_post_with_extras(postid):
@@ -47,7 +49,7 @@ def get_post_with_extras(postid):
         'post': post.serialize(),
         'author': author.serialize(),
         'reactions': reactions
-    }), 200
+    })
 
 @app.route('/comments/chain/<commentid>')
 def get_comment_chain(commentid):
@@ -62,7 +64,7 @@ def get_comment_chain(commentid):
         comments.append(comment)
     if len(comments) == 0:
         return plain_response("The given comment has no children. Requested resource not found."), 404
-    return jsonify(comments), 200
+    return jsonify(comments)
 
 
 @app.route('/post/reactions/<postid>')
@@ -70,7 +72,7 @@ def get_reactions(postid):
     reactions = PostReaction.query.filter_by(post_id=postid).all()
     if reactions is None:
         return plain_response("The given post ID doesn't exist. Requested resource not found."), 404
-    return jsonify(serialize_list(reactions)), 200
+    return jsonify(serialize_list(reactions))
 
 
 @app.route('/user/<userid>')
@@ -78,7 +80,7 @@ def get_user(userid):
     user = User.query.filter_by(id=userid).one()
     if user is None:
         return plain_response("The given user ID doesn't exist. Requested resource not found."), 404
-    return jsonify(user.serialize()), 200
+    return jsonify(user.serialize())
 
 
 @app.route('/user/pref/')
@@ -88,7 +90,7 @@ def get_user_preference():
     prefs = UserPreference.query.filter_by(user=userid).one()
     if prefs is None:
         return plain_response("The token user ID doesn't exist. Requested resource not found."), 404
-    return jsonify(prefs), 200
+    return jsonify(prefs)
 
 
 @app.route('/post', methods=['POST'])
@@ -180,7 +182,7 @@ def create_user():
     db.session.add(user)
     db.session.add(credentials)
     db.session.commit()
-    return plain_response(user.id), 200
+    return jsonify(get_user_token(user))
 
 
 @app.route('/user/login', methods=["POST"])
@@ -192,12 +194,17 @@ def login():
         credentials = UserCredentials.query.filter_by(user_id=user.id).scalar()
     else:
         return plain_response('Incorrect password or email'), 409
+    
     if credentials is not None and credentials.check_password(password):
-        value = user.generate_auth_token()
-        value['user_id'] = user.id
-        return jsonify(value)
+        return jsonify(get_user_token(user))
     else:
         return plain_response('Incorrect password or email'), 500
+
+
+def get_user_token(user):
+    value = user.generate_auth_token()
+    value['user_id'] = user.id
+    return value
 
 
 @app.route('/user/logout', methods=["POST"])
@@ -207,7 +214,7 @@ def logout():
     blacklisted = Blacklisted(jti)
     db.session.add(blacklisted)
     db.session.commit()
-    return plain_response(''), 200
+    return plain_response('')
 
 
 @jwt.token_in_blacklist_loader
