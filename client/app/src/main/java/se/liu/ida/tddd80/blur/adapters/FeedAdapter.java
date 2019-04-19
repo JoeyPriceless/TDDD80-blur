@@ -62,7 +62,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder>{
         Post post = mFeed.get(i);
 
         viewHolder.authorName.setText(post.getAuthor().getUsername());
-        viewHolder.timestamp.setText(StringUtil.timeSinceCreation(post.getTimeCreated()));
+        viewHolder.timestamp.setText(StringUtil.formatDateTimeShort(post.getTimeCreated()));
         viewHolder.content.setText(post.getContent());
     }
 

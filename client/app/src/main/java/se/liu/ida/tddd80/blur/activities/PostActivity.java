@@ -11,16 +11,27 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializer;
 import com.google.gson.JsonSyntaxException;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.lang.reflect.Type;
 
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.models.Post;
 import se.liu.ida.tddd80.blur.models.User;
+import se.liu.ida.tddd80.blur.utilities.DateTimeDeserializer;
 import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
+import se.liu.ida.tddd80.blur.utilities.StringUtil;
 
 
 public class PostActivity extends AppCompatActivity {
@@ -34,7 +45,7 @@ public class PostActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_post);
 		Intent intent = getIntent();
 		//String postId = intent.getStringExtra(getResources().getString(R.string.extra_post_id));
-        String postId = "10553b0e90a648a19d16f4435f444935";
+        String postId = "05532a8ffd5b42f4b6d047e70530b67c";
 
 		netUtil = NetworkUtil.getInstance(this);
 		netUtil.getPostWithExtras(postId, new postExtraResponseListener(), new postExtraErrorListener());
@@ -45,7 +56,7 @@ public class PostActivity extends AppCompatActivity {
         public void onResponse(JSONObject response) {
             try {
                 GsonBuilder gsonBuilder = new GsonBuilder();
-                gsonBuilder.excludeFieldsWithoutExposeAnnotation();
+                gsonBuilder.registerTypeAdapter(DateTime.class, new DateTimeDeserializer());
                 gson = gsonBuilder.create();
 
                 JSONObject postObj = response.getJSONObject("post");
@@ -57,7 +68,8 @@ public class PostActivity extends AppCompatActivity {
 
                 // TODO set image
                 ((TextView)findViewById(R.id.textview_post_author)).setText(author.getUsername());
-                ((TextView)findViewById(R.id.textview_post_time)).setText(post.getFormatedTimeCreated());
+                ((TextView)findViewById(R.id.textview_post_time)).setText(
+                        StringUtil.formatDateTimeLong(post.getTimeCreated()));
                 ((TextView)findViewById(R.id.textview_post_content)).setText(post.getContent());
 
             } catch (JSONException | JsonSyntaxException ex) {

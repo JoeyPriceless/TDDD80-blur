@@ -11,12 +11,9 @@ import java.util.Date;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
 
 public class Post {
-    @Expose
     private String id;
     private User author;
-    @Expose
     private String content;
-    @Expose
     @SerializedName("timestamp")
     private DateTime timeCreated; // Check json compatibility
     private Reactions reactions;
@@ -37,13 +34,8 @@ public class Post {
         return timeCreated;
     }
 
-    public String getFormatedTimeCreated() {
-        // TODO format
-        return timeCreated.toString();
-    }
-
-    public String getTimeSinceCreation() {
-        return StringUtil.timeSinceCreation(timeCreated);
+    public void setTimeCreated(DateTime timeCreated) {
+        this.timeCreated = timeCreated;
     }
 
     public void setId(String id) {
@@ -52,19 +44,5 @@ public class Post {
 
     public String getId() {
         return id;
-    }
-
-    public Post(String id, User author, String content, DateTime timestamp,
-                Reactions reactions) {
-        this.id = id;
-        this.author = author;
-        this.content = content;
-        this.timeCreated = timestamp;
-        this.reactions = reactions;
-    }
-
-    public Post(User author, String content) {
-        this.author = author;
-        this.content = content;
     }
 }
