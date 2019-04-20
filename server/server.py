@@ -3,6 +3,9 @@ from models import *
 from __init__ import app, db, jwt
 from flask_jwt_extended import jwt_required, get_raw_jwt
 
+USERNAME_MIN_LENGTH = 3
+USERNAME_MAX_LENGTH = 24
+PASSWORD_MIN_LENGTH = 8
 
 def reset_db():
     print("Dropping all tables")
@@ -172,11 +175,17 @@ def delete_comment(commentid):
 def create_user():
     username = request.json['username']
     email = request.json['email']
+    password = request.json['password']
+
+    if len(username) < USERNAME_MIN_LENGTH or len(username) > USERNAME_MAX_LENGTH:
+        return plain_response('Invalid username length. Must be between 3-24 characters.'), 409
+    if len(password) < PASSWORD_MIN_LENGTH:
+        return plain_response('Invalid password. Must be longer than 8 characters.'), 409
     if User.query.filter_by(username=username).scalar() is not None:
         return plain_response('Username already exists'), 409
     if User.query.filter_by(email=email).scalar() is not None:
         return plain_response('Email already exists'), 409
-    password = request.json['password']
+
     user = User(username, email)
     credentials = UserCredentials(user, password)
     db.session.add(user)
@@ -189,16 +198,20 @@ def create_user():
 def login():
     email = request.json['email']
     password = request.json['password']
+    if len(password) < PASSWORD_MIN_LENGTH:
+        return plain_response('Invalid password. Must be longer than 8 characters.'), 409
     user = User.query.filter_by(email=email).scalar()
     if user is not None:
         credentials = UserCredentials.query.filter_by(user_id=user.id).scalar()
     else:
         return plain_response('Incorrect password or email'), 409
-    
-    if credentials is not None and credentials.check_password(password):
+
+    if credentials is None:
+        return plain_response('Could not find credentials for existing user', 500)
+    elif credentials.check_password(password):
         return jsonify(get_user_token(user))
     else:
-        return plain_response('Incorrect password or email'), 500
+        return plain_response('Incorrect password or email'), 409
 
 
 def get_user_token(user):
