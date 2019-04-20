@@ -8,10 +8,10 @@ import android.os.Bundle;
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.fragments.FeedFragment;
 import se.liu.ida.tddd80.blur.models.FeedType;
+import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
 
 public class FeedActivity extends AppCompatActivity
         implements FeedFragment.OnFragmentInteractionListener{
-
 	@Override protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_feed);
@@ -21,6 +21,7 @@ public class FeedActivity extends AppCompatActivity
         transaction.replace(R.id.framelayout_fragmentholder,
                 FeedFragment.newInstance(FeedType.HOT.toString()));
         transaction.commit();
+
 	}
 
     @Override public void onFragmentInteraction(final Uri uri) {

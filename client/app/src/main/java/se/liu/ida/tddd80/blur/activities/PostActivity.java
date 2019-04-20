@@ -48,6 +48,7 @@ public class PostActivity extends AppCompatActivity {
         String postId = "87370e447bbc4765a3a3f334379bbcba";
 
 		netUtil = NetworkUtil.getInstance(this);
+		gson = netUtil.getGson();
 		netUtil.getPostWithExtras(postId, new postExtraResponseListener(), new postExtraErrorListener());
 	}
 
@@ -55,9 +56,6 @@ public class PostActivity extends AppCompatActivity {
         @Override
         public void onResponse(JSONObject response) {
             try {
-                GsonBuilder gsonBuilder = new GsonBuilder();
-                gsonBuilder.registerTypeAdapter(DateTime.class, new DateTimeDeserializer());
-                gson = gsonBuilder.create();
 
                 JSONObject postObj = response.getJSONObject("post");
                 post = gson.fromJson(postObj.toString(), Post.class);
@@ -74,7 +72,7 @@ public class PostActivity extends AppCompatActivity {
 
             } catch (JSONException | JsonSyntaxException ex) {
                 Log.e(TAG, ExceptionUtils.getStackTrace(ex));
-                Toast.makeText(PostActivity.this, "Could not parse response",
+                Toast.makeText(PostActivity.this, "Error when parsing response",
                         Toast.LENGTH_LONG).show();
             }
         }

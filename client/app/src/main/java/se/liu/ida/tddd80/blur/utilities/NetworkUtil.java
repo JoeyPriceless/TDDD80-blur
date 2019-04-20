@@ -1,6 +1,7 @@
 package se.liu.ida.tddd80.blur.utilities;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.android.volley.Request.Method;
@@ -10,22 +11,31 @@ import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.models.FeedType;
 import se.liu.ida.tddd80.blur.models.Post;
 import se.liu.ida.tddd80.blur.models.ReactionType;
 import se.liu.ida.tddd80.blur.models.User;
 
+import static android.content.SharedPreferences.*;
+
 // Singleton Volley class as recommended in docs.
 public class NetworkUtil {
+    private final String TAG = getClass().getSimpleName();
+    private Context appContext;
     private static NetworkUtil instance;
     private RequestQueue queue;
     private Gson gson;
+    private String tokenStringKey;
     private String token;
 
     public Gson getGson() {
@@ -34,12 +44,19 @@ public class NetworkUtil {
 
     public void setToken(String token) {
         this.token = token;
+        storeToken();
     }
 
     private NetworkUtil(Context context) {
         // Application context to make it last throughout app lifetime.
-        this.queue = Volley.newRequestQueue(context.getApplicationContext());
-        this.gson = new Gson();
+        appContext = context.getApplicationContext();
+        this.queue = Volley.newRequestQueue(appContext);
+        GsonBuilder gb = new GsonBuilder();
+        // Register a type adapter to properly parse server datetime format.
+        gb.registerTypeAdapter(DateTime.class, new DateTimeDeserializer());
+        this.gson = gb.create();
+        tokenStringKey = appContext.getResources().getString(R.string.token_pref_key);
+        loadToken();
     }
 
     public static NetworkUtil getInstance(Context context) {
@@ -47,6 +64,25 @@ public class NetworkUtil {
             instance = new NetworkUtil(context);
         }
         return instance;
+    }
+
+    private void storeToken() {
+        SharedPreferences prefs = appContext.getSharedPreferences(appContext.getPackageName(),
+                Context.MODE_PRIVATE);
+        Editor editor = prefs.edit();
+        editor.putString(tokenStringKey, token);
+        editor.apply();
+    }
+
+    private void loadToken() {
+        SharedPreferences prefs = appContext.getSharedPreferences(appContext.getPackageName(),
+                Context.MODE_PRIVATE);
+        token = prefs.getString(tokenStringKey, null);
+    }
+
+    public boolean isTokenValid() {
+        // TODO: update logic to deal with expired tokens
+        return token != null;
     }
 
     private Map<String, String> getHeadersAuth() {
@@ -68,6 +104,7 @@ public class NetworkUtil {
                 return getHeadersAuth();
             }
         };
+  		Log.i(TAG, String.format("%s: %s", StringUtil.MethodToString(method), url));
   		queue.add(jsonRequest);
   	}
 
@@ -86,13 +123,14 @@ public class NetworkUtil {
                 return getHeadersAuth();
             }
         };
+        Log.i(TAG, String.format("%s: %s", StringUtil.MethodToString(method), url));
         queue.add(jsonRequest);
     }
 
-    public void login(User user, String password, Listener<JSONObject> responseListener,
+    public void login(String email, String password, Listener<JSONObject> responseListener,
                        ErrorListener errorListener) {
         Map<String, String> params = new HashMap<>();
-        params.put("email", user.getEmail());
+        params.put("email", email);
         params.put("password", password);
 
         requestJson(Url.build(Url.USER_LOGIN), Method.POST, responseListener, errorListener, params);
@@ -102,11 +140,11 @@ public class NetworkUtil {
         requestJson(Url.build(Url.USER_LOGOUT), Method.POST, responseListener, errorListener);
     }
 
-  	public void createUser(User user, String password, Listener<JSONObject> responseListener,
-                           ErrorListener errorListener) {
+  	public void createUser(String username, String email, String password,
+                           Listener<JSONObject> responseListener, ErrorListener errorListener) {
         Map<String, String> params = new HashMap<>();
-        params.put("username", user.getUsername());
-        params.put("email", user.getEmail());
+        params.put("username", username);
+        params.put("email", email);
         params.put("password", password);
 
         requestJson(Url.build(Url.USER_CREATE), Method.POST, responseListener,
