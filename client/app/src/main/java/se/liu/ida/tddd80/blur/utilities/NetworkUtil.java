@@ -4,13 +4,16 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.android.volley.Request;
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -97,17 +100,14 @@ public class NetworkUtil {
      * @param responseListener Listener which contains actions upon success
      * @param errorListener Listener which contains actions upon failure
      */
-    private void requestJson(String url, int method, Listener<JSONObject> responseListener,
-                             ErrorListener errorListener) {
-  		JsonObjectRequest jsonRequest = new JsonObjectRequest(method, url, null, responseListener,
+    private void requestJsonObject(String url, int method, Listener<JSONObject> responseListener,
+                                   ErrorListener errorListener) {
+  		JsonObjectRequest request = new JsonObjectRequest(method, url, null, responseListener,
                 errorListener) {
             @Override
-            public Map<String, String> getHeaders() {
-                return getHeadersAuth();
-            }
+            public Map<String, String> getHeaders() { return getHeadersAuth(); }
         };
-  		Log.i(TAG, String.format("%s: %s", StringUtil.MethodToString(method), url));
-  		queue.add(jsonRequest);
+  		addToQueue(request);
   	}
 
     /**
@@ -118,22 +118,39 @@ public class NetworkUtil {
      * @param errorListener Listener which contains actions upon failure
      * @param data JSON data mapped in key/value format
      */
-  	private void requestJson(String url, int method, Listener<JSONObject> responseListener,
-                             ErrorListener errorListener, final Map<String, String> data) {
-        if (method == Method.GET || method == Method.DELETE) {
-            requestJson(url, method, responseListener, errorListener);
-            Log.w(this.getClass().getSimpleName(), "GET or DELETE request sent to wrong method.");
-        }
-
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(method, url, new JSONObject(data),
+  	private void requestJsonObject(String url, int method, Listener<JSONObject> responseListener,
+                                   ErrorListener errorListener, final Map<String, String> data) {
+        JsonObjectRequest request = new JsonObjectRequest(method, url, new JSONObject(data),
                 responseListener, errorListener) {
             @Override
             public Map<String, String> getHeaders() {
                 return getHeadersAuth();
             }
         };
-        Log.i(TAG, String.format("%s: %s", StringUtil.MethodToString(method), url));
-        queue.add(jsonRequest);
+        addToQueue(request);
+    }
+
+    /**
+     * Request JSON response from url using method (Usually GET or DELETE).
+     * @param url target URL. Complete URL including prefix and hostname
+     * @param method HTTP method from enum
+     * @param responseListener Listener which contains actions upon success
+     * @param errorListener Listener which contains actions upon failure
+     */
+    private void requestJsonArray(String url, int method, Listener<JSONArray> responseListener,
+                                   ErrorListener errorListener) {
+        JsonArrayRequest request = new JsonArrayRequest(method, url, null, responseListener,
+                errorListener) {
+            @Override
+            public Map<String, String> getHeaders() { return getHeadersAuth(); }
+        };
+        addToQueue(request);
+    }
+
+    private void addToQueue(Request request) {
+        Log.i(TAG, String.format("%s: %s",
+                StringUtil.MethodToString(request.getMethod()), request.getUrl()));
+        queue.add(request);
     }
 
 
@@ -147,7 +164,7 @@ public class NetworkUtil {
         params.put("email", email);
         params.put("password", password);
 
-        requestJson(Url.build(Url.USER_LOGIN), Method.POST, responseListener, errorListener, params);
+        requestJsonObject(Url.build(Url.USER_LOGIN), Method.POST, responseListener, errorListener, params);
     }
 
     /**
@@ -155,7 +172,7 @@ public class NetworkUtil {
      * NetworkUtil.clearToken();
      */
     public void logout(Listener<JSONObject> responseListener, ErrorListener errorListener) {
-        requestJson(Url.build(Url.USER_LOGOUT), Method.POST, responseListener, errorListener);
+        requestJsonObject(Url.build(Url.USER_LOGOUT), Method.POST, responseListener, errorListener);
     }
 
   	public void createUser(String username, String email, String password,
@@ -165,13 +182,13 @@ public class NetworkUtil {
         params.put("email", email);
         params.put("password", password);
 
-        requestJson(Url.build(Url.USER_CREATE), Method.POST, responseListener,
+        requestJsonObject(Url.build(Url.USER_CREATE), Method.POST, responseListener,
                     errorListener, params);
     }
 
     public void getUser(String id, Listener<JSONObject> responseListener,
                         ErrorListener errorListener) {
-        requestJson(Url.build(Url.USER_GET, id), Method.GET, responseListener, errorListener);
+        requestJsonObject(Url.build(Url.USER_GET, id), Method.GET, responseListener, errorListener);
     }
 
     public void createPost(String content, String authorId, Listener<JSONObject> responseListener,
@@ -179,13 +196,13 @@ public class NetworkUtil {
         Map<String, String> params = new HashMap<>();
             params.put("content", content);
             params.put("user_id", authorId);
-        requestJson(Url.build(Url.POST_CREATE), Method.POST, responseListener,
+        requestJsonObject(Url.build(Url.POST_CREATE), Method.POST, responseListener,
                             errorListener, params);
     }
 
     public void getPost(String id, Listener<JSONObject> responseListener,
                             ErrorListener errorListener) {
-        requestJson(Url.build(Url.POST_GET, id), Method.GET, responseListener, errorListener);
+        requestJsonObject(Url.build(Url.POST_GET, id), Method.GET, responseListener, errorListener);
     }
 
     /**
@@ -193,12 +210,12 @@ public class NetworkUtil {
      */
     public void getPostWithExtras(String id, Listener<JSONObject> responseListener,
                                 ErrorListener errorListener) {
-        requestJson(Url.build(Url.POST_GET_EXTRAS, id), Method.GET, responseListener, errorListener);
+        requestJsonObject(Url.build(Url.POST_GET_EXTRAS, id), Method.GET, responseListener, errorListener);
     }
 
     public void getReactions(String postId, Listener<JSONObject> responseListener,
                                 ErrorListener errorListener) {
-        requestJson(Url.build(Url.POST_REACTIONS_GET, postId), Method.GET, responseListener,
+        requestJsonObject(Url.build(Url.POST_REACTIONS_GET, postId), Method.GET, responseListener,
                 errorListener);
     }
 
@@ -208,13 +225,13 @@ public class NetworkUtil {
                     params.put("post_id", postId);
                     params.put("user_id", userId);
                     params.put("reaction", String.valueOf(reaction.ordinal()));
-        requestJson(Url.build(Url.POST_REACTIONS_ADD), Method.POST, responseListener,
+        requestJsonObject(Url.build(Url.POST_REACTIONS_ADD), Method.POST, responseListener,
                                     errorListener, params);
     }
 
     public void getFeed(FeedType type, Listener<JSONObject> responseListener, ErrorListener
             errorListener) {
-        requestJson(Url.build(Url.FEED_GET, type.toString().toLowerCase()), Method.GET, responseListener, errorListener);
+        requestJsonObject(Url.build(Url.FEED_GET, type.toString().toLowerCase()), Method.GET, responseListener, errorListener);
     }
 
     /**

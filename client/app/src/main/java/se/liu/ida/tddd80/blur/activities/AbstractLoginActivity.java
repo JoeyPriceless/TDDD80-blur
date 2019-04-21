@@ -79,12 +79,7 @@ public abstract class AbstractLoginActivity extends AppCompatActivity {
         @Override
         public void onErrorResponse(VolleyError error) {
             String message;
-            try {
-                message = StringUtil.parsePlainJsonResponse(error);
-            } catch (JSONException ex) {
-                parseError(ex);
-                return;
-            }
+            message = StringUtil.parsePlainJsonResponse(error);
             Log.w(TAG, message);
             Toast.makeText(getBaseContext(), message, Toast.LENGTH_LONG).show();
         }

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +19,10 @@ import org.json.JSONObject;
 
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.adapters.FeedAdapter;
-import se.liu.ida.tddd80.blur.models.Feed;
 import se.liu.ida.tddd80.blur.models.FeedType;
+import se.liu.ida.tddd80.blur.utilities.GsonUtil;
 import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
+import se.liu.ida.tddd80.blur.utilities.StringUtil;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,6 +33,7 @@ import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
  * create an instance of this fragment.
  */
 public class FeedFragment extends Fragment {
+    private final String TAG = getClass().getSimpleName();
     private static final String ARG_FEED_NAME = "feedName";
 
     private FeedType mFeedType;
@@ -114,7 +117,7 @@ public class FeedFragment extends Fragment {
     private class ResponseListener implements Response.Listener<JSONObject> {
         @Override
         public void onResponse(JSONObject response) {
-            //mAdapter = new FeedAdapter(Feed.fromJson(response));
+            mAdapter = new FeedAdapter(GsonUtil.getInstance().FeedFromJson(response));
             rv.setAdapter(mAdapter);
         }
     }
@@ -122,7 +125,8 @@ public class FeedFragment extends Fragment {
     private class ResponseErrorListener implements Response.ErrorListener {
         @Override
         public void onErrorResponse(VolleyError error) {
-            Toast.makeText(getContext(), "Failed to fetch feed.\n" + error,
+            Log.e(TAG, StringUtil.parsePlainJsonResponse(error));
+            Toast.makeText(getContext(), "Failed to fetch feed.\n",
                     Toast.LENGTH_LONG).show();
         }
     }

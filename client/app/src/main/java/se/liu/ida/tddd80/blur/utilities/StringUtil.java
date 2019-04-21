@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.android.volley.VolleyError;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.json.JSONException;
@@ -69,10 +70,17 @@ public class StringUtil {
      * Gets the error message from a VolleyError.
      * @param error Error returned from server
      */
-    public static String parsePlainJsonResponse(VolleyError error) throws JSONException {
-        JSONObject body = new JSONObject(new String(error.networkResponse.data,
-                StandardCharsets.UTF_8));
-        return parsePlainJsonResponse(body);
+    public static String parsePlainJsonResponse(VolleyError error) {
+        try {
+            JSONObject body = new JSONObject(new String(error.networkResponse.data,
+                    StandardCharsets.UTF_8));
+            return parsePlainJsonResponse(body);
+        } catch (Exception ex) {
+            if (error.getCause() != null)
+                return ExceptionUtils.getStackTrace(error.getCause());
+            else
+                return "Error parsing error response.";
+        }
     }
 
     /**
