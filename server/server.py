@@ -18,10 +18,12 @@ def reset_db():
 
 @app.route('/feed/<type>')
 def get_feed(type):
-    feed = FeedObject.query.filter_by(type=type).one()
+    # TODO: implement proper feed creation.
+    # Currently just returns all posts
+    feed = Post.query.all()
     if feed is None:
         return respond(plain_response("Feed empty! Requested resource not found."), 404)
-    return respond(feed.serialize())
+    return respond([post.serialize_with_extras() for post in feed])
 
 
 @app.route('/comments/<postid>')
@@ -47,15 +49,7 @@ def get_post(postid):
 @app.route('/post/extras/<postid>')
 def get_post_with_extras(postid):
     post = Post.query.filter_by(id=postid).one()
-    author = User.query.filter_by(id=post.author_id).one()
-    reactions = serialize_list(PostReaction.query.filter_by(post_id=postid).all())
-
-    # serialized for easier gson handling according to https://stackoverflow.com/a/39320732/4400799
-    return respond({
-        'post': post.serialize(),
-        'author': author.serialize(),
-        'reactions': reactions
-    })
+    return respond(post.serialize_with_extras())
 
 @app.route('/comments/chain/<commentid>')
 def get_comment_chain(commentid):

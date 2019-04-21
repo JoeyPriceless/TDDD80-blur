@@ -5,6 +5,7 @@ import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token
 from util import format_datetime
+from server import serialize_list
 
 
 class User(db.Model):
@@ -73,6 +74,18 @@ class Post(db.Model):
             'time_created': {
                 'datetime': format_datetime(self.time_created)
             }
+        }
+
+
+    def serialize_with_extras(self):
+        # serialized for easier gson handling according to
+        # https://stackoverflow.com/a/39320732/4400799
+        author = User.query.filter_by(id=self.author_id).one()
+        reactions = serialize_list(PostReaction.query.filter_by(post_id=self.id).all())
+        return {
+            'post': self.serialize(),
+            'author': author.serialize(),
+            'reactions': reactions
         }
 
 
