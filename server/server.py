@@ -3,6 +3,7 @@ from models import *
 from __init__ import app, db, jwt
 from flask_jwt_extended import jwt_required, get_raw_jwt
 import sys
+import json
 
 USERNAME_MIN_LENGTH = 3
 USERNAME_MAX_LENGTH = 24
@@ -16,14 +17,16 @@ def reset_db():
     db.session.commit()
 
 
-@app.route('/feed/<type>')
-def get_feed(type):
-    # TODO: implement proper feed creation.
-    # Currently just returns all posts
+@app.route('/feed/<feedtype>')
+def get_feed(feedtype):
+    # TODO: implement proper feed creation. Currently just returns all posts
     feed = Post.query.all()
     if feed is None:
         return respond(plain_response("Feed empty! Requested resource not found."), 404)
-    return respond([post.serialize_with_extras() for post in feed])
+    return respond({
+        'type': feedtype,
+        'posts': [post.serialize_with_extras() for post in feed]
+    })
 
 
 @app.route('/comments/<postid>')
@@ -254,7 +257,7 @@ def serialize_list(lst):
 
 
 def respond(response, status=200):
-    print(f"{status}: {response}")
+    print(f"{status}: {json.dumps(response, indent=2)}")
     sys.stdout.flush()
     return jsonify(response), status
 
