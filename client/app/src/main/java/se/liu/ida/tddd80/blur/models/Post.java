@@ -1,15 +1,21 @@
 package se.liu.ida.tddd80.blur.models;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import org.joda.time.DateTime;
+
 import java.time.LocalDateTime;
+import java.util.Date;
+
+import se.liu.ida.tddd80.blur.utilities.StringUtil;
 
 public class Post {
     private String id;
     private User author;
     private String content;
-    @SerializedName("timestamp")
-    private LocalDateTime timeCreated; // Check json compatibility
+    @SerializedName("time_created")
+    private DateTime timeCreated; // Check json compatibility
     private Reactions reactions;
 
     public User getAuthor() {
@@ -24,8 +30,12 @@ public class Post {
         return content;
     }
 
-    public LocalDateTime getTimeCreated() {
+    public DateTime getTimeCreated() {
         return timeCreated;
+    }
+
+    public void setTimeCreated(DateTime timeCreated) {
+        this.timeCreated = timeCreated;
     }
 
     public void setId(String id) {
@@ -34,19 +44,5 @@ public class Post {
 
     public String getId() {
         return id;
-    }
-
-    public Post(String id, User author, String content, LocalDateTime timestamp,
-                Reactions reactions) {
-        this.id = id;
-        this.author = author;
-        this.content = content;
-        this.timeCreated = timestamp;
-        this.reactions = reactions;
-    }
-
-    public Post(User author, String content) {
-        this.author = author;
-        this.content = content;
     }
 }

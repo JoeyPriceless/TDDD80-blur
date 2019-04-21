@@ -3,4 +3,6 @@
 
     <!-- Intent extras -->
     <string name="extra_post_id">POST_ID</string>
+
+    <string name="token_pref_key">TOKEN</string>
 </resources>
