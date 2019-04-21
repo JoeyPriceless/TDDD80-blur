@@ -83,7 +83,7 @@ class Post(db.Model):
         reactions = server.serialize_list(PostReaction.query.filter_by(post_id=self.id).all())
         return {
             'id': self.id,
-            'author': author,
+            'author': author.serialize(),
             'content': self.content,
             'time_created': {
                 'datetime': format_datetime(self.time_created)
