@@ -14,8 +14,8 @@ def start_timer():
 
 
 def create_feed():
-
     # TODO: Sort through posts and compile the top.
+    pass
 
 
 def count_reactions_per_post(reaction_type):
