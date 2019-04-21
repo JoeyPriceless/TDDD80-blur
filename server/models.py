@@ -74,7 +74,7 @@ class Post(db.Model):
         # Score +1 if reaction type is positive and -1 if it's negative
         # Reaction type is an int between 0-5, with the first 3 being positive reactions.
         for reaction in reactions:
-            score += 1 if (reaction < 3) else -1
+            score += 1 if (reaction.reaction_type < 3) else -1
         return score
 
     def serialize(self):
@@ -106,7 +106,7 @@ class Post(db.Model):
 
 class PostReaction(db.Model):
     id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
-    post_id = db.Column(db.String, db.ForeignKey('post.id'), unique=True, nullable=False)
+    post_id = db.Column(db.String, db.ForeignKey('post.id'), nullable=False)
     user_id = db.Column(db.String, db.ForeignKey('user.id'), unique=True, nullable=False)
     reaction_type = db.Column(db.Integer, nullable=False)
 
@@ -129,7 +129,7 @@ class PostReaction(db.Model):
 
 class CommentReaction(db.Model):
     id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
-    comment_id = db.Column(db.String, db.ForeignKey('post.id'), unique=True, nullable=False)
+    comment_id = db.Column(db.String, db.ForeignKey('post.id'), nullable=False)
     user_id = db.Column(db.String, db.ForeignKey('user.id'), unique=True, nullable=False)
     reaction_type = db.Column(db.Integer, nullable=False)
 
