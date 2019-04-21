@@ -2,26 +2,12 @@ package se.liu.ida.tddd80.blur.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
-
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.google.gson.JsonSyntaxException;
-
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
 
-public class LoginActivity extends AbstractAccountActivity {
+public class LoginActivity extends AbstractLoginActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

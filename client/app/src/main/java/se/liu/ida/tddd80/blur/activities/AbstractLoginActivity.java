@@ -1,8 +1,8 @@
 package se.liu.ida.tddd80.blur.activities;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -23,7 +23,7 @@ import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
 
-public abstract class AbstractAccountActivity extends AppCompatActivity {
+public abstract class AbstractLoginActivity extends AppCompatActivity {
     protected final String TAG = getClass().getSimpleName();
     protected Class targetActivity = FeedActivity.class;
     protected NetworkUtil netUtil;
@@ -38,7 +38,7 @@ public abstract class AbstractAccountActivity extends AppCompatActivity {
         passwordMinLength = getResources().getInteger(R.integer.password_min_length);
         netUtil = NetworkUtil.getInstance(this);
         // User is already logged in.
-        if (netUtil.isTokenValid())
+        if (netUtil.isUserLoggedIn())
             continueToTarget();
     }
 
@@ -67,8 +67,7 @@ public abstract class AbstractAccountActivity extends AppCompatActivity {
         public void onResponse(JSONObject response) {
             // TODO: User & UserId should probably be saved somewhere (Singleton?)
             try {
-                String token = response.getString(("token"));
-                netUtil.setToken(token);
+                netUtil.setToken(response.getString(("token")));
             } catch (JSONException | JsonSyntaxException ex) {
                 parseError(ex);
             }
@@ -91,6 +90,9 @@ public abstract class AbstractAccountActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Button is only enabled when all fields are valid.
+     */
     protected void setButton() {
         btn.setEnabled(isPasswordValid() && isEmailValid());
     }

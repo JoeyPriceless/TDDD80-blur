@@ -15,6 +15,11 @@ import org.joda.time.format.ISODateTimeFormat;
 
 import java.lang.reflect.Type;
 
+/**
+ * Used by Gson to serialize/deserialize Joda DateTime objects according to the format returned by
+ * server. E.g. time_created would look like:
+ * "time_created": {"datetime: "2015-11-27T00:29:06.839600+02:00"} where datetime follows ISO 8601
+ */
 public final class DateTimeDeserializer implements JsonDeserializer<DateTime>, JsonSerializer<DateTime>
 {
     static final org.joda.time.format.DateTimeFormatter DATE_TIME_FORMATTER =

@@ -1,14 +1,8 @@
 package se.liu.ida.tddd80.blur.models;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import org.joda.time.DateTime;
-
-import java.time.LocalDateTime;
-import java.util.Date;
-
-import se.liu.ida.tddd80.blur.utilities.StringUtil;
 
 public class Post {
     private String id;
