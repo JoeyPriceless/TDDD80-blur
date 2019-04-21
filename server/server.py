@@ -135,7 +135,7 @@ def react_to_post():
     post_reaction = PostReaction(post_id, user_id, reaction)
     db.session.add(post_reaction)
     db.session.commit()
-    return respond(Post.query.filter_by(post_id=post_id).one().reaction_score())
+    return respond(Post.query.filter_by(id=post_id).one().reaction_score())
 
 
 @app.route('/comment/react', methods=['POST'])
