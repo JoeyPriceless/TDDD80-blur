@@ -34,6 +34,7 @@ public class NetworkUtil {
     private Context appContext;
     private static NetworkUtil instance;
     private RequestQueue queue;
+    private String userId;
     private String tokenStringKey;
     private String token;
 
@@ -45,6 +46,14 @@ public class NetworkUtil {
     public void clearToken() {
         token = null;
         storeToken();
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUserId() {
+        return userId;
     }
 
     private NetworkUtil(Context context) {
@@ -102,8 +111,8 @@ public class NetworkUtil {
      */
     private void requestJsonObject(String url, int method, Listener<JSONObject> responseListener,
                                    ErrorListener errorListener) {
-  		JsonObjectRequest request = new JsonObjectRequest(method, url, null, responseListener,
-                errorListener) {
+  		JsonObjectRequest request = new JsonObjectRequest(method, url, null,
+                responseListener, errorListener) {
             @Override
             public Map<String, String> getHeaders() { return getHeadersAuth(); }
         };
@@ -139,8 +148,8 @@ public class NetworkUtil {
      */
     private void requestJsonArray(String url, int method, Listener<JSONArray> responseListener,
                                    ErrorListener errorListener) {
-        JsonArrayRequest request = new JsonArrayRequest(method, url, null, responseListener,
-                errorListener) {
+        JsonArrayRequest request = new JsonArrayRequest(method, url, null,
+                responseListener, errorListener) {
             @Override
             public Map<String, String> getHeaders() { return getHeadersAuth(); }
         };
@@ -164,7 +173,8 @@ public class NetworkUtil {
         params.put("email", email);
         params.put("password", password);
 
-        requestJsonObject(Url.build(Url.USER_LOGIN), Method.POST, responseListener, errorListener, params);
+        requestJsonObject(Url.build(Url.USER_LOGIN), Method.POST, responseListener, errorListener,
+                params);
     }
 
     /**
@@ -210,7 +220,8 @@ public class NetworkUtil {
      */
     public void getPostWithExtras(String id, Listener<JSONObject> responseListener,
                                 ErrorListener errorListener) {
-        requestJsonObject(Url.build(Url.POST_GET_EXTRAS, id), Method.GET, responseListener, errorListener);
+        requestJsonObject(Url.build(Url.POST_GET_EXTRAS, id), Method.GET, responseListener,
+                errorListener);
     }
 
     public void getReactions(String postId, Listener<JSONObject> responseListener,
@@ -219,11 +230,10 @@ public class NetworkUtil {
                 errorListener);
     }
 
-    public void reactToPost(String postId, String userId, ReactionType reaction,
+    public void reactToPost(String postId, ReactionType reaction,
                             Listener<JSONObject> responseListener, ErrorListener errorListener) {
         Map<String, String> params = new HashMap<>();
                     params.put("post_id", postId);
-                    params.put("user_id", userId);
                     params.put("reaction", String.valueOf(reaction.ordinal()));
         requestJsonObject(Url.build(Url.POST_REACTIONS_ADD), Method.POST, responseListener,
                                     errorListener, params);
@@ -231,7 +241,8 @@ public class NetworkUtil {
 
     public void getFeed(FeedType type, Listener<JSONObject> responseListener, ErrorListener
             errorListener) {
-        requestJsonObject(Url.build(Url.FEED_GET, type.toString().toLowerCase()), Method.GET, responseListener, errorListener);
+        requestJsonObject(Url.build(Url.FEED_GET, type.toString().toLowerCase()), Method.GET,
+                responseListener, errorListener);
     }
 
     /**

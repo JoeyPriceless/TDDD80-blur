@@ -91,6 +91,7 @@ class Post(db.Model):
         # serialized for easier gson handling according to
         # https://stackoverflow.com/a/39320732/4400799
         author = User.query.filter_by(id=self.author_id).one()
+        # should probably use count_reactions
         reactions = server.serialize_list(PostReaction.query.filter_by(post_id=self.id).all())
         return {
             'id': self.id,

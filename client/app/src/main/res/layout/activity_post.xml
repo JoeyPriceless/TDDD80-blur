@@ -63,6 +63,7 @@
 
     <LinearLayout
         android:id="@+id/linearlayout_post_buttons"
+        style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -73,24 +74,44 @@
 
         <Button
             android:id="@+id/button_post_react"
-            android:layout_width="wrap_content"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="React" />
+            android:drawableLeft="@drawable/ic_positive_black_24dp"
+            android:onClick="onClickReactionButton"
+            android:text="512"
+            tools:text="512" />
 
         <Button
             android:id="@+id/button_post_comment"
-            android:layout_width="wrap_content"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Comments" />
+            android:drawableLeft="@drawable/ic_comment_black_24dp"
+            android:text="1024"
+            tools:text="1024" />
 
         <Button
             android:id="@+id/button_post_favorite"
-            android:layout_width="wrap_content"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Favorites" />
+            android:drawableLeft="@drawable/ic_favorite_hollow_black_24dp"
+            android:text="2048"
+            tools:text="2048" />
+
+        <Button
+            android:id="@+id/button_post_share"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableLeft="@drawable/ic_share_black_24dp"
+            android:text="4096"
+            tools:text="4096" />
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView

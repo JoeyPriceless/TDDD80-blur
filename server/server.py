@@ -129,6 +129,7 @@ def post_comment():
 @app.route('/post/reactions', methods=['POST'])
 @jwt_required
 def react_to_post():
+    # TODO check if user has left reaction already, if so, change it.
     reaction = int(request.json['reaction'])
     post_id = request.json['post_id']
     user_id = get_raw_jwt()['identity']
@@ -141,6 +142,7 @@ def react_to_post():
 @app.route('/comment/react', methods=['POST'])
 @jwt_required
 def react_to_comment():
+    # TODO check if user has left reaction already, if so, change it.
     reaction = request.json['reaction']
     comment_id = request.json['comment']
     user_id = get_raw_jwt()['user']

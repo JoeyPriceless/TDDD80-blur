@@ -10,7 +10,8 @@ public class Post {
     private String content;
     @SerializedName("time_created")
     private DateTime timeCreated; // Check json compatibility
-    private Reactions reactions;
+    //private Reactions reactions;
+    private int score;
 
     public User getAuthor() {
         return author;
@@ -30,6 +31,19 @@ public class Post {
 
     public void setTimeCreated(DateTime timeCreated) {
         this.timeCreated = timeCreated;
+    }
+
+    //public Reactions getReactions() {
+    //    return reactions;
+    //}
+
+
+    public int getScore() {
+        return score;
+    }
+
+    public void incrementScore(int amount) {
+        score += amount;
     }
 
     public void setId(String id) {
