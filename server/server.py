@@ -123,7 +123,7 @@ def post_comment():
     comment = Comment(user_id, content, parent, post_id)
     db.session.add(comment)
     db.session.commit()
-    return respond(plain_response(comment.id))
+    return respond(Comment.query.filter_by(id=comment.id).one().reaction_score())
 
 
 @app.route('/post/reactions', methods=['POST'])
@@ -135,7 +135,7 @@ def react_to_post():
     post_reaction = PostReaction(post_id, user_id, reaction)
     db.session.add(post_reaction)
     db.session.commit()
-    return respond(plain_response(post_reaction.id))
+    return respond(Post.query.filter_by(post_id=post_id).one().reaction_score())
 
 
 @app.route('/comment/react', methods=['POST'])
@@ -147,7 +147,7 @@ def react_to_comment():
     comment_reaction = CommentReaction(comment_id, user_id, reaction)
     db.session.add(comment_reaction)
     db.session.commit()
-    return respond(plain_response(comment_reaction.id))
+    return respond(comment_reaction.serialize())
 
 
 @app.route('/post/delete/<postid>')

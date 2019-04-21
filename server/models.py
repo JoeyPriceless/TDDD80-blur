@@ -66,6 +66,17 @@ class Post(db.Model):
             .join(sq, sq.c.post_id == self.id, sq.c.reaction_type == reaction_type).all()
         return result
 
+    # TODO: Should probably contain more complicated logic involving interaction count and not just
+    #       negative / positive
+    def reaction_score(self):
+        score = 0
+        reactions = self.get_reactions()
+        # Score +1 if reaction type is positive and -1 if it's negative
+        # Reaction type is an int between 0-5, with the first 3 being positive reactions.
+        for reaction in reactions:
+            score += 1 if (reaction < 3) else -1
+        return score
+
     def serialize(self):
         return {
             'id': self.id,
@@ -88,7 +99,8 @@ class Post(db.Model):
             'time_created': {
                 'datetime': format_datetime(self.time_created)
             },
-            'reactions': {}
+            'score': self.reaction_score(),
+            'reactions': reactions
         }
 
 
@@ -101,7 +113,7 @@ class PostReaction(db.Model):
     def __init__(self, post_id, user_id, reaction_type):
         self.post_id = post_id
         self.user_id = user_id
-        if reaction_type > 6 or reaction_type < 0:
+        if reaction_type > 5 or reaction_type < 0:
             self.reaction_type = 0
         else:
             self.reaction_type = reaction_type
