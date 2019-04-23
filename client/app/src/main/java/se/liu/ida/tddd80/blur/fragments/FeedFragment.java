@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -36,9 +37,9 @@ public class FeedFragment extends Fragment {
     private final String TAG = getClass().getSimpleName();
     private static final String ARG_FEED_NAME = "feedName";
 
-    private FeedType mFeedType;
-    private FeedAdapter mAdapter;
-    private NetworkUtil mNetUtil;
+    private FeedType feedType;
+    private FeedAdapter adapter;
+    private NetworkUtil netUtil;
     private RecyclerView rv;
 
     private OnFragmentInteractionListener mListener;
@@ -59,10 +60,10 @@ public class FeedFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mFeedType = FeedType.valueOf((String)getArguments().get(ARG_FEED_NAME));
+            feedType = FeedType.valueOf((String)getArguments().get(ARG_FEED_NAME));
         }
-        mNetUtil = NetworkUtil.getInstance(getContext());
-        mNetUtil.getFeed(mFeedType, new ResponseListener(), new ResponseErrorListener());
+        netUtil = NetworkUtil.getInstance(getContext());
+        netUtil.getFeed(feedType, new ResponseListener(), new ResponseErrorListener());
     }
 
     @Override
@@ -71,7 +72,10 @@ public class FeedFragment extends Fragment {
         // Inflate the layout for this fragment
         View inflatedView = inflater.inflate(R.layout.fragment_feed, container, false);
         rv = inflatedView.findViewById(R.id.recyclerview_feed);
-        rv.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager lm = new LinearLayoutManager(getContext());
+        rv.setLayoutManager(lm);
+        rv.addItemDecoration(new DividerItemDecoration(rv.getContext(), lm.getOrientation()));
+        rv.setHasFixedSize(true);
         return inflatedView;
     }
 
@@ -117,8 +121,9 @@ public class FeedFragment extends Fragment {
     private class ResponseListener implements Response.Listener<JSONObject> {
         @Override
         public void onResponse(JSONObject response) {
-            mAdapter = new FeedAdapter(GsonUtil.getInstance().parseFeed(response));
-            rv.setAdapter(mAdapter);
+            adapter = new FeedAdapter(GsonUtil.getInstance().parseFeed(response),
+                    getFragmentManager());
+            rv.setAdapter(adapter);
         }
     }
 
@@ -126,8 +131,7 @@ public class FeedFragment extends Fragment {
         @Override
         public void onErrorResponse(VolleyError error) {
             Log.e(TAG, StringUtil.parsePlainJsonResponse(error));
-            Toast.makeText(getContext(), "Failed to fetch feed.\n",
-                    Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Failed to fetch feed.", Toast.LENGTH_LONG).show();
         }
     }
 }

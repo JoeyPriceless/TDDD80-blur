@@ -2,6 +2,7 @@ package se.liu.ida.tddd80.blur.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,11 +12,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import se.liu.ida.tddd80.blur.R;
+import se.liu.ida.tddd80.blur.fragments.ReactDialogFragment;
 import se.liu.ida.tddd80.blur.models.Feed;
 import se.liu.ida.tddd80.blur.models.Post;
+import se.liu.ida.tddd80.blur.models.ReactionType;
+import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
+import se.liu.ida.tddd80.blur.utilities.ResponseListeners;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
+import se.liu.ida.tddd80.blur.utilities.ViewUtil;
 
-public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder>{
+public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView authorImage;
         public TextView authorName;
@@ -33,15 +40,25 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder>{
             timestamp = v.findViewById(R.id.textview_feeditem_time);
             content = v.findViewById(R.id.textview_feeditem_content);
             reactButton = v.findViewById(R.id.button_feeditem_react);
+            reactButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String postId = feed.get(getAdapterPosition()).getId();
+                    ViewUtil.showReactionDialog(v.getContext(), fragmentManager, postId,
+                            reactButton.getId());
+                }
+            });
             commentButton = v.findViewById(R.id.button_feeditem_comment);
             favoriteButton = v.findViewById(R.id.button_feeditem_favorite);
         }
     }
 
-    private Feed mFeed;
+    private Feed feed;
+    private FragmentManager fragmentManager;
 
-    public FeedAdapter(Feed feed) {
-        this.mFeed = feed;
+    public FeedAdapter(Feed feed, FragmentManager fragmentManager) {
+        this.feed = feed;
+        this.fragmentManager = fragmentManager;
     }
 
     @NonNull
@@ -58,16 +75,17 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder>{
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-        Post post = mFeed.get(i);
+    public void onBindViewHolder(@NonNull ViewHolder vh, int i) {
+        Post post = feed.get(i);
 
-        viewHolder.authorName.setText(post.getAuthor().getUsername());
-        viewHolder.timestamp.setText(StringUtil.formatDateTimeShort(post.getTimeCreated()));
-        viewHolder.content.setText(post.getContent());
+        vh.authorName.setText(post.getAuthor().getUsername());
+        vh.timestamp.setText(StringUtil.formatDateTimeShort(post.getTimeCreated()));
+        vh.content.setText(post.getContent());
+        ViewUtil.updateReactionButton(vh.reactButton, post.getReactions());
     }
 
     @Override
     public int getItemCount() {
-        return mFeed.size();
+        return feed.size();
     }
 }

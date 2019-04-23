@@ -45,9 +45,6 @@ def get_comments(postid):
 @app.route('/post/<postid>')
 def get_post(postid):
     post = Post.query.filter_by(id=postid).one()
-    if post is None:
-        return respond(
-            plain_response("The given post ID doesn't exist. Requested resource not found."), 404)
     return respond(post.serialize())
 
 @app.route('/post/extras/<postid>')

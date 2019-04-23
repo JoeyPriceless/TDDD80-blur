@@ -14,8 +14,12 @@ import se.liu.ida.tddd80.blur.R;
 import static android.app.AlertDialog.*;
 
 public class ReactDialogFragment extends DialogFragment {
+    public static String KEY_POST_ID = "POST_ID";
+    public static String KEY_BUTTON_ID = "BUTTON_ID";
     public ReactDialogListener listener;
     private int index;
+    private String postId;
+    private int buttonId;
 
     public int getIndex() {
         return index;
@@ -23,6 +27,25 @@ public class ReactDialogFragment extends DialogFragment {
 
     private void setIndex(int i) {
         index = i;
+    }
+
+    public String getPostId() {
+        return postId;
+    }
+
+    public int getButtonId() {
+        return buttonId;
+    }
+
+    public ReactDialogFragment() {
+    }
+
+    @Override
+    public void setArguments(@Nullable Bundle args) {
+        if (args != null) {
+            postId = args.getString(KEY_POST_ID);
+            buttonId = args.getInt(KEY_BUTTON_ID);
+        }
     }
 
     @NonNull
