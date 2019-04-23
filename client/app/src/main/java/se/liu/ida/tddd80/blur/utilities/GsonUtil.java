@@ -4,10 +4,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import org.joda.time.DateTime;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import se.liu.ida.tddd80.blur.models.Feed;
 import se.liu.ida.tddd80.blur.models.Post;
+import se.liu.ida.tddd80.blur.models.Reactions;
 
 /**
  * Singleton class which contains a Gson instance and methods to deserialize JSONObjects into java
@@ -33,11 +35,31 @@ public class GsonUtil {
     /**
      * Returns a Post from a successful getPostWithExtras request.
      */
-    public Post PostFromPostWithExtras(JSONObject object) {
+    public Post parsePostWithExtras(JSONObject object) {
         return gson.fromJson(object.toString(), Post.class);
     }
 
-    public Feed FeedFromJson(JSONObject object) {
+    public Feed parseFeed(JSONObject object) {
         return gson.fromJson(object.toString(), Feed.class);
+    }
+
+    public Reactions parseReactions(JSONObject object) {
+        return gson.fromJson(object.toString(), Reactions.class);
+    }
+
+    public String parseString(JSONObject object) {
+        try {
+            return object.getString("response");
+        } catch (JSONException ex) {
+            return "";
+        }
+    }
+
+    public int parseInt(JSONObject object) {
+        try {
+            return object.getInt("response");
+        } catch (JSONException ex) {
+            return 0;
+        }
     }
 }

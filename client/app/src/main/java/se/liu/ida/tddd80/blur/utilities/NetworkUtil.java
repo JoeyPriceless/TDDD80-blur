@@ -97,7 +97,7 @@ public class NetworkUtil {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
         // Only send authorization if there is a token.
-        if (token != null && token.isEmpty())
+        if (token != null && !token.isEmpty())
             headers.put("Authorization", "Bearer ".concat(token));
         return headers;
     }

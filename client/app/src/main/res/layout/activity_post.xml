@@ -1,126 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginStart="16dp"
-    android:layout_marginEnd="16dp"
     tools:context=".activities.PostActivity">
 
-    <LinearLayout
-        android:id="@+id/linearlayout_post_header"
-        android:layout_width="match_parent"
+    <android.support.constraint.ConstraintLayout
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:orientation="horizontal"
-        android:weightSum="100"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_width="match_parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp">
+        <LinearLayout
+            android:id="@+id/linearlayout_post_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            android:weightSum="100"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/imageview_post_author"
+            <ImageView
+                android:id="@+id/imageview_post_author"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="30"
+                app:srcCompat="@mipmap/ic_launcher_round" />
+
+            <LinearLayout
+                android:id="@+id/linearlayout_post_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="70"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textview_post_author"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    tools:text="Username can be super duper long" />
+
+                <TextView
+                    android:id="@+id/textview_post_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="00:34 - 1 April 2019" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textview_post_content"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="30"
-            app:srcCompat="@mipmap/ic_launcher_round" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearlayout_post_header"
+            tools:text="Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat mas" />
 
         <LinearLayout
-            android:id="@+id/linearlayout_post_title"
-            android:layout_width="0dp"
+            android:id="@+id/linearlayout_post_buttons"
+            style="?android:attr/buttonBarStyle"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_weight="70"
-            android:orientation="vertical">
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textview_post_content">
 
-            <TextView
-                android:id="@+id/textview_post_author"
-                android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/button_post_react"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                tools:text="Username can be super duper long" />
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/ic_positive_black_24dp"
+                android:onClick="onClickReactionButton"
+                android:text="512"
+                tools:text="512" />
 
-            <TextView
-                android:id="@+id/textview_post_time"
-                android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/button_post_comment"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                tools:text="00:34 - 1 April 2019" />
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/ic_comment_black_24dp"
+                android:text="1024"
+                tools:text="1024" />
+
+            <Button
+                android:id="@+id/button_post_favorite"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/ic_favorite_hollow_black_24dp"
+                android:text="2048"
+                tools:text="2048" />
+
+            <Button
+                android:id="@+id/button_post_share"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/ic_share_black_24dp"
+                android:text="4096"
+                tools:text="4096" />
         </LinearLayout>
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/textview_post_content"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearlayout_post_header"
-        tools:text="Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat mas" />
-
-    <LinearLayout
-        android:id="@+id/linearlayout_post_buttons"
-        style="?android:attr/buttonBarStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textview_post_content">
-
-        <Button
-            android:id="@+id/button_post_react"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:drawableLeft="@drawable/ic_positive_black_24dp"
-            android:onClick="onClickReactionButton"
-            android:text="512"
-            tools:text="512" />
-
-        <Button
-            android:id="@+id/button_post_comment"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:drawableLeft="@drawable/ic_comment_black_24dp"
-            android:text="1024"
-            tools:text="1024" />
-
-        <Button
-            android:id="@+id/button_post_favorite"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:drawableLeft="@drawable/ic_favorite_hollow_black_24dp"
-            android:text="2048"
-            tools:text="2048" />
-
-        <Button
-            android:id="@+id/button_post_share"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:drawableLeft="@drawable/ic_share_black_24dp"
-            android:text="4096"
-            tools:text="4096" />
-    </LinearLayout>
+    </android.support.constraint.ConstraintLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerview_post_comments"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearlayout_post_buttons" />
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>

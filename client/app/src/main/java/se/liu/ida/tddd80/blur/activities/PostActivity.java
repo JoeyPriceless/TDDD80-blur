@@ -1,8 +1,9 @@
 package se.liu.ida.tddd80.blur.activities;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -21,15 +22,18 @@ import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.fragments.ReactDialogFragment;
 import se.liu.ida.tddd80.blur.models.Post;
 import se.liu.ida.tddd80.blur.models.ReactionType;
+import se.liu.ida.tddd80.blur.models.Reactions;
 import se.liu.ida.tddd80.blur.utilities.GsonUtil;
 import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
+import se.liu.ida.tddd80.blur.utilities.ViewUtil;
 
 
 public class PostActivity extends AppCompatActivity
         implements ReactDialogFragment.ReactDialogListener {
     private final String TAG = getClass().getSimpleName();
     NetworkUtil netUtil;
+    GsonUtil gsonUtil;
 	private Post post;
 
 	private Button btnReact;
@@ -41,6 +45,7 @@ public class PostActivity extends AppCompatActivity
 		String postId = intent.getStringExtra(getResources().getString(R.string.extra_post_id));
 
 		netUtil = NetworkUtil.getInstance(this);
+		gsonUtil = GsonUtil.getInstance();
 		netUtil.getPostWithExtras(postId, new postExtraResponseListener(), new postExtraErrorListener());
 	}
 
@@ -48,7 +53,7 @@ public class PostActivity extends AppCompatActivity
         @Override
         public void onResponse(JSONObject response) {
             try {
-                post = GsonUtil.getInstance().PostFromPostWithExtras(response);
+                post = gsonUtil.parsePostWithExtras(response);
                 // TODO set image
                 ((TextView)findViewById(R.id.textview_post_author)).setText(
                         post.getAuthor().getUsername());
@@ -57,7 +62,7 @@ public class PostActivity extends AppCompatActivity
                 ((TextView)findViewById(R.id.textview_post_content)).setText(post.getContent());
 
                 btnReact = findViewById(R.id.button_post_react);
-                btnReact.setText(String.valueOf(post.getScore()));
+                ViewUtil.updateReactionButton(btnReact, post.getReactions());
 
             } catch (JsonSyntaxException ex) {
                 Log.e(TAG, ExceptionUtils.getStackTrace(ex));
@@ -96,7 +101,8 @@ public class PostActivity extends AppCompatActivity
     private class ReactionSuccess implements Response.Listener<JSONObject> {
         @Override
         public void onResponse(JSONObject response) {
-
+            post.setReactions(gsonUtil.parseReactions(response));
+            ViewUtil.updateReactionButton(btnReact, post.getReactions());
         }
     }
 

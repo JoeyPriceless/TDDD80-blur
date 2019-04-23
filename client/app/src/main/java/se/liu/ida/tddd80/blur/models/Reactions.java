@@ -2,6 +2,8 @@ package se.liu.ida.tddd80.blur.models;
 
 import android.util.Pair;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.EnumMap;
 
 /**
@@ -9,11 +11,27 @@ import java.util.EnumMap;
  */
 public class Reactions {
     private EnumMap<ReactionType, Integer> map = new EnumMap<>(ReactionType.class);
+    private int score;
+    @SerializedName("own_reaction")
+    private ReactionType ownReaction;
 
     public Reactions(Pair<ReactionType, Integer>... pairs) {
         for (Pair<ReactionType, Integer> pair : pairs) {
             map.put(pair.first, pair.second);
         }
+    }
+
+    public ReactionType getOwnReaction() {
+        return ownReaction;
+    }
+
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 
     /**

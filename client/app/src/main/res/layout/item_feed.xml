@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp">
 
     <LinearLayout
         android:id="@+id/linearlayout_feeditem_header"
@@ -43,7 +45,7 @@
                 android:id="@+id/textview_feeditem_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="00:34 - 1 April 2019" />
+                tools:text="1 Apr 2019" />
         </LinearLayout>
     </LinearLayout>
 
@@ -52,13 +54,16 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearlayout_feeditem_header"
         tools:text="Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat mas" />
 
+
     <LinearLayout
         android:id="@+id/linearlayout_feeditem_buttons"
+        style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -69,24 +74,44 @@
 
         <Button
             android:id="@+id/button_feeditem_react"
-            android:layout_width="wrap_content"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="React" />
+            android:drawableLeft="@drawable/ic_positive_black_24dp"
+            android:onClick="onClickReactionButton"
+            android:text="512"
+            tools:text="512" />
 
         <Button
             android:id="@+id/button_feeditem_comment"
-            android:layout_width="wrap_content"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Comments" />
+            android:drawableLeft="@drawable/ic_comment_black_24dp"
+            android:text="1024"
+            tools:text="1024" />
 
         <Button
             android:id="@+id/button_feeditem_favorite"
-            android:layout_width="wrap_content"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Favorites" />
+            android:drawableLeft="@drawable/ic_favorite_hollow_black_24dp"
+            android:text="2048"
+            tools:text="2048" />
+
+        <Button
+            android:id="@+id/button_feeditem_share"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableLeft="@drawable/ic_share_black_24dp"
+            android:text="4096"
+            tools:text="4096" />
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

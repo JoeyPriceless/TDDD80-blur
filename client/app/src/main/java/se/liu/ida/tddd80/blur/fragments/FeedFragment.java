@@ -117,7 +117,7 @@ public class FeedFragment extends Fragment {
     private class ResponseListener implements Response.Listener<JSONObject> {
         @Override
         public void onResponse(JSONObject response) {
-            mAdapter = new FeedAdapter(GsonUtil.getInstance().FeedFromJson(response));
+            mAdapter = new FeedAdapter(GsonUtil.getInstance().parseFeed(response));
             rv.setAdapter(mAdapter);
         }
     }
