@@ -77,6 +77,20 @@ class Post(db.Model):
             score += 1 if (reaction.reaction_type < 3) else -1
         return score
 
+    def serialize_reactions(self, user_id=None):
+        reactions = server.serialize_list(PostReaction.query.filter_by(post_id=self.id).all())
+        # Generates the requesters own reaction type if it exists.
+        # If the requester isn't logged in or hasn't reacted, the value is -1.
+        own_reaction_type = "null"
+        if user_id:
+            own_reaction = PostReaction.query.filter_by(post_id=self.id, user_id=user_id).scalar()
+            own_reaction_type = own_reaction.reaction_type if own_reaction else "null"
+        return {
+            'score': self.reaction_score(),
+            'own_reaction': own_reaction_type
+            # include mapping?
+        }
+
     def serialize(self):
         return {
             'id': self.id,
@@ -92,15 +106,6 @@ class Post(db.Model):
         # https://stackoverflow.com/a/39320732/4400799
         author = User.query.filter_by(id=self.author_id).one()
         # should probably use count_reactions
-        reactions = server.serialize_list(PostReaction.query.filter_by(post_id=self.id).all())
-
-        # Generates the requesters own reaction type if it exists.
-        # If the requester isn't logged in or hasn't reacted, the value is -1.
-        own_reaction_type = "null"
-        if user_id:
-            own_reaction = PostReaction.query.filter_by(post_id=self.id, user_id=user_id).scalar()
-            own_reaction_type = own_reaction.reaction_type if own_reaction else "null"
-
         return {
             'id': self.id,
             'author': author.serialize(),
@@ -108,11 +113,7 @@ class Post(db.Model):
             'time_created': {
                 'datetime': format_datetime(self.time_created)
             },
-            'score': self.reaction_score(),
-            'reactions': {
-                'own_reaction': own_reaction_type
-                # include mapping?
-            }
+            'reactions': self.serialize_reactions(user_id)
         }
 
 

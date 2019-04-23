@@ -54,8 +54,9 @@ def get_post(postid):
 @jwt_optional
 def get_post_with_extras(postid):
     post = Post.query.filter_by(id=postid).one()
-    if get_jwt_identity():
-        response = post.serialize_with_extras(get_jwt_identity())
+    user_id = get_jwt_identity()
+    if user_id:
+        response = post.serialize_with_extras(user_id)
     else:
         response = post.serialize_with_extras()
     return respond(response)
@@ -137,6 +138,10 @@ def post_comment():
 def react_to_post():
     reaction = int(request.json['reaction'])
     post_id = request.json['post_id']
+    post = Post.query.filter_by(id=post_id).scalar()
+    if not post:
+        return respond(plain_response(
+            "The given post ID doesn't exist. Requested resource not found"), 404)
     user_id = get_jwt_identity()
     # Check if PostReaction already exists. If so update its type. Otherwise, create a new reaction.
     post_reaction = PostReaction.query.filter_by(post_id=post_id, user_id=user_id).scalar()
@@ -150,7 +155,7 @@ def react_to_post():
         post_reaction = PostReaction(post_id, user_id, reaction)
         db.session.add(post_reaction)
     db.session.commit()
-    return respond(plain_response(Post.query.filter_by(id=post_id).one().reaction_score()))
+    return respond(post.serialize_reactions(user_id))
 
 
 @app.route('/comment/react', methods=['POST'])
@@ -159,7 +164,11 @@ def react_to_comment():
     # TODO change from reaction type to binary reaction
     reaction = request.json['reaction']
     comment_id = request.json['comment']
-    user_id = get_raw_jwt()['user']
+    comment = Comment.query.filter_by(id=comment_id).scalar()
+    if not comment:
+        return respond(plain_response(
+            "The given comment ID doesn't exist. Requested resource not found"), 404)
+    user_id = get_jwt_identity()
     # Check if CommentReaction already exists. If so update its type. Otherwise, create a new
     # reaction.
     comment_reaction = CommentReaction.query.filter_by(comment_id=comment_id, user_id=user_id) \
