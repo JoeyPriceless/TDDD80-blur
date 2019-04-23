@@ -9,6 +9,7 @@ USERNAME_MIN_LENGTH = 3
 USERNAME_MAX_LENGTH = 24
 PASSWORD_MIN_LENGTH = 8
 
+
 def reset_db():
     print("Dropping all tables")
     db.drop_all()
@@ -140,13 +141,12 @@ def react_to_post():
         post_reaction = PostReaction(post_id, user_id, reaction)
         db.session.add(post_reaction)
     db.session.commit()
-    return respond(Post.query.filter_by(id=post_id).one().reaction_score())
+    return respond(plain_response(Post.query.filter_by(id=post_id).one().reaction_score()))
 
 
 @app.route('/comment/react', methods=['POST'])
 @jwt_required
 def react_to_comment():
-    # TODO check if user has left reaction already, if so, change it.
     # TODO change from reaction type to binary reaction
     reaction = request.json['reaction']
     comment_id = request.json['comment']
@@ -161,7 +161,7 @@ def react_to_comment():
         comment_reaction = CommentReaction(comment_id, user_id, reaction)
         db.session.add(comment_reaction)
     db.session.commit()
-    return respond(comment_reaction.serialize())
+    return respond(plain_response(comment_reaction.serialize()))
 
 
 @app.route('/post/delete/<postid>')
