@@ -1,7 +1,7 @@
 from flask import jsonify, request
 from models import *
 from __init__ import app, db, jwt
-from flask_jwt_extended import jwt_required, get_raw_jwt
+from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 import sys
 import json
 
@@ -51,10 +51,11 @@ def get_post(postid):
     return respond(post.serialize())
 
 @app.route('/post/extras/<postid>')
+@jwt_optional
 def get_post_with_extras(postid):
     post = Post.query.filter_by(id=postid).one()
-    if get_raw_jwt():
-        response = post.serialize_with_extras(get_raw_jwt()['identity'])
+    if get_jwt_identity():
+        response = post.serialize_with_extras(get_jwt_identity())
     else:
         response = post.serialize_with_extras()
     return respond(response)
@@ -98,7 +99,7 @@ def get_user(userid):
 @app.route('/user/pref/')
 @jwt_required
 def get_user_preference():
-    userid = get_raw_jwt()['identity']
+    userid = get_jwt_identity()
     prefs = UserPreference.query.filter_by(user=userid).one()
     if prefs is None:
         return respond(
@@ -110,7 +111,7 @@ def get_user_preference():
 @jwt_required
 def create_post():
     content = request.json['content']
-    user_id = get_raw_jwt()['identity']
+    user_id = get_jwt_identity()
     post = Post(user_id, content)
     db.session.add(post)
     db.session.commit()
@@ -123,7 +124,7 @@ def post_comment():
     content = request.json['content']
     parent = request.json['parent']
     post_id = request.json['post_id']
-    user_id = get_raw_jwt()['identity']
+    user_id = get_jwt_identity()
     # TODO: Needs to be able to handle posting comments without a parent comment.
     comment = Comment(user_id, content, parent, post_id)
     db.session.add(comment)
@@ -136,7 +137,7 @@ def post_comment():
 def react_to_post():
     reaction = int(request.json['reaction'])
     post_id = request.json['post_id']
-    user_id = get_raw_jwt()['identity']
+    user_id = get_jwt_identity()
     # Check if PostReaction already exists. If so update its type. Otherwise, create a new reaction.
     post_reaction = PostReaction.query.filter_by(post_id=post_id, user_id=user_id).scalar()
     if post_reaction:
@@ -182,7 +183,7 @@ def delete_post(postid):
     if post is None:
         return respond(
             plain_response("The given post ID doesn't exist. Requested resource not found."), 404)
-    if post.author != get_raw_jwt()['identity']:
+    if post.author != get_jwt_identity():
         return respond(
             plain_response("User is not author of specified post. Permission denied."), 403)
     post.kill_children(db)
@@ -197,7 +198,7 @@ def delete_comment(commentid):
     if comment is None:
         return respond(
             plain_response("The given post ID doesn't exist. Requested resource not found."), 404)
-    if comment.author != get_raw_jwt()['identity']:
+    if comment.author != get_jwt_identity():
         return respond(
             plain_response("User is not author of specified post. Permission denied."), 403)
     comment.kill_children(db)
