@@ -87,12 +87,20 @@ class Post(db.Model):
             }
         }
 
-    def serialize_with_extras(self):
+    def serialize_with_extras(self, user_id=None):
         # serialized for easier gson handling according to
         # https://stackoverflow.com/a/39320732/4400799
         author = User.query.filter_by(id=self.author_id).one()
         # should probably use count_reactions
         reactions = server.serialize_list(PostReaction.query.filter_by(post_id=self.id).all())
+
+        # Generates the requesters own reaction type if it exists.
+        # If the requester isn't logged in or hasn't reacted, the value is -1.
+        own_reaction_type = "null"
+        if user_id:
+            own_reaction = PostReaction.query.filter_by(post_id=self.id, user_id=user_id).scalar()
+            own_reaction_type = own_reaction.reaction_type if own_reaction else "null"
+
         return {
             'id': self.id,
             'author': author.serialize(),
@@ -101,7 +109,10 @@ class Post(db.Model):
                 'datetime': format_datetime(self.time_created)
             },
             'score': self.reaction_score(),
-            'reactions': reactions
+            'reactions': {
+                'own_reaction': own_reaction_type
+                # include mapping?
+            }
         }
 
 

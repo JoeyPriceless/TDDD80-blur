@@ -53,7 +53,11 @@ def get_post(postid):
 @app.route('/post/extras/<postid>')
 def get_post_with_extras(postid):
     post = Post.query.filter_by(id=postid).one()
-    return respond(post.serialize_with_extras())
+    if get_raw_jwt():
+        response = post.serialize_with_extras(get_raw_jwt()['identity'])
+    else:
+        response = post.serialize_with_extras()
+    return respond(response)
 
 @app.route('/comments/chain/<commentid>')
 def get_comment_chain(commentid):
@@ -136,7 +140,11 @@ def react_to_post():
     # Check if PostReaction already exists. If so update its type. Otherwise, create a new reaction.
     post_reaction = PostReaction.query.filter_by(post_id=post_id, user_id=user_id).scalar()
     if post_reaction:
-        post_reaction.reaction_type = reaction
+        # If user selects same reaction, it should be deleted. Otherwise, change to new reaction.
+        if post_reaction.reaction_type == reaction:
+            db.session.delete(post_reaction)
+        else:
+            post_reaction.reaction_type = reaction
     else:
         post_reaction = PostReaction(post_id, user_id, reaction)
         db.session.add(post_reaction)
@@ -156,7 +164,10 @@ def react_to_comment():
     comment_reaction = CommentReaction.query.filter_by(comment_id=comment_id, user_id=user_id) \
         .scalar()
     if comment_reaction:
-        comment_reaction.reaction_type = reaction
+        if comment_reaction.reaction_type == reaction:
+            db.session.delete(comment_reaction)
+        else:
+            comment_reaction.reaction_type = reaction
     else:
         comment_reaction = CommentReaction(comment_id, user_id, reaction)
         db.session.add(comment_reaction)
