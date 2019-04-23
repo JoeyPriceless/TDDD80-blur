@@ -129,12 +129,16 @@ def post_comment():
 @app.route('/post/reactions', methods=['POST'])
 @jwt_required
 def react_to_post():
-    # TODO check if user has left reaction already, if so, change it.
     reaction = int(request.json['reaction'])
     post_id = request.json['post_id']
     user_id = get_raw_jwt()['identity']
-    post_reaction = PostReaction(post_id, user_id, reaction)
-    db.session.add(post_reaction)
+    # Check if PostReaction already exists. If so update its type. Otherwise, create a new reaction.
+    post_reaction = PostReaction.query.filter_by(post_id=post_id, user_id=user_id).scalar()
+    if post_reaction:
+        post_reaction.reaction_type = reaction
+    else:
+        post_reaction = PostReaction(post_id, user_id, reaction)
+        db.session.add(post_reaction)
     db.session.commit()
     return respond(Post.query.filter_by(id=post_id).one().reaction_score())
 
@@ -143,11 +147,19 @@ def react_to_post():
 @jwt_required
 def react_to_comment():
     # TODO check if user has left reaction already, if so, change it.
+    # TODO change from reaction type to binary reaction
     reaction = request.json['reaction']
     comment_id = request.json['comment']
     user_id = get_raw_jwt()['user']
-    comment_reaction = CommentReaction(comment_id, user_id, reaction)
-    db.session.add(comment_reaction)
+    # Check if CommentReaction already exists. If so update its type. Otherwise, create a new
+    # reaction.
+    comment_reaction = CommentReaction.query.filter_by(comment_id=comment_id, user_id=user_id) \
+        .scalar()
+    if comment_reaction:
+        comment_reaction.reaction_type = reaction
+    else:
+        comment_reaction = CommentReaction(comment_id, user_id, reaction)
+        db.session.add(comment_reaction)
     db.session.commit()
     return respond(comment_reaction.serialize())
 
