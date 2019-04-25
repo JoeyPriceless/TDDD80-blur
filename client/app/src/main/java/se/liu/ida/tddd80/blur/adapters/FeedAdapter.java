@@ -1,6 +1,7 @@
 package se.liu.ida.tddd80.blur.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import se.liu.ida.tddd80.blur.R;
+import se.liu.ida.tddd80.blur.activities.PostActivity;
 import se.liu.ida.tddd80.blur.fragments.ReactDialogFragment;
 import se.liu.ida.tddd80.blur.models.Feed;
 import se.liu.ida.tddd80.blur.models.Post;
@@ -43,22 +45,40 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
             reactButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String postId = feed.get(getAdapterPosition()).getId();
-                    ViewUtil.showReactionDialog(v.getContext(), fragmentManager, postId,
+                    ViewUtil.showReactionDialog(v.getContext(), fragmentManager, getPostId(),
                             reactButton.getId());
                 }
             });
             commentButton = v.findViewById(R.id.button_feeditem_comment);
             favoriteButton = v.findViewById(R.id.button_feeditem_favorite);
+
+            v.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener != null) {
+                        listener.onPostClick(getPostId());
+                    }
+                }
+            });
+        }
+
+        private String getPostId() {
+            return feed.get(getAdapterPosition()).getId();
         }
     }
 
     private Feed feed;
     private FragmentManager fragmentManager;
+    private OnPostClickListener listener;
 
-    public FeedAdapter(Feed feed, FragmentManager fragmentManager) {
+    public interface OnPostClickListener {
+        void onPostClick(String postId);
+    }
+
+    public FeedAdapter(Feed feed, FragmentManager fragmentManager, OnPostClickListener listener) {
         this.feed = feed;
         this.fragmentManager = fragmentManager;
+        this.listener = listener;
     }
 
     @NonNull

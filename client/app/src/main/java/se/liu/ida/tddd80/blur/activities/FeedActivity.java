@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.fragments.FeedFragment;
@@ -37,7 +38,7 @@ public class FeedActivity extends AppCompatActivity
     public void onClickReactionDialog(ReactDialogFragment dialog) {
         ReactionType type = ReactionType.values()[dialog.getIndex()];
         NetworkUtil.getInstance(this).reactToPost(dialog.getPostId(), type,
-                new ResponseListeners.ReactionSuccess(new View(this), dialog.getButtonId()),
+                new ResponseListeners.ReactionSuccess((Button)findViewById(dialog.getButtonId())),
                 new ResponseListeners.DefaultError(this));
     }
 }

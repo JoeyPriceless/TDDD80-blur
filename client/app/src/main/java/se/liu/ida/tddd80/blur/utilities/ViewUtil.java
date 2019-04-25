@@ -14,6 +14,13 @@ import se.liu.ida.tddd80.blur.models.ReactionType;
 import se.liu.ida.tddd80.blur.models.Reactions;
 
 public class ViewUtil {
+
+    /**
+     * Update a given reaction button according to a post's reactions. Sets the color of the icon
+     * and text according to the user's vote.
+     * @param button Button which drawable/text should be updated
+     * @param reactions The reactions belonging to the post which was voted on.
+     */
     public static void updateReactionButton(Button button, Reactions reactions) {
         button.setText(String.valueOf(reactions.getScore()));
         int colorId = R.color.colorReactionNeutral;
@@ -32,6 +39,13 @@ public class ViewUtil {
         showReactionDialog(context, fragmentManager, postId, 0);
     }
 
+    /**
+     * Shows an ReactDialog displaying each of the votes a user can select for a post.
+     * @param context
+     * @param fragmentManager
+     * @param postId
+     * @param buttonId
+     */
     public static void showReactionDialog(Context context, FragmentManager fragmentManager,
                                           String postId, int buttonId) {
         if (!NetworkUtil.getInstance(context).isUserLoggedIn()) {

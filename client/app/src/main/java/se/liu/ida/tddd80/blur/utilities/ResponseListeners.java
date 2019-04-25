@@ -2,7 +2,6 @@ package se.liu.ida.tddd80.blur.utilities;
 
 import android.content.Context;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -15,6 +14,10 @@ import se.liu.ida.tddd80.blur.models.Post;
 
 public class ResponseListeners {
 
+    /**
+     * Provides a default responselistener for a NetworkUtil.reactToPost call. Updates a given
+     * reaction button with the new score.
+     */
     public static class ReactionSuccess implements Response.Listener<JSONObject> {
         private Post post;
         private Button btnReact;
@@ -24,9 +27,9 @@ public class ResponseListeners {
             btnReact = reactionButton;
         }
 
-        public ReactionSuccess(View v, int buttonId) {
+        public ReactionSuccess(Button btnReact) {
             this.post = new Post();
-            this.btnReact = v.findViewById(buttonId);
+            this.btnReact = btnReact;
         }
 
         @Override
@@ -36,6 +39,9 @@ public class ResponseListeners {
         }
     }
 
+    /**
+     * Provides a defailt ErrorListener for Volley requests. Notifies the log and creates a toast.
+     */
     public static class DefaultError implements Response.ErrorListener {
         Context context;
 
@@ -47,7 +53,7 @@ public class ResponseListeners {
         public void onErrorResponse(VolleyError error) {
             String errorString = error.toString();
             Log.e(context.getClass().getSimpleName(), errorString);
-            Toast.makeText(context, errorString, Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, errorString, Toast.LENGTH_LONG).show();
         }
     }
 }

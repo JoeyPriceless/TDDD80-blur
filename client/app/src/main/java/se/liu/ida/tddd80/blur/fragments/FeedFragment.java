@@ -1,6 +1,7 @@
 package se.liu.ida.tddd80.blur.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,6 +20,7 @@ import com.android.volley.VolleyError;
 import org.json.JSONObject;
 
 import se.liu.ida.tddd80.blur.R;
+import se.liu.ida.tddd80.blur.activities.PostActivity;
 import se.liu.ida.tddd80.blur.adapters.FeedAdapter;
 import se.liu.ida.tddd80.blur.models.FeedType;
 import se.liu.ida.tddd80.blur.utilities.GsonUtil;
@@ -122,7 +124,7 @@ public class FeedFragment extends Fragment {
         @Override
         public void onResponse(JSONObject response) {
             adapter = new FeedAdapter(GsonUtil.getInstance().parseFeed(response),
-                    getFragmentManager());
+                    getFragmentManager(), new PostActivityListener());
             rv.setAdapter(adapter);
         }
     }
@@ -132,6 +134,16 @@ public class FeedFragment extends Fragment {
         public void onErrorResponse(VolleyError error) {
             Log.e(TAG, StringUtil.parsePlainJsonResponse(error));
             Toast.makeText(getContext(), "Failed to fetch feed.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private class PostActivityListener implements FeedAdapter.OnPostClickListener {
+        @Override
+        public void onPostClick(String postId) {
+            Intent postActivityIntent = new Intent(getContext(), PostActivity.class);
+            postActivityIntent.putExtra(getResources().getString(R.string.extra_post_id),
+                    postId);
+            startActivity(postActivityIntent);
         }
     }
 }
