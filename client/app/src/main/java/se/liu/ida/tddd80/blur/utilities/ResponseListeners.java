@@ -3,6 +3,8 @@ package se.liu.ida.tddd80.blur.utilities;
 import android.content.Context;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
@@ -21,10 +23,15 @@ public class ResponseListeners {
     public static class ReactionSuccess implements Response.Listener<JSONObject> {
         private Post post;
         private Button btnReact;
+        private TextView tvAuthor;
+        private ImageView ivAuthor;
 
-        public ReactionSuccess(Post post, Button reactionButton) {
+        public ReactionSuccess(Post post, Button reactionButton, TextView tvAuthor,
+                               ImageView ivAuthor) {
             this.post = post;
             btnReact = reactionButton;
+            this.tvAuthor = tvAuthor;
+            this.ivAuthor = ivAuthor;
         }
 
         public ReactionSuccess(Button btnReact) {
@@ -35,7 +42,7 @@ public class ResponseListeners {
         @Override
         public void onResponse(JSONObject response) {
             post.setReactions(GsonUtil.getInstance().parseReactions(response));
-            ViewUtil.updateReactionButton(btnReact, post.getReactions());
+            ViewUtil.onReactionUpdateViews(btnReact, post.getReactions(), tvAuthor, ivAuthor);
         }
     }
 

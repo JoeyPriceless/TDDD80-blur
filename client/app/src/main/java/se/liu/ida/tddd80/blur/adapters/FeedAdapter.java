@@ -1,7 +1,6 @@
 package se.liu.ida.tddd80.blur.adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,13 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import se.liu.ida.tddd80.blur.R;
-import se.liu.ida.tddd80.blur.activities.PostActivity;
-import se.liu.ida.tddd80.blur.fragments.ReactDialogFragment;
 import se.liu.ida.tddd80.blur.models.Feed;
 import se.liu.ida.tddd80.blur.models.Post;
-import se.liu.ida.tddd80.blur.models.ReactionType;
-import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
-import se.liu.ida.tddd80.blur.utilities.ResponseListeners;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
 import se.liu.ida.tddd80.blur.utilities.ViewUtil;
 
@@ -101,7 +95,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
         vh.authorName.setText(post.getAuthor().getUsername());
         vh.timestamp.setText(StringUtil.formatDateTimeShort(post.getTimeCreated()));
         vh.content.setText(post.getContent());
-        ViewUtil.updateReactionButton(vh.reactButton, post.getReactions());
+        ViewUtil.onReactionUpdateViews(vh.reactButton, post.getReactions(), vh.authorName, vh.authorImage);
     }
 
     @Override

@@ -103,15 +103,6 @@
             android:text="2048"
             tools:text="2048" />
 
-        <Button
-            android:id="@+id/button_feeditem_share"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:drawableLeft="@drawable/ic_share_black_24dp"
-            android:text="4096"
-            tools:text="4096" />
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
