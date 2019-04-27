@@ -19,14 +19,17 @@ def reset_db():
 
 
 @app.route('/feed/<feedtype>')
+@jwt_optional
 def get_feed(feedtype):
+    user_id = get_jwt_identity()
     # TODO: implement proper feed creation. Currently just returns all posts
     feed = Post.query.all()
     if feed is None:
         return respond(plain_response("Feed empty! Requested resource not found."), 404)
+
     return respond({
         'type': feedtype,
-        'posts': [post.serialize_with_extras() for post in feed]
+        'posts': [post.serialize_with_extras(user_id) for post in feed]
     })
 
 
