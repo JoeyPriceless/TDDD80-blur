@@ -266,7 +266,7 @@ def get_user_token(user):
 @app.route('/user/logout', methods=["POST"])
 @jwt_required
 def logout():
-    jti = get_raw_jwt()['jti']
+    jti = get_jwt_identity()
     blacklisted = Blacklisted(jti)
     db.session.add(blacklisted)
     db.session.commit()

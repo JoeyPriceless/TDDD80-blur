@@ -120,7 +120,7 @@ class Post(db.Model):
 class PostReaction(db.Model):
     id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
     post_id = db.Column(db.String, db.ForeignKey('post.id'), nullable=False)
-    user_id = db.Column(db.String, db.ForeignKey('user.id'), unique=True, nullable=False)
+    user_id = db.Column(db.String, db.ForeignKey('user.id'), nullable=False)
     reaction_type = db.Column(db.Integer, nullable=False)
 
     def __init__(self, post_id, user_id, reaction_type):
