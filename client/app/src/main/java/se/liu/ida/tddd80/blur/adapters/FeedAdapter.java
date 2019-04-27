@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import se.liu.ida.tddd80.blur.R;
+import se.liu.ida.tddd80.blur.activities.PostActivity;
 import se.liu.ida.tddd80.blur.models.Feed;
 import se.liu.ida.tddd80.blur.models.Post;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
@@ -91,11 +92,16 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder vh, int i) {
         Post post = feed.get(i);
-
-        vh.authorName.setText(post.getAuthor().getUsername());
+        // TODO
+        vh.authorName.setText(PostActivity.AUTHOR_SPACE_PADDING + post.getAuthor().getUsername());
         vh.timestamp.setText(StringUtil.formatDateTimeShort(post.getTimeCreated()));
         vh.content.setText(post.getContent());
-        ViewUtil.onReactionUpdateViews(vh.reactButton, post.getReactions(), vh.authorName, vh.authorImage);
+        ViewUtil.onReactionUpdateViews(vh.reactButton, post.getReactions(), vh.authorName,
+                vh.authorImage);
+        // TODO
+        vh.commentButton.setText("1024");
+        // TODO
+        vh.favoriteButton.setText("2048");
     }
 
     @Override

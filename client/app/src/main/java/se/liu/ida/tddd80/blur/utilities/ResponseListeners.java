@@ -34,9 +34,11 @@ public class ResponseListeners {
             this.ivAuthor = ivAuthor;
         }
 
-        public ReactionSuccess(Button btnReact) {
+        public ReactionSuccess(Button btnReact, TextView tvAuthor, ImageView ivAuthor) {
             this.post = new Post();
             this.btnReact = btnReact;
+            this.tvAuthor = tvAuthor;
+            this.ivAuthor = ivAuthor;
         }
 
         @Override
@@ -47,7 +49,7 @@ public class ResponseListeners {
     }
 
     /**
-     * Provides a defailt ErrorListener for Volley requests. Notifies the log and creates a toast.
+     * Provides a default ErrorListener for Volley requests. Notifies the log and creates a toast.
      */
     public static class DefaultError implements Response.ErrorListener {
         Context context;

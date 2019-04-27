@@ -29,15 +29,14 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="22"
-                android:src="@mipmap/img_profile_default_round" />
+                tools:src="@mipmap/img_profile_default" />
 
             <LinearLayout
                 android:id="@+id/linearlayout_post_title"
+                android:gravity="center_vertical"
                 android:layout_width="0dp"
                 android:layout_height="80dp"
                 android:layout_marginLeft="10dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
                 android:layout_weight="78"
                 android:orientation="vertical">
 
@@ -93,7 +92,6 @@
                 android:layout_weight="1"
                 android:drawableLeft="@drawable/ic_positive_black_24dp"
                 android:onClick="onClickReactionButton"
-                android:text="512"
                 tools:text="512" />
 
             <Button
@@ -103,7 +101,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:drawableLeft="@drawable/ic_comment_black_24dp"
-                android:text="1024"
                 tools:text="1024" />
 
             <Button
@@ -113,7 +110,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:drawableLeft="@drawable/ic_favorite_hollow_black_24dp"
-                android:text="2048"
                 tools:text="2048" />
 
         </LinearLayout>

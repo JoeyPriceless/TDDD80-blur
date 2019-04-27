@@ -11,15 +11,19 @@ import android.support.v4.app.DialogFragment;
 
 import se.liu.ida.tddd80.blur.R;
 
-import static android.app.AlertDialog.*;
+import static android.app.AlertDialog.Builder;
 
 public class ReactDialogFragment extends DialogFragment {
     public static String KEY_POST_ID = "POST_ID";
     public static String KEY_BUTTON_ID = "BUTTON_ID";
+    public static String KEY_AUTHOR_TEXT_ID = "AUTHOR_TEXT_ID";
+    public static String KEY_IMAGE_VIEW_ID = "IMAGE_VIEW_ID";
     public ReactDialogListener listener;
     private int index;
     private String postId;
     private int buttonId;
+    private int authorTextViewId;
+    private int authorImageViewId;
 
     public int getIndex() {
         return index;
@@ -37,6 +41,14 @@ public class ReactDialogFragment extends DialogFragment {
         return buttonId;
     }
 
+    public int getAuthorTextViewId() {
+        return authorTextViewId;
+    }
+
+    public int getAuthorImageViewId() {
+        return authorImageViewId;
+    }
+
     public ReactDialogFragment() {
     }
 
@@ -45,6 +57,8 @@ public class ReactDialogFragment extends DialogFragment {
         if (args != null) {
             postId = args.getString(KEY_POST_ID);
             buttonId = args.getInt(KEY_BUTTON_ID);
+            authorTextViewId = args.getInt(KEY_AUTHOR_TEXT_ID);
+            authorImageViewId = args.getInt(KEY_IMAGE_VIEW_ID);
         }
     }
 

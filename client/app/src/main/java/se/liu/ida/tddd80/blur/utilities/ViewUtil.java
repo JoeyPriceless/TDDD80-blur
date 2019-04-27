@@ -78,23 +78,25 @@ public class ViewUtil {
         tv.getPaint().setMaskFilter(filter);
     }
 
-    public static void blurImage(ImageView iv) {
-        try {
-            Blurry.with(iv.getContext()).radius(iv.getWidth() / 50).sampling(10).capture(iv).into(iv);
-        } catch (NullPointerException ex) {
-            return;
-        }
+    public static void blurImage(final ImageView iv) {
+        // TODO set actual image
+        // The Blurry library cannot be run on the UI thread as it often fails a race condition
+        // with the ImageView.
+        iv.post(new Runnable() {
+            @Override
+            public void run() {
+                Context context = iv.getContext();
+                iv.setImageDrawable(context.getDrawable(R.mipmap.img_profile_default));
+                Blurry.with(context).radius(iv.getWidth() / 50).sampling(10).capture(iv).into(iv);
+            }
+        });
     }
 
     public static void unBlurPost(TextView tv, ImageView iv) {
         // TODO include custom image
         // Can't find any info on how to unblur an ImageView through Blurry so have to reset the
         // drawable. Look into overlay blur on image?
-        try {
-            iv.setImageDrawable(tv.getContext().getDrawable(R.mipmap.img_profile_default_round));
-        } catch (NullPointerException ex) {
-
-        }
+        iv.setImageDrawable(tv.getContext().getDrawable(R.mipmap.img_profile_default_round));
         tv.getPaint().setMaskFilter(null);
         tv.invalidate();
     }

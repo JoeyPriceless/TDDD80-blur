@@ -18,25 +18,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/imageview_feeditem_author"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="30"
-            app:srcCompat="@mipmap/ic_launcher_round" />
+            android:layout_weight="22"
+            tools:src="@mipmap/img_profile_default" />
 
         <LinearLayout
             android:id="@+id/linearlayout_feeditem_title"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="80dp"
             android:layout_marginLeft="10dp"
-            android:layout_weight="70"
+            android:layout_weight="78"
+            android:gravity="center_vertical"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/textview_feeditem_author"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 tools:text="Username can be super duper long" />
@@ -80,7 +83,6 @@
             android:layout_weight="1"
             android:drawableLeft="@drawable/ic_positive_black_24dp"
             android:onClick="onClickReactionButton"
-            android:text="512"
             tools:text="512" />
 
         <Button
@@ -90,7 +92,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:drawableLeft="@drawable/ic_comment_black_24dp"
-            android:text="1024"
             tools:text="1024" />
 
         <Button
@@ -100,7 +101,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:drawableLeft="@drawable/ic_favorite_hollow_black_24dp"
-            android:text="2048"
             tools:text="2048" />
 
     </LinearLayout>

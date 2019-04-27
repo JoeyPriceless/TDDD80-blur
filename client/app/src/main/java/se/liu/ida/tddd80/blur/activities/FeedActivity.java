@@ -1,12 +1,13 @@
 package se.liu.ida.tddd80.blur.activities;
 
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.fragments.FeedFragment;
@@ -37,8 +38,11 @@ public class FeedActivity extends AppCompatActivity
     @Override
     public void onClickReactionDialog(ReactDialogFragment dialog) {
         ReactionType type = ReactionType.values()[dialog.getIndex()];
+        Button button = findViewById(dialog.getButtonId());
+        TextView tvAuthor = findViewById(dialog.getAuthorTextViewId());
+        ImageView ivAuthor = findViewById(dialog.getAuthorImageViewId());
         NetworkUtil.getInstance(this).reactToPost(dialog.getPostId(), type,
-                new ResponseListeners.ReactionSuccess((Button)findViewById(dialog.getButtonId())),
+                new ResponseListeners.ReactionSuccess(button, tvAuthor, ivAuthor),
                 new ResponseListeners.DefaultError(this));
     }
 }
