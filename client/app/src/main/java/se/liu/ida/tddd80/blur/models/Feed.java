@@ -1,9 +1,10 @@
 package se.liu.ida.tddd80.blur.models;
 
-import java.util.ArrayList;
+import java.util.List;
 
-public class Feed extends ArrayList<Post> {
+public class Feed {
     private FeedType type;
+    private List<Post> posts;
 
     public FeedType getType() {
         return type;
@@ -13,13 +14,11 @@ public class Feed extends ArrayList<Post> {
         this.type = type;
     }
 
-    public Feed(FeedType type, String json) {
-        this.type = type;
-        fromJson(json);
+    public Post get(int i) {
+        return posts.get(i);
     }
 
-    public static Feed fromJson(String json) {
-        // TODO serialize json
-        return new Feed(FeedType.HOT);
+    public int size() {
+        return posts.size();
     }
 }

@@ -1,12 +1,19 @@
 package se.liu.ida.tddd80.blur.models;
 
-import android.support.annotation.Nullable;
 import android.util.Pair;
+
+import com.google.gson.annotations.SerializedName;
 
 import java.util.EnumMap;
 
+/**
+ * An EnumMap between ReactionTypes and the number of reactions registered.
+ */
 public class Reactions {
     private EnumMap<ReactionType, Integer> map = new EnumMap<>(ReactionType.class);
+    private int score;
+    @SerializedName("own_reaction")
+    private ReactionType ownReaction;
 
     public Reactions(Pair<ReactionType, Integer>... pairs) {
         for (Pair<ReactionType, Integer> pair : pairs) {
@@ -14,6 +21,23 @@ public class Reactions {
         }
     }
 
+    public ReactionType getOwnReaction() {
+        return ownReaction;
+    }
+
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    /**
+     * @param type The type of reaction
+     * @return The number of reactions of type
+     */
     public int getReactionCount(ReactionType type) {
         Integer value = map.get(type);
         if (value == null) {

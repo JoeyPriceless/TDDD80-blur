@@ -4,17 +4,16 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.android.volley.Request;
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -22,39 +21,45 @@ import java.util.Map;
 
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.models.FeedType;
-import se.liu.ida.tddd80.blur.models.Post;
 import se.liu.ida.tddd80.blur.models.ReactionType;
-import se.liu.ida.tddd80.blur.models.User;
 
-import static android.content.SharedPreferences.*;
+import static android.content.SharedPreferences.Editor;
 
-// Singleton Volley class as recommended in docs.
+/**
+ * Singleton utility class that handles requests to the server. Also keeps track of user
+ * authentication token.
+ */
 public class NetworkUtil {
     private final String TAG = getClass().getSimpleName();
     private Context appContext;
     private static NetworkUtil instance;
     private RequestQueue queue;
-    private Gson gson;
+    private String userId;
     private String tokenStringKey;
     private String token;
-
-    public Gson getGson() {
-        return gson;
-    }
 
     public void setToken(String token) {
         this.token = token;
         storeToken();
     }
 
+    public void clearToken() {
+        token = null;
+        storeToken();
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
     private NetworkUtil(Context context) {
         // Application context to make it last throughout app lifetime.
         appContext = context.getApplicationContext();
         this.queue = Volley.newRequestQueue(appContext);
-        GsonBuilder gb = new GsonBuilder();
-        // Register a type adapter to properly parse server datetime format.
-        gb.registerTypeAdapter(DateTime.class, new DateTimeDeserializer());
-        this.gson = gb.create();
         tokenStringKey = appContext.getResources().getString(R.string.token_pref_key);
         loadToken();
     }
@@ -80,64 +85,104 @@ public class NetworkUtil {
         token = prefs.getString(tokenStringKey, null);
     }
 
-    public boolean isTokenValid() {
+    public boolean isUserLoggedIn() {
         // TODO: update logic to deal with expired tokens
         return token != null;
     }
 
+    /**
+     * Adds default headers onto HTTP request.
+     */
     private Map<String, String> getHeadersAuth() {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
         // Only send authorization if there is a token.
-        if (token != null && token.isEmpty())
+        if (token != null && !token.isEmpty())
             headers.put("Authorization", "Bearer ".concat(token));
         return headers;
     }
 
-    // For methods without body (GET, DELETE)
-    private void requestJson(String url, int method, Listener<JSONObject> responseListener,
-                             ErrorListener errorListener) {
-  		JsonObjectRequest jsonRequest = new JsonObjectRequest(method, url, null, responseListener,
-                errorListener) {
+    /**
+     * Request JSON response from url using method (Usually GET or DELETE).
+     * @param url target URL. Complete URL including prefix and hostname
+     * @param method HTTP method from enum
+     * @param responseListener Listener which contains actions upon success
+     * @param errorListener Listener which contains actions upon failure
+     */
+    private void requestJsonObject(String url, int method, Listener<JSONObject> responseListener,
+                                   ErrorListener errorListener) {
+  		JsonObjectRequest request = new JsonObjectRequest(method, url, null,
+                responseListener, errorListener) {
             @Override
-            public Map<String, String> getHeaders() {
-                return getHeadersAuth();
-            }
+            public Map<String, String> getHeaders() { return getHeadersAuth(); }
         };
-  		Log.i(TAG, String.format("%s: %s", StringUtil.MethodToString(method), url));
-  		queue.add(jsonRequest);
+  		addToQueue(request);
   	}
 
-  	// For methods with body (POST, PUT)
-  	private void requestJson(String url, int method, Listener<JSONObject> responseListener,
-                             ErrorListener errorListener, final Map<String, String> data) {
-        if (method == Method.GET || method == Method.DELETE) {
-            requestJson(url, method, responseListener, errorListener);
-            Log.w(this.getClass().getSimpleName(), "GET or DELETE request sent to wrong method.");
-        }
-
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(method, url, new JSONObject(data),
+    /**
+     * Sends a payload data and requests JSON response from url using method (Usually POST or PUT).
+     * @param url target URL. Complete URL including prefix and hostname
+     * @param method HTTP method from enum
+     * @param responseListener Listener which contains actions upon success
+     * @param errorListener Listener which contains actions upon failure
+     * @param data JSON data mapped in key/value format
+     */
+  	private void requestJsonObject(String url, int method, Listener<JSONObject> responseListener,
+                                   ErrorListener errorListener, final Map<String, String> data) {
+        JsonObjectRequest request = new JsonObjectRequest(method, url, new JSONObject(data),
                 responseListener, errorListener) {
             @Override
             public Map<String, String> getHeaders() {
                 return getHeadersAuth();
             }
         };
-        Log.i(TAG, String.format("%s: %s", StringUtil.MethodToString(method), url));
-        queue.add(jsonRequest);
+        addToQueue(request);
     }
 
+    /**
+     * Request JSON response from url using method (Usually GET or DELETE).
+     * @param url target URL. Complete URL including prefix and hostname
+     * @param method HTTP method from enum
+     * @param responseListener Listener which contains actions upon success
+     * @param errorListener Listener which contains actions upon failure
+     */
+    private void requestJsonArray(String url, int method, Listener<JSONArray> responseListener,
+                                   ErrorListener errorListener) {
+        JsonArrayRequest request = new JsonArrayRequest(method, url, null,
+                responseListener, errorListener) {
+            @Override
+            public Map<String, String> getHeaders() { return getHeadersAuth(); }
+        };
+        addToQueue(request);
+    }
+
+    private void addToQueue(Request request) {
+        Log.i(TAG, String.format("%s: %s",
+                StringUtil.MethodToString(request.getMethod()), request.getUrl()));
+        queue.add(request);
+    }
+
+
+    /**
+     * Requests an authorization token for the given credentials. responseListener should call
+     * NetworkUtil.setToken()
+     */
     public void login(String email, String password, Listener<JSONObject> responseListener,
                        ErrorListener errorListener) {
         Map<String, String> params = new HashMap<>();
         params.put("email", email);
         params.put("password", password);
 
-        requestJson(Url.build(Url.USER_LOGIN), Method.POST, responseListener, errorListener, params);
+        requestJsonObject(Url.build(Url.USER_LOGIN), Method.POST, responseListener, errorListener,
+                params);
     }
 
+    /**
+     * Log out of the server, blacklisting the authorization token. responseListener should call
+     * NetworkUtil.clearToken();
+     */
     public void logout(Listener<JSONObject> responseListener, ErrorListener errorListener) {
-        requestJson(Url.build(Url.USER_LOGOUT), Method.POST, responseListener, errorListener);
+        requestJsonObject(Url.build(Url.USER_LOGOUT), Method.POST, responseListener, errorListener);
     }
 
   	public void createUser(String username, String email, String password,
@@ -147,67 +192,74 @@ public class NetworkUtil {
         params.put("email", email);
         params.put("password", password);
 
-        requestJson(Url.build(Url.USER_CREATE), Method.POST, responseListener,
+        requestJsonObject(Url.build(Url.USER_CREATE), Method.POST, responseListener,
                     errorListener, params);
     }
 
     public void getUser(String id, Listener<JSONObject> responseListener,
                         ErrorListener errorListener) {
-        requestJson(Url.build(Url.USER_GET, id), Method.GET, responseListener, errorListener);
+        requestJsonObject(Url.build(Url.USER_GET, id), Method.GET, responseListener, errorListener);
     }
 
-    public void createPost(Post post, Listener<JSONObject> responseListener,
+    public void createPost(String content, String authorId, Listener<JSONObject> responseListener,
                                ErrorListener errorListener) {
         Map<String, String> params = new HashMap<>();
-            params.put("content", post.getContent());
-            params.put("user_id", post.getAuthor().getId());
-        requestJson(Url.build(Url.POST_CREATE), Method.POST, responseListener,
+            params.put("content", content);
+            params.put("user_id", authorId);
+        requestJsonObject(Url.build(Url.POST_CREATE), Method.POST, responseListener,
                             errorListener, params);
     }
 
     public void getPost(String id, Listener<JSONObject> responseListener,
                             ErrorListener errorListener) {
-        requestJson(Url.build(Url.POST_GET, id), Method.GET, responseListener, errorListener);
+        requestJsonObject(Url.build(Url.POST_GET, id), Method.GET, responseListener, errorListener);
     }
 
+    /**
+     * Request a post of a given id, along with extras such as it's author, reactions and comments.
+     */
     public void getPostWithExtras(String id, Listener<JSONObject> responseListener,
                                 ErrorListener errorListener) {
-        requestJson(Url.build(Url.POST_GET_EXTRAS, id), Method.GET, responseListener, errorListener);
+        requestJsonObject(Url.build(Url.POST_GET_EXTRAS, id), Method.GET, responseListener,
+                errorListener);
     }
 
     public void getReactions(String postId, Listener<JSONObject> responseListener,
                                 ErrorListener errorListener) {
-        requestJson(Url.build(Url.POST_REACTIONS_GET, postId), Method.GET, responseListener,
+        requestJsonObject(Url.build(Url.POST_REACTIONS_GET, postId), Method.GET, responseListener,
                 errorListener);
     }
 
-    public void reactToPost(Post post, ReactionType reaction, Listener<JSONObject> responseListener,
-                                    ErrorListener errorListener) {
+    public void reactToPost(String postId, ReactionType reaction,
+                            Listener<JSONObject> responseListener, ErrorListener errorListener) {
         Map<String, String> params = new HashMap<>();
-                    params.put("post_id", post.getId());
-                    params.put("user_id", post.getAuthor().getId());
+                    params.put("post_id", postId);
                     params.put("reaction", String.valueOf(reaction.ordinal()));
-        requestJson(Url.build(Url.POST_REACTIONS_ADD), Method.POST, responseListener,
+        requestJsonObject(Url.build(Url.POST_REACTIONS_ADD), Method.POST, responseListener,
                                     errorListener, params);
     }
 
     public void getFeed(FeedType type, Listener<JSONObject> responseListener, ErrorListener
             errorListener) {
-        requestJson(Url.build(Url.FEED_GET, type.toString().toLowerCase()), Method.GET, responseListener, errorListener);
+        requestJsonObject(Url.build(Url.FEED_GET, type.toString().toLowerCase()), Method.GET,
+                responseListener, errorListener);
     }
 
+    /**
+     * Contains endpoints for server requests which can be used to build URLs.
+     */
     private enum Url {
-        ROOT("https://tddd80-server.herokuapp.com"),
-        USER_LOGIN("/user/login"),
-        USER_LOGOUT("/user/logout"),
-        USER_CREATE("/user"),
-        USER_GET("/user/"),
+        FEED_GET("/feed/"),
         POST_CREATE("/post"),
         POST_GET("/post/"),
         POST_GET_EXTRAS("/post/extras/"),
         POST_REACTIONS_ADD("/post/reactions"),
         POST_REACTIONS_GET("/post/reactions/"),
-        FEED_GET("/feed/");
+        ROOT("https://tddd80-server.herokuapp.com"),
+        USER_CREATE("/user"),
+        USER_GET("/user/"),
+        USER_LOGIN("/user/login"),
+        USER_LOGOUT("/user/logout");
 
         private String address;
 
@@ -216,7 +268,11 @@ public class NetworkUtil {
         }
 
 
-
+        /**
+         * Concatinates elements of different types to build a URL
+         * @param elements Objects to be concatinated. Uses their toString representation.
+         * @return build URL.
+         */
         public static String build(Object... elements) {
             StringBuilder address = new StringBuilder(Url.ROOT.address);
             for (Object o : elements) {

@@ -1,92 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp">
 
     <LinearLayout
-            android:id="@+id/linearlayout_feeditem_header"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal"
-            android:weightSum="100"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+        android:id="@+id/linearlayout_feeditem_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        android:weightSum="100"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-            <ImageView
-                android:id="@+id/imageview_feeditem_author"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="30"
-                app:srcCompat="@mipmap/ic_launcher_round" />
-
-            <LinearLayout
-                android:id="@+id/linearlayout_feeditem_title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_weight="70"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/textview_feeditem_author"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Username can be super duper long"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/textview_feeditem_time"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="00:34 - 1 April 2019" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/textview_feeditem_content"
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/imageview_feeditem_author"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat mas"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearlayout_feeditem_header" />
+            android:layout_height="match_parent"
+            android:layout_weight="22"
+            tools:src="@mipmap/img_profile_default" />
 
         <LinearLayout
-            android:id="@+id/linearlayout_feeditem_buttons"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textview_feeditem_content">
+            android:id="@+id/linearlayout_feeditem_title"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="78"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
 
-            <Button
-                android:id="@+id/button_feeditem_react"
+            <TextView
+                android:id="@+id/textview_feeditem_author"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                tools:text="Username can be super duper long" />
+
+            <TextView
+                android:id="@+id/textview_feeditem_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="React" />
-
-            <Button
-                android:id="@+id/button_feeditem_comment"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Comments" />
-
-            <Button
-                android:id="@+id/button_feeditem_favorite"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Favorites" />
+                tools:text="1 Apr 2019" />
         </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textview_feeditem_content"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearlayout_feeditem_header"
+        tools:text="Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat mas" />
+
+
+    <LinearLayout
+        android:id="@+id/linearlayout_feeditem_buttons"
+        style="?android:attr/buttonBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textview_feeditem_content">
+
+        <Button
+            android:id="@+id/button_feeditem_react"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableLeft="@drawable/ic_positive_black_24dp"
+            android:onClick="onClickReactionButton"
+            tools:text="512" />
+
+        <Button
+            android:id="@+id/button_feeditem_comment"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableLeft="@drawable/ic_comment_black_24dp"
+            tools:text="1024" />
+
+        <Button
+            android:id="@+id/button_feeditem_favorite"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableLeft="@drawable/ic_favorite_hollow_black_24dp"
+            tools:text="2048" />
+
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

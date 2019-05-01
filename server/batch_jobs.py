@@ -20,15 +20,15 @@ def create_feed():
     # Score = total_vote_score * multiplier / time_since_posted
     posts = Post.query.order_by(Post.time_created).limit(FEED_LENGTH)
     for post in posts:
-        feedObject = FeedObject(post, get_total_score(post) * SCORE_MULTIPLIER /)
+        feedObject = FeedObject(post, get_total_score(post) * SCORE_MULTIPLIER)
         db.session.add(feedObject)
 
     db.session.commit()
-
     # TODO: Sort through posts and compile the top.
+    pass
 
 def get_total_score(post):
-
+    pass
 
 def count_reactions_per_post(reaction_type):
     sq = db.session.query(PostReaction).count(PostReaction.post_id).label('count') \

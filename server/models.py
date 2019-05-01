@@ -5,6 +5,7 @@ import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token
 from util import format_datetime
+import server
 
 
 class User(db.Model):
@@ -65,6 +66,31 @@ class Post(db.Model):
             .join(sq, sq.c.post_id == self.id, sq.c.reaction_type == reaction_type).all()
         return result
 
+    # TODO: Should probably contain more complicated logic involving interaction count and not just
+    #       negative / positive
+    def reaction_score(self):
+        score = 0
+        reactions = self.get_reactions()
+        # Score +1 if reaction type is positive and -1 if it's negative
+        # Reaction type is an int between 0-5, with the first 3 being positive reactions.
+        for reaction in reactions:
+            score += 1 if (reaction.reaction_type < 3) else -1
+        return score
+
+    def serialize_reactions(self, user_id=None):
+        reactions = server.serialize_list(PostReaction.query.filter_by(post_id=self.id).all())
+        # Generates the requesters own reaction type if it exists.
+        # If the requester isn't logged in or hasn't reacted, the value is -1.
+        own_reaction_type = "null"
+        if user_id:
+            own_reaction = PostReaction.query.filter_by(post_id=self.id, user_id=user_id).scalar()
+            own_reaction_type = own_reaction.reaction_type if own_reaction else "null"
+        return {
+            'score': self.reaction_score(),
+            'own_reaction': own_reaction_type
+            # include mapping?
+        }
+
     def serialize(self):
         return {
             'id': self.id,
@@ -75,17 +101,32 @@ class Post(db.Model):
             }
         }
 
+    def serialize_with_extras(self, user_id=None):
+        # serialized for easier gson handling according to
+        # https://stackoverflow.com/a/39320732/4400799
+        author = User.query.filter_by(id=self.author_id).one()
+        # should probably use count_reactions
+        return {
+            'id': self.id,
+            'author': author.serialize(),
+            'content': self.content,
+            'time_created': {
+                'datetime': format_datetime(self.time_created)
+            },
+            'reactions': self.serialize_reactions(user_id)
+        }
+
 
 class PostReaction(db.Model):
     id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
-    post_id = db.Column(db.String, db.ForeignKey('post.id'), unique=True, nullable=False)
-    user_id = db.Column(db.String, db.ForeignKey('user.id'), unique=True, nullable=False)
+    post_id = db.Column(db.String, db.ForeignKey('post.id'), unique=False, nullable=False)
+    user_id = db.Column(db.String, db.ForeignKey('user.id'), unique=False, nullable=False)
     reaction_type = db.Column(db.Integer, nullable=False)
 
     def __init__(self, post_id, user_id, reaction_type):
         self.post_id = post_id
         self.user_id = user_id
-        if reaction_type > 6 or reaction_type < 0:
+        if reaction_type > 5 or reaction_type < 0:
             self.reaction_type = 0
         else:
             self.reaction_type = reaction_type
@@ -101,7 +142,7 @@ class PostReaction(db.Model):
 
 class CommentReaction(db.Model):
     id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
-    comment_id = db.Column(db.String, db.ForeignKey('post.id'), unique=True, nullable=False)
+    comment_id = db.Column(db.String, db.ForeignKey('post.id'), nullable=False)
     user_id = db.Column(db.String, db.ForeignKey('user.id'), unique=True, nullable=False)
     reaction_type = db.Column(db.Integer, nullable=False)
 

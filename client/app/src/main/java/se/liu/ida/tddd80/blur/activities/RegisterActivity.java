@@ -1,7 +1,6 @@
 package se.liu.ida.tddd80.blur.activities;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -11,7 +10,7 @@ import android.widget.EditText;
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
 
-public class RegisterActivity extends AbstractAccountActivity {
+public class RegisterActivity extends AbstractLoginActivity {
     private EditText etUsername;
     private int usernameMinLength;
     private int usernameMaxLength;

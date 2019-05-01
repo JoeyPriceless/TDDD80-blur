@@ -1,14 +1,8 @@
 package se.liu.ida.tddd80.blur.models;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import org.joda.time.DateTime;
-
-import java.time.LocalDateTime;
-import java.util.Date;
-
-import se.liu.ida.tddd80.blur.utilities.StringUtil;
 
 public class Post {
     private String id;
@@ -38,11 +32,23 @@ public class Post {
         this.timeCreated = timeCreated;
     }
 
+    public Reactions getReactions() {
+        return reactions;
+    }
+
+    public void setReactions(Reactions reactions) {
+        this.reactions = reactions;
+    }
+
     public void setId(String id) {
         this.id = id;
     }
 
     public String getId() {
         return id;
+    }
+
+    public void applyReaction(ReactionType reaction) {
+
     }
 }
