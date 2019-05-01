@@ -7,6 +7,7 @@ USERNAME_MIN_LENGTH = 3
 USERNAME_MAX_LENGTH = 24
 PASSWORD_MIN_LENGTH = 8
 
+
 def reset_db():
     print("Dropping all tables")
     db.drop_all()
@@ -15,12 +16,15 @@ def reset_db():
     db.session.commit()
 
 
-@app.route('/feed/<type>')
-def get_feed_hot(type):
-    feed = FeedObject.query.filter_by(type=type).one()
+@app.route('/feed/<feed_type>')
+def get_feed_hot(feed_type):
+    feed = FeedObject.query.filter_by(type=feed_type).all()
     if feed is None:
         return plain_response("Feed empty! Requested resource not found."), 404
-    return jsonify(feed.serialize())
+    post_feed = list()
+    for feedObject in feed:
+        post_feed.append(get_post_with_extras(feedObject.post_id))
+    return jsonify(post_feed)
 
 
 @app.route('/comments/<postid>')
@@ -41,6 +45,7 @@ def get_post(postid):
         return plain_response("The given post ID doesn't exist. Requested resource not found."), 404
     return jsonify(post.serialize())
 
+
 @app.route('/post/extras/<postid>')
 def get_post_with_extras(postid):
     post = Post.query.filter_by(id=postid).one()
@@ -54,13 +59,15 @@ def get_post_with_extras(postid):
         'reactions': reactions
     })
 
+
 @app.route('/comments/chain/<commentid>')
 def get_comment_chain(commentid):
     comments = []
     comment = Comment.query.filter_by(id=commentid).one()
     if comment is None:
         return plain_response("The given comment ID doesn't exist. Requested resource not found."), 404
-    while True:
+    # TODO: This is outdated, we now support multiple children. Is that even right?
+    while comment is not None:
         comment = comment.child
         if comment is None:
             break
@@ -70,7 +77,7 @@ def get_comment_chain(commentid):
     return jsonify(comments)
 
 
-@app.route('/post/reactions/<postid>')
+@app.route('/post/react/<postid>')
 def get_reactions(postid):
     reactions = PostReaction.query.filter_by(post_id=postid).all()
     if reactions is None:
@@ -121,7 +128,7 @@ def post_comment():
     return plain_response(comment.id)
 
 
-@app.route('/post/reactions', methods=['POST'])
+@app.route('/post/react', methods=['POST'])
 @jwt_required
 def react_to_post():
     reaction = int(request.json['reaction'])
@@ -137,7 +144,7 @@ def react_to_post():
 @jwt_required
 def react_to_comment():
     reaction = request.json['reaction']
-    comment_id = request.json['comment']
+    comment_id = request.json['comment_id']
     user_id = get_raw_jwt()['user']
     comment_reaction = CommentReaction(comment_id, user_id, reaction)
     db.session.add(comment_reaction)
@@ -205,9 +212,8 @@ def login():
         credentials = UserCredentials.query.filter_by(user_id=user.id).scalar()
     else:
         return plain_response('Incorrect password or email'), 409
-
     if credentials is None:
-        return plain_response('Could not find credentials for existing user', 500)
+        return plain_response('Could not find credentials for existing user'), 500
     elif credentials.check_password(password):
         return jsonify(get_user_token(user))
     else:

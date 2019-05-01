@@ -30,11 +30,14 @@ class TestServerFunctions(unittest.TestCase):
     def test_2_post(self):
         if self.token is None:
             self.test_0_login()
+
+        post_ids = list()
         # Test creating a post.
         content = 'Mannen myten legenden.'
         r = requests.post(URL_ROOT + "/post", json={'content': content},
                           headers={'Authorization': self.token})
         self.assertEqual(r.status_code, 200)
+        post_ids.append(r.text)
 
         # Test getting the just created post.
         post_id = r.text
@@ -51,6 +54,7 @@ class TestServerFunctions(unittest.TestCase):
                           headers={'Authorization': self.token})
         self.assertEqual(r.status_code, 200)
         post_id = r.text
+        post_ids.append(post_id)
         r = requests.get(URL_ROOT + "/post/" + post_id)
         self.assertEqual(r.status_code, 200)
         post = json.loads(r.text)
@@ -60,18 +64,95 @@ class TestServerFunctions(unittest.TestCase):
 
         # Test reacting to post
         reaction = '1'
-        r = requests.post(URL_ROOT + "/post/reactions", json={'post_id': post_id, 'reaction': reaction},
+        r = requests.post(URL_ROOT + "/post/react", json={'post_id': post_id, 'reaction': reaction},
                           headers={'Authorization': self.token})
         self.assertEqual(r.status_code, 200)
         reaction_id = r.text
-        r = requests.get(URL_ROOT + "/post", json={'post_id': post_id, 'reaction': reaction},
-                          headers={'Authorization': self.token})
+        r = requests.get(URL_ROOT + "/post/react/" + reaction_id, json={'post_id': post_id, 'reaction': reaction},
+                         headers={'Authorization': self.token})
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(json.loads(r.text)[0].id, reaction_id)
+
+        # TODO: Need to be able to remove reactions
+
+        # Test deleting all previous posts.
+        for post_id in post_ids:
+            r = requests.post(URL_ROOT + "/post/delete/" + post_id,
+                              headers={'Authorization': self.token})
+            self.assertEqual(r.status_code, 200)
+            r = requests.get(URL_ROOT + "/post/" + post_id,
+                             headers={'Authorization': self.token})
+            self.assertEqual(r.status_code, 404)
+            # TODO: Should test deleting post with a unauthorized account.
 
         pass
 
     def test_3_comment(self):
         if self.token is None:
             self.test_0_login()
+
+        r = requests.post(URL_ROOT + "/post", json={'content': 'Template post.'},
+                          headers={'Authorization': self.token})
+        self.assertEqual(r.status_code, 200)
+        post_id = r.text
+
+        comment_ids = list()
+        # Test creating a comment.
+        content = 'Mannen myten legenden.'
+        r = requests.post(URL_ROOT + "/commment", json={'content': content, 'parent': None, 'post_id': post_id},
+                          headers={'Authorization': self.token})
+        self.assertEqual(r.status_code, 200)
+        comment_ids.append(r.text)
+
+        # Test getting the just created comment.
+        comment_id = r.text
+        r = requests.get(URL_ROOT + "/comment/" + comment_id)
+        self.assertEqual(r.status_code, 200)
+        comment = json.loads(r.text)
+        self.assertEqual(comment.content, content)
+        self.assertEqual(comment.author_id, self.user_id)
+        self.assertEqual(comment.id, comment_id)
+
+        # Test that multiple posts can be created.
+        content = 'Mannen som inte är legenden'
+        r = requests.post(URL_ROOT + "/commment", json={'content': content, 'parent': None, 'post_id': post_id},
+                          headers={'Authorization': self.token})
+        self.assertEqual(r.status_code, 200)
+        comment_id = r.text
+        comment_ids.append(comment_id)
+        r = requests.get(URL_ROOT + "/comment/" + comment_id)
+        self.assertEqual(r.status_code, 200)
+        comment = json.loads(r.text)
+        self.assertEqual(comment.content, content)
+        self.assertEqual(comment.author_id, self.user_id)
+        self.assertEqual(comment.id, comment_id)
+
+        # Test reacting to post
+        reaction = '1'
+        r = requests.post(URL_ROOT + "/comment/react", json={'comment_id': comment_id, 'reaction': reaction},
+                          headers={'Authorization': self.token})
+        self.assertEqual(r.status_code, 200)
+        reaction_id = r.text
+        r = requests.get(URL_ROOT + "/comment/react/" + reaction_id, json={'post_id': post_id, 'reaction': reaction},
+                         headers={'Authorization': self.token})
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(json.loads(r.text)[0].id, reaction_id)
+
+        # TODO: Need to be able to remove reactions
+
+        # Test deleting all previous comments.
+        for post_id in comment_ids:
+            r = requests.post(URL_ROOT + "/post/delete/" + post_id,
+                              headers={'Authorization': self.token})
+            self.assertEqual(r.status_code, 200)
+            r = requests.get(URL_ROOT + "/post/" + post_id,
+                             headers={'Authorization': self.token})
+            self.assertEqual(r.status_code, 404)
+            # TODO: Should test deleting comments with a unauthorized account.
+
+        pass
+
+
         pass
 
     def test_4_deletion(self):

@@ -131,7 +131,7 @@ class FeedObject(db.Model):
     post_id = db.Column(db.String, db.ForeignKey('post.id'), unique=True)
     post = db.relationship('Post', backref='feed')
 
-    def __init__(self, post, type):
+    def __init__(self, post, score):
         self.type = self.FEED_HOT
         self.post = post
         self.post_id = post.id
@@ -146,7 +146,7 @@ class FeedObject(db.Model):
 
 class Comment(db.Model):
     id = db.Column(db.String, unique=True, primary_key=True)
-    author = db.Column(db.String, db.ForeignKey('user.id'), unique=True)
+    author_id = db.Column(db.String, db.ForeignKey('user.id'), unique=True)
     upvotes = db.Column(db.Integer, nullable=False)
     downvotes = db.Column(db.Integer, nullable=False)
     time_created = db.Column(db.DateTime, nullable=False)
@@ -175,7 +175,7 @@ class Comment(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'author': self.author,
+            'author_id': self.author,
             'upvotes': self.upvotes,
             'downvotes': self.downvotes,
             'time_created': {

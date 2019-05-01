@@ -6,3 +6,6 @@ heroku ps:scale web=1
 
 Lathund:
 https://www.ida.liu.se/~TDDD80/laborationer/server/heroku_commands.sv.shtml
+
+Starta en worker på servern:
+$ heroku scale worker=1
