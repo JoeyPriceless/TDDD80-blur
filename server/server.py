@@ -41,7 +41,7 @@ def get_comments(postid):
         if post is None:
             return respond(
                 plain_response("Given post ID doesn't exist. Requested resource not found."), 404)
-        return respond(plain_response("Requested post has no comments."))
+        return respond(plain_response("Requested post has no comments."), 404)
     return respond(comments)
 
 
@@ -78,7 +78,7 @@ def get_comment_chain(commentid):
     if len(comments) == 0:
         return respond(
             plain_response("The given comment has no children. Requested resource not found."), 404)
-    return respond(comments)
+    return respond(serialize_list(comments))
 
 
 @app.route('/post/react/<postid>')

@@ -1,6 +1,6 @@
 from rq import Queue
 from redis import Redis
-from models import Post, PostReaction, FeedObject
+from models import Post, FeedObject
 from __init__ import db
 import time
 import datetime
@@ -20,18 +20,10 @@ def create_feed():
     # Score = total_vote_score * multiplier / time_since_posted
     posts = Post.query.order_by(Post.time_created).limit(FEED_LENGTH)
     for post in posts:
-        feedObject = FeedObject(post, get_total_score(post) * SCORE_MULTIPLIER)
-        db.session.add(feedObject)
+        feed_object = FeedObject(post, post.reaction_score() * SCORE_MULTIPLIER /
+                                 datetime.datetime.today() - post.time_created)
+        db.session.add(feed_object)
 
     db.session.commit()
     # TODO: Sort through posts and compile the top.
     pass
-
-def get_total_score(post):
-    pass
-
-def count_reactions_per_post(reaction_type):
-    sq = db.session.query(PostReaction).count(PostReaction.post_id).label('count') \
-        .group_by(PostReaction.post_id).subquery()
-    result = db.session.query(Post, sq.c.count) \
-        .join(sq, sq.c.post_id == Post.id, sq.c.reaction_type == reaction_type).all()

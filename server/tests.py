@@ -1,8 +1,6 @@
 import requests
 import unittest
 import json
-from flask import jsonify
-from models import *
 import server
 
 URL_ROOT = "https://tddd80-server.herokuapp.com/"
@@ -15,7 +13,7 @@ class TestServerFunctions(unittest.TestCase):
                                                    'password': 'password123'})
         self.assertEqual(r.status_code, 200)
         print("User with id: " + get_field(r, 'response') + " created.")
-        r = requests.post(URL_ROOT + "user/login", json={'username': 'test_user', 'password': 'password123'})
+        r = requests.post(URL_ROOT + "user/login", json={'emial': 'begnt@gmail.com', 'password': 'password123'})
         self.assertEqual(r.status_code, 200)
         self.token = "Bearer " + get_field(r, 'token')
         self.user_id = get_field(r, 'user_id')
@@ -113,7 +111,7 @@ class TestServerFunctions(unittest.TestCase):
         self.assertEqual(comment.author_id, self.user_id)
         self.assertEqual(comment.id, comment_id)
 
-        # Test that multiple posts can be created.
+        # Test that multiple root comments can be created.
         content = 'Mannen som inte är legenden'
         r = requests.post(URL_ROOT + "/commment", json={'content': content, 'parent': None, 'post_id': post_id},
                           headers={'Authorization': self.token})
@@ -127,38 +125,50 @@ class TestServerFunctions(unittest.TestCase):
         self.assertEqual(comment.author_id, self.user_id)
         self.assertEqual(comment.id, comment_id)
 
-        # Test reacting to post
+        # Test that comment chain works.
+        parent_id = comment_id
+        content = 'Mannen som inte är barn'
+        r = requests.post(URL_ROOT + "/commment", json={'content': content, 'parent': parent_id, 'post_id': post_id},
+                          headers={'Authorization': self.token})
+        self.assertEqual(r.status_code, 200)
+        comment_id = r.text
+        comment_ids.append(comment_id)
+        r = requests.get(URL_ROOT + "/comment/" + comment_id)
+        self.assertEqual(r.status_code, 200)
+        comment = json.loads(r.text)
+        self.assertEqual(comment.content, content)
+        self.assertEqual(comment.author_id, self.user_id)
+        self.assertEqual(comment.id, comment_id)
+        r = requests.get(URL_ROOT + "/comments/chain/" + parent_id)
+        self.assertEqual(r.status_code, 200)
+        comments = json.loads(r.text)
+        self.assertEqual(comments[0].id, comment_id)
+
+        # Test reacting to comment
         reaction = '1'
         r = requests.post(URL_ROOT + "/comment/react", json={'comment_id': comment_id, 'reaction': reaction},
                           headers={'Authorization': self.token})
         self.assertEqual(r.status_code, 200)
-        reaction_id = r.text
-        r = requests.get(URL_ROOT + "/comment/react/" + reaction_id, json={'post_id': post_id, 'reaction': reaction},
-                         headers={'Authorization': self.token})
+        r = requests.get(URL_ROOT + "/comment/" + comment_id)
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(json.loads(r.text)[0].id, reaction_id)
+        self.assertEqual(json.loads(r.text).upvotes, 1)
 
         # TODO: Need to be able to remove reactions
 
         # Test deleting all previous comments.
-        for post_id in comment_ids:
+        for comment_id in comment_ids:
+            r = requests.post(URL_ROOT + "/comment/delete/" + comment_id,
+                              headers={'Authorization': self.token})
+            self.assertEqual(r.status_code, 200)
+            r = requests.get(URL_ROOT + "/comments/" + comment_id,
+                             headers={'Authorization': self.token})
+            self.assertEqual(r.status_code, 404)
             r = requests.post(URL_ROOT + "/post/delete/" + post_id,
                               headers={'Authorization': self.token})
             self.assertEqual(r.status_code, 200)
-            r = requests.get(URL_ROOT + "/post/" + post_id,
-                             headers={'Authorization': self.token})
-            self.assertEqual(r.status_code, 404)
             # TODO: Should test deleting comments with a unauthorized account.
-
         pass
 
-
-        pass
-
-    def test_4_deletion(self):
-        if self.token is None:
-            self.test_0_login()
-        pass
 
 
 def get_field(response, field):
