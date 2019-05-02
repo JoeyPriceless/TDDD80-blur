@@ -1,11 +1,10 @@
-from __init__ import db
+from . import db
 import uuid
 import datetime
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token
-from util import format_datetime
-from util import serialize_list
+from .util import format_datetime, serialize_list
 
 
 class User(db.Model):

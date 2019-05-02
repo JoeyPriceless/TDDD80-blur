@@ -20,7 +20,7 @@ class TestServerFunctions(unittest.TestCase):
     def test_1_feed(self):
         if self.__class__.token is None:
             self.test_0_login()
-        requests.get(URL_ROOT + "/feed/", json={'username': 'test_user', 'password': 'password123'})
+        requests.get(URL_ROOT + "feed/", json={'username': 'test_user', 'password': 'password123'})
         pass
 
     def test_2_post(self):
@@ -96,7 +96,7 @@ class TestServerFunctions(unittest.TestCase):
             # TODO: Should test deleting post with a unauthorized account.
 
     def test_3_comment(self):
-        if self.__class__.token is None:
+        if not self.__class__.token:
             self.test_0_login()
 
         r = requests.post(URL_ROOT + "post", json={'content': 'Template post.'},

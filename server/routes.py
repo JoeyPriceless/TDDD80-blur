@@ -1,10 +1,10 @@
 from flask import jsonify, request
-from models import *
-from __init__ import app, db, jwt
+from .models import *
+from flask import current_app as app
 from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 import sys
 import json
-from util import serialize_list
+from .util import serialize_list
 
 USERNAME_MIN_LENGTH = 3
 USERNAME_MAX_LENGTH = 24
@@ -17,6 +17,7 @@ def reset_db():
     print("Initializing all tables")
     db.create_all()
     db.session.commit()
+
 
 @app.route('/feed/<feedtype>')
 @jwt_optional
@@ -282,13 +283,6 @@ def logout():
     return respond(plain_response(''))
 
 
-@jwt.token_in_blacklist_loader
-def check_if_token_in_blacklist(decrypted_token):
-    jti = decrypted_token['jti']
-    result = Blacklisted.query.filter_by(token_identifier=jti).scalar()
-    return result is not None
-
-
 def plain_response(string):
     return {"response": string}
 
@@ -298,10 +292,10 @@ def respond(response, status=200):
     sys.stdout.flush()
     return jsonify(response), status
 
-def main():
-    reset_db()
-    db.session.commit()
-    #app.run()
-    jwt.token_in_blacklist_loader(check_if_token_in_blacklist)
-
-main()
+# def main():
+#     reset_db()
+#     db.session.commit()
+#     #app.run()
+#     jwt.token_in_blacklist_loader(check_if_token_in_blacklist)
+#
+# main()
