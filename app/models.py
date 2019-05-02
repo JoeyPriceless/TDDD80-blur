@@ -1,4 +1,4 @@
-from server import db
+from app import db
 import uuid
 import datetime
 
