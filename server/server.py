@@ -4,6 +4,7 @@ from __init__ import app, db, jwt
 from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 import sys
 import json
+from util import serialize_list
 
 USERNAME_MIN_LENGTH = 3
 USERNAME_MAX_LENGTH = 24
@@ -16,7 +17,6 @@ def reset_db():
     print("Initializing all tables")
     db.create_all()
     db.session.commit()
-
 
 @app.route('/feed/<feedtype>')
 @jwt_optional
@@ -47,9 +47,11 @@ def get_comments(postid):
 
 @app.route('/post/<postid>')
 def get_post(postid):
-    post = Post.query.filter_by(id=postid).one()
-    return respond(post.serialize())
-
+    post = Post.query.filter_by(id=postid).scalar()
+    if post:
+        return respond(post.serialize())
+    else:
+        return respond(plain_response("Given post ID doesn't exist. Requested resource not found."), 404)
 
 @app.route('/post/extras/<postid>')
 @jwt_optional
@@ -187,34 +189,36 @@ def react_to_comment():
     return respond(plain_response(comment_reaction.serialize()))
 
 
-@app.route('/post/delete/<postid>')
+@app.route('/post/<postid>', methods=['DELETE'])
 @jwt_required
 def delete_post(postid):
     post = Post.query.filter_by(id=postid).one()
     if post is None:
         return respond(
             plain_response("The given post ID doesn't exist. Requested resource not found."), 404)
-    if post.author != get_jwt_identity():
+    if post.author_id != get_jwt_identity():
         return respond(
             plain_response("User is not author of specified post. Permission denied."), 403)
     post.kill_children(db)
     db.session.delete(post)
     db.session.commit()
+    return respond('')
 
 
-@app.route('/comment/delete/<commentid>')
+@app.route('/comment/<commentid>', methods=['DELETE'])
 @jwt_required
 def delete_comment(commentid):
     comment = Comment.query.filter_by(id=commentid).one()
     if comment is None:
         return respond(
             plain_response("The given post ID doesn't exist. Requested resource not found."), 404)
-    if comment.author != get_jwt_identity():
+    if comment.author_id != get_jwt_identity():
         return respond(
             plain_response("User is not author of specified post. Permission denied."), 403)
     comment.kill_children(db)
     db.session.delete(comment)
     db.session.push()
+    return respond('')
 
 
 @app.route('/user', methods=["POST"])
@@ -289,18 +293,15 @@ def plain_response(string):
     return {"response": string}
 
 
-def serialize_list(lst):
-    return [element.serialize() for element in lst]
-
-
 def respond(response, status=200):
     print(f"{status}: {json.dumps(response, indent=2)}")
     sys.stdout.flush()
     return jsonify(response), status
 
-
-if __name__ == '__main__':
-    db.create_all()
+def main():
+    reset_db()
     db.session.commit()
-    app.run()
+    #app.run()
     jwt.token_in_blacklist_loader(check_if_token_in_blacklist)
+
+main()

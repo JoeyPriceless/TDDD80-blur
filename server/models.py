@@ -5,7 +5,7 @@ import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token
 from util import format_datetime
-import server
+from util import serialize_list
 
 
 class User(db.Model):
@@ -78,7 +78,7 @@ class Post(db.Model):
         return score
 
     def serialize_reactions(self, user_id=None):
-        reactions = server.serialize_list(PostReaction.query.filter_by(post_id=self.id).all())
+        reactions = serialize_list(PostReaction.query.filter_by(post_id=self.id).all())
         # Generates the requesters own reaction type if it exists.
         # If the requester isn't logged in or hasn't reacted, the value is -1.
         own_reaction_type = "null"
@@ -88,7 +88,6 @@ class Post(db.Model):
         return {
             'score': self.reaction_score(),
             'own_reaction': own_reaction_type
-            # include mapping?
         }
 
     def serialize(self):

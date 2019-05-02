@@ -2,10 +2,10 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 #from batch_jobs import start_timer
-
 import os
 
 
+print("Running __init__")
 app = Flask(__name__)
 if 'NAMESPACE' in os.environ and os.environ['NAMESPACE'] == 'heroku':
     db_uri = os.environ['DATABASE_URL']
@@ -28,4 +28,3 @@ app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
 #start_timer()
-
