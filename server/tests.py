@@ -10,7 +10,7 @@ class TestServerFunctions(unittest.TestCase):
         r = requests.post(URL_ROOT + "user", json={'username': 'test_user', 'email': 'bengt@gmail.com',
                                                    'password': 'password123'})
         self.assertEqual(r.status_code, 200)
-        print("User with id: " + get_field(r, 'usier_id') + " created.")
+        print("User with id: " + get_field(r, 'user_id') + " created.")
         r = requests.post(URL_ROOT + "user/login", json={'email': 'bengt@gmail.com', 'password': 'password123'})
         self.assertEqual(r.status_code, 200)
         self.__class__.token = "Bearer " + get_field(r, 'token')

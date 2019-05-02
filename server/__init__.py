@@ -18,7 +18,7 @@ def create_app():
         debug_flag = False
     else:  # when running locally with sqlite
         db_uri = 'sqlite:///test.db'
-        f = open("server/server_package/.secret", 'r')
+        f = open("server/.secret", 'r')
         secret = f.read()
         f.close()
         debug_flag = True
