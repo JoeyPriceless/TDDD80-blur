@@ -1,10 +1,10 @@
 from flask import jsonify, request
-from .models import *
+from server.models import *
 from flask import current_app as app
 from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 import sys
 import json
-from .util import serialize_list
+from server.util import serialize_list
 
 USERNAME_MIN_LENGTH = 3
 USERNAME_MAX_LENGTH = 24
