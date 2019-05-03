@@ -185,8 +185,6 @@ class Comment(db.Model):
     def __init__(self, author, content, parent, post_id):
         self.id = uuid.uuid4().hex
         self.author = author
-        self.upvotes = 0
-        self.downvotes = 0
         self.time_created = datetime.datetime.now()
         self.content = content
         self.parent = parent
