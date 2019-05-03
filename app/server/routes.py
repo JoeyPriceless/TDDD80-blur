@@ -45,25 +45,15 @@ def get_comments(postid):
         return respond(plain_response("Requested post has no comments."), 404)
     return respond(comments)
 
-
 @app.route('/post/<postid>')
+@jwt_optional
 def get_post(postid):
     post = Post.query.filter_by(id=postid).scalar()
+    user_id = get_jwt_identity()
     if post:
-        return respond(post.serialize())
+        return respond(post.serialize(user_id))
     else:
         return respond(plain_response("Given post ID doesn't exist. Requested resource not found."), 404)
-
-@app.route('/post/extras/<postid>')
-@jwt_optional
-def get_post_with_extras(postid):
-    post = Post.query.filter_by(id=postid).one()
-    user_id = get_jwt_identity()
-    if user_id:
-        response = post.serialize_with_extras(user_id)
-    else:
-        response = post.serialize_with_extras()
-    return respond(response)
 
 
 @app.route('/comments/chain/<commentid>')

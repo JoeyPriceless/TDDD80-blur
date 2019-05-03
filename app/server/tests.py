@@ -7,9 +7,8 @@ URL_ROOT = "http://127.0.0.1:5000/"
 
 
 class TestServerFunctions(unittest.TestCase):
-
-    token = ""
-    user_id = ""
+    token = None
+    user_id = None
 
     def test_0_login(self):
         r = requests.post(URL_ROOT + "user", json={'username': 'test_user', 'email': 'bengt@gmail.com',
@@ -45,7 +44,7 @@ class TestServerFunctions(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         post = json.loads(r.text)
         self.assertEqual(post.get('content'), content)
-        self.assertEqual(post.get('author_id'), self.__class__.user_id)
+        self.assertEqual(post.get('author').get('id'), self.__class__.user_id)
         self.assertEqual(post.get('id'), post_id)
 
         # Test that multiple posts can be created.
@@ -59,7 +58,7 @@ class TestServerFunctions(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         post = json.loads(r.text)
         self.assertEqual(post.get('content'), content)
-        self.assertEqual(post.get('author_id'), self.__class__.user_id)
+        self.assertEqual(post.get('author').get('id'), self.__class__.user_id)
         self.assertEqual(post.get('id'), post_id)
 
         # Test reacting to post
