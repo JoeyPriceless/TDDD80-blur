@@ -1,6 +1,6 @@
 from rq import Queue
 from redis import Redis
-from server.models import Post, FeedObject, db
+from server.models import Post, FeedObject
 import time
 import datetime
 
@@ -10,12 +10,12 @@ FEED_LENGTH = 100
 SCORE_MULTIPLIER = 10
 
 
-def start_timer():
-    create_feed()
+def start_timer(db):
+    create_feed(db)
     time.sleep(1500)
 
 
-def create_feed():
+def create_feed(db):
     # Score = total_vote_score * multiplier / time_since_posted
     posts = Post.query.order_by(Post.time_created).limit(FEED_LENGTH)
     for post in posts:
@@ -25,4 +25,3 @@ def create_feed():
 
     db.session.commit()
     # TODO: Sort through posts and compile the top.
-    pass

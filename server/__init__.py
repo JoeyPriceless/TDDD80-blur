@@ -6,6 +6,7 @@ import os
 db = SQLAlchemy()
 jwt = JWTManager()
 
+
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):
     jti = decrypted_token['jti']
@@ -13,10 +14,11 @@ def check_if_token_in_blacklist(decrypted_token):
     result = Blacklisted.query.filter_by(token_identifier=jti).scalar()
     return result is not None
 
+
 app = Flask(__name__)
 db.init_app(app)
 jwt.init_app(app)
-is_remote ='NAMESPACE' in os.environ and os.environ['NAMESPACE'] == 'heroku'
+is_remote = 'NAMESPACE' in os.environ and os.environ['NAMESPACE'] == 'heroku'
 if is_remote:
     db_uri = os.environ['DATABASE_URL']
     secret = os.environ['SECRET_KEY']
