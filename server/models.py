@@ -4,7 +4,7 @@ import datetime
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token
-from .util import format_datetime, serialize_list
+from server.util import format_datetime, serialize_list
 
 
 class User(db.Model):
@@ -76,30 +76,7 @@ class Post(db.Model):
             score += 1 if (reaction.reaction_type < 3) else -1
         return score
 
-    def serialize_reactions(self, user_id=None):
-        reactions = serialize_list(PostReaction.query.filter_by(post_id=self.id).all())
-        # Generates the requesters own reaction type if it exists.
-        # If the requester isn't logged in or hasn't reacted, the value is -1.
-        own_reaction_type = "null"
-        if user_id:
-            own_reaction = PostReaction.query.filter_by(post_id=self.id, user_id=user_id).scalar()
-            own_reaction_type = own_reaction.reaction_type if own_reaction else "null"
-        return {
-            'score': self.reaction_score(),
-            'own_reaction': own_reaction_type
-        }
-
-    def serialize(self):
-        return {
-            'id': self.id,
-            'author_id': self.author_id,
-            'content': self.content,
-            'time_created': {
-                'datetime': format_datetime(self.time_created)
-            }
-        }
-
-    def serialize_with_extras(self, user_id=None):
+    def serialize(self, user_id=None):
         # serialized for easier gson handling according to
         # https://stackoverflow.com/a/39320732/4400799
         author = User.query.filter_by(id=self.author_id).one()
@@ -112,6 +89,19 @@ class Post(db.Model):
                 'datetime': format_datetime(self.time_created)
             },
             'reactions': self.serialize_reactions(user_id)
+        }
+
+    def serialize_reactions(self, user_id=None):
+        reactions = serialize_list(PostReaction.query.filter_by(post_id=self.id).all())
+        # Generates the requesters own reaction type if it exists.
+        # If the requester isn't logged in or hasn't reacted, the value is -1.
+        own_reaction_type = "null"
+        if user_id:
+            own_reaction = PostReaction.query.filter_by(post_id=self.id, user_id=user_id).scalar()
+            own_reaction_type = own_reaction.reaction_type if own_reaction else "null"
+        return {
+            'score': self.reaction_score(),
+            'own_reaction': own_reaction_type
         }
 
 
