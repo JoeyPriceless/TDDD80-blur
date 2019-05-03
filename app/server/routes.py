@@ -260,7 +260,7 @@ def login():
         return respond(plain_response('Incorrect password or email'), 409)
 
     if credentials is None:
-        return respond(plain_response('Could not find credentials for existing user', 500))
+        return respond(plain_response('Could not find credentials for existing user'), 500)
     elif credentials.check_password(password):
         return respond(get_user_token(user))
     else:
@@ -291,11 +291,3 @@ def respond(response, status=200):
     print(f"{status}: {json.dumps(response, indent=2)}")
     sys.stdout.flush()
     return jsonify(response), status
-
-# def main():
-#     reset_db()
-#     db.session.commit()
-#     #app.run()
-#     jwt.token_in_blacklist_loader(check_if_token_in_blacklist)
-#
-# main()
