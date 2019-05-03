@@ -3,6 +3,7 @@ import unittest
 import json
 
 URL_ROOT = "http://127.0.0.1:5000/"
+#URL_ROOT = "https://tddd80-server.herokuapp.com/"
 
 class TestServerFunctions(unittest.TestCase):
 
