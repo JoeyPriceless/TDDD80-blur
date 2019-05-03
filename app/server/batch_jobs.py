@@ -1,7 +1,6 @@
 from rq import Queue
 from redis import Redis
-from models import Post, FeedObject
-from __init__ import db
+from server.models import Post, FeedObject, db
 import time
 import datetime
 
