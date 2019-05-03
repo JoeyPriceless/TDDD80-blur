@@ -36,6 +36,7 @@ def create_app():
         if not is_remote:
             db.drop_all()
         db.create_all()
+        app.run()
         jwt.token_in_blacklist_loader(check_if_token_in_blacklist)
         return app
 
