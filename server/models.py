@@ -186,8 +186,6 @@ class FeedObject(db.Model):
 class Comment(db.Model):
     id = db.Column(db.String, unique=True, primary_key=True)
     author_id = db.Column(db.String, db.ForeignKey('user.id'), unique=True)
-    upvotes = db.Column(db.Integer, nullable=False)
-    downvotes = db.Column(db.Integer, nullable=False)
     time_created = db.Column(db.DateTime, nullable=False)
     content = db.Column(db.String, nullable=False)
     parent_id = db.Column(db.String, db.ForeignKey('comment.id'), unique=False)
