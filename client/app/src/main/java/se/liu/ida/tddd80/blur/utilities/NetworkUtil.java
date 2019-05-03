@@ -220,7 +220,7 @@ public class NetworkUtil {
      */
     public void getPostWithExtras(String id, Listener<JSONObject> responseListener,
                                 ErrorListener errorListener) {
-        requestJsonObject(Url.build(Url.POST_GET_EXTRAS, id), Method.GET, responseListener,
+        requestJsonObject(Url.build(Url.POST_GET, id), Method.GET, responseListener,
                 errorListener);
     }
 
@@ -252,7 +252,6 @@ public class NetworkUtil {
         FEED_GET("/feed/"),
         POST_CREATE("/post"),
         POST_GET("/post/"),
-        POST_GET_EXTRAS("/post/extras/"),
         POST_REACTIONS_ADD("/post/reactions"),
         POST_REACTIONS_GET("/post/reactions/"),
         ROOT("https://tddd80-server.herokuapp.com"),
