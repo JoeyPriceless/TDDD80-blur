@@ -5,6 +5,7 @@ from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 import sys
 import json
 from server.util import serialize_list
+from server.batch_jobs import create_feed
 
 USERNAME_MIN_LENGTH = 3
 USERNAME_MAX_LENGTH = 24
@@ -32,6 +33,12 @@ def get_feed(feedtype):
         'type': feedtype,
         'posts': [post.serialize_with_extras(user_id) for post in feed]
     })
+
+
+@app.route('/feed/generate')
+def generate_feed():
+    create_feed(db)
+    return respond("New feed generated.", 200)
 
 
 @app.route('/comments/<postid>')
