@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.BlurMaskFilter;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
@@ -14,7 +15,9 @@ import android.widget.Toast;
 
 import jp.wasabeef.blurry.Blurry;
 import se.liu.ida.tddd80.blur.R;
+import se.liu.ida.tddd80.blur.fragments.FeedFragment;
 import se.liu.ida.tddd80.blur.fragments.ReactDialogFragment;
+import se.liu.ida.tddd80.blur.models.Feed;
 import se.liu.ida.tddd80.blur.models.ReactionType;
 import se.liu.ida.tddd80.blur.models.Reactions;
 
@@ -44,21 +47,15 @@ public class ViewUtil {
         button.setTextColor(color);
     }
 
-    public static void showReactionDialog(Context context, FragmentManager fragmentManager,
-                                          String postId) {
-        showReactionDialog(context, fragmentManager, postId, 0, 0, 0);
-    }
-
     /**
      * Shows an ReactDialog displaying each of the votes a user can select for a post.
      * @param context
      * @param fragmentManager
      * @param postId
-     * @param buttonId
      */
-    public static void showReactionDialog(Context context, FragmentManager fragmentManager,
-                                          String postId, int buttonId, int authorTextViewId,
-                                          int authorImageViewId) {
+    private static void pShowReactionDialog(Context context, FragmentManager fragmentManager,
+                                          String postId, @Nullable FeedFragment targetFragment,
+                                           @Nullable Integer adapterPosition) {
         if (!NetworkUtil.getInstance(context).isUserLoggedIn()) {
             Toast.makeText(context, "You must be logged in to react",
                     Toast.LENGTH_SHORT).show();
@@ -67,11 +64,23 @@ public class ViewUtil {
         ReactDialogFragment dialog = new ReactDialogFragment();
         Bundle args = new Bundle();
         args.putString(ReactDialogFragment.KEY_POST_ID, postId);
-        args.putInt(ReactDialogFragment.KEY_BUTTON_ID, buttonId);
-        args.putInt(ReactDialogFragment.KEY_AUTHOR_TEXT_ID, authorTextViewId);
-        args.putInt(ReactDialogFragment.KEY_IMAGE_VIEW_ID, authorImageViewId);
+        if (targetFragment != null && adapterPosition != null) {
+            args.putInt(ReactDialogFragment.KEY_ADAPTER_POSITION, adapterPosition);
+            dialog.setTargetFragment(targetFragment, FeedFragment.DIALOG_FRAGENT);
+        }
         dialog.setArguments(args);
         dialog.show(fragmentManager, context.getClass().getSimpleName());
+    }
+
+    public static void showReactionDialog(Context context, FragmentManager fragmentManager,
+                                          String postId, FeedFragment targetFragment,
+                                          Integer adapterPosition) {
+        pShowReactionDialog(context, fragmentManager, postId, targetFragment, adapterPosition);
+    }
+
+    public static void showReactionDialog(Context context, FragmentManager fragmentManager,
+                                          String postId) {
+        pShowReactionDialog(context, fragmentManager, postId, null, null);
     }
 
     public static void blurText(TextView tv) {

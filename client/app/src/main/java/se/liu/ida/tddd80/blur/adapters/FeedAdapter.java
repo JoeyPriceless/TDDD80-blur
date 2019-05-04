@@ -11,10 +11,14 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.List;
+
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.activities.PostActivity;
+import se.liu.ida.tddd80.blur.fragments.FeedFragment;
 import se.liu.ida.tddd80.blur.models.Feed;
 import se.liu.ida.tddd80.blur.models.Post;
+import se.liu.ida.tddd80.blur.models.Reactions;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
 import se.liu.ida.tddd80.blur.utilities.ViewUtil;
 
@@ -41,18 +45,16 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     ViewUtil.showReactionDialog(v.getContext(), fragmentManager, getPostId(),
-                            reactButton.getId(), authorName.getId(), authorImage.getId());
+                            fragment, getAdapterPosition());
                 }
             });
             commentButton = v.findViewById(R.id.button_feeditem_comment);
             favoriteButton = v.findViewById(R.id.button_feeditem_favorite);
-
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (listener != null) {
+                    if (listener != null)
                         listener.onPostClick(getPostId());
-                    }
                 }
             });
         }
@@ -63,6 +65,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
     }
 
     private Feed feed;
+    private FeedFragment fragment;
     private FragmentManager fragmentManager;
     private OnPostClickListener listener;
 
@@ -70,10 +73,17 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
         void onPostClick(String postId);
     }
 
-    public FeedAdapter(Feed feed, FragmentManager fragmentManager, OnPostClickListener listener) {
+    public FeedAdapter(Feed feed, FeedFragment fragment, FragmentManager fragmentManager,
+                       OnPostClickListener listener) {
         this.feed = feed;
+        this.fragment = fragment;
         this.fragmentManager = fragmentManager;
         this.listener = listener;
+    }
+
+    public void setPostReactions(int position, Reactions reactions) {
+        feed.get(position).setReactions(reactions);
+        notifyItemChanged(position);
     }
 
     @NonNull
@@ -90,8 +100,17 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder vh, int i) {
-        Post post = feed.get(i);
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull List<Object> payloads) {
+        if (payloads.isEmpty()) {
+            super.onBindViewHolder(holder, position, payloads);
+        } else {
+
+        }
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull final ViewHolder vh, int i) {
+        final Post post = feed.get(i);
         // TODO
         vh.authorName.setText(PostActivity.AUTHOR_SPACE_PADDING + post.getAuthor().getUsername());
         vh.timestamp.setText(StringUtil.formatDateTimeShort(post.getTimeCreated()));
@@ -108,4 +127,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
     public int getItemCount() {
         return feed.size();
     }
+
+
 }

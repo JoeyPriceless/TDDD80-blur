@@ -18,8 +18,7 @@ import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
 import se.liu.ida.tddd80.blur.utilities.ResponseListeners;
 
 public class FeedActivity extends AppCompatActivity
-        implements FeedFragment.OnFragmentInteractionListener,
-        ReactDialogFragment.ReactDialogListener {
+        implements FeedFragment.OnFragmentInteractionListener {
 	@Override protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_feed);
@@ -34,15 +33,4 @@ public class FeedActivity extends AppCompatActivity
 
     @Override public void onFragmentInteraction(final Uri uri) {
    	}
-
-    @Override
-    public void onClickReactionDialog(ReactDialogFragment dialog) {
-        ReactionType type = ReactionType.values()[dialog.getIndex()];
-        Button button = findViewById(dialog.getButtonId());
-        TextView tvAuthor = findViewById(dialog.getAuthorTextViewId());
-        ImageView ivAuthor = findViewById(dialog.getAuthorImageViewId());
-        NetworkUtil.getInstance(this).reactToPost(dialog.getPostId(), type,
-                new ResponseListeners.ReactionSuccess(button, tvAuthor, ivAuthor),
-                new ResponseListeners.DefaultError(this));
-    }
 }

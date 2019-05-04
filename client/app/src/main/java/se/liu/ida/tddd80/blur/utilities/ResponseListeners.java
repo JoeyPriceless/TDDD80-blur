@@ -12,6 +12,7 @@ import com.android.volley.VolleyError;
 
 import org.json.JSONObject;
 
+import se.liu.ida.tddd80.blur.adapters.FeedAdapter;
 import se.liu.ida.tddd80.blur.models.Post;
 
 public class ResponseListeners {
@@ -34,17 +35,25 @@ public class ResponseListeners {
             this.ivAuthor = ivAuthor;
         }
 
-        public ReactionSuccess(Button btnReact, TextView tvAuthor, ImageView ivAuthor) {
-            this.post = new Post();
-            this.btnReact = btnReact;
-            this.tvAuthor = tvAuthor;
-            this.ivAuthor = ivAuthor;
-        }
-
         @Override
         public void onResponse(JSONObject response) {
             post.setReactions(GsonUtil.getInstance().parseReactions(response));
             ViewUtil.onReactionUpdateViews(btnReact, post.getReactions(), tvAuthor, ivAuthor);
+        }
+    }
+
+    public static class FeedReactionSuccess implements Response.Listener<JSONObject> {
+        private FeedAdapter adapter;
+        private int position;
+
+        public FeedReactionSuccess(FeedAdapter adapter, int position) {
+            this.adapter = adapter;
+            this.position = position;
+        }
+
+        @Override
+        public void onResponse(JSONObject response) {
+            adapter.setPostReactions(position, GsonUtil.getInstance().parseReactions(response));
         }
     }
 

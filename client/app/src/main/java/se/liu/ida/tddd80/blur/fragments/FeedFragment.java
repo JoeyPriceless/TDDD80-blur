@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,6 +13,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
@@ -23,8 +27,10 @@ import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.activities.PostActivity;
 import se.liu.ida.tddd80.blur.adapters.FeedAdapter;
 import se.liu.ida.tddd80.blur.models.FeedType;
+import se.liu.ida.tddd80.blur.models.ReactionType;
 import se.liu.ida.tddd80.blur.utilities.GsonUtil;
 import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
+import se.liu.ida.tddd80.blur.utilities.ResponseListeners;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
 
 /**
@@ -35,9 +41,10 @@ import se.liu.ida.tddd80.blur.utilities.StringUtil;
  * Use the {@link FeedFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FeedFragment extends Fragment {
+public class FeedFragment extends Fragment implements ReactDialogFragment.ReactDialogListener {
     private final String TAG = getClass().getSimpleName();
     private static final String ARG_FEED_NAME = "feedName";
+    public static final int DIALOG_FRAGENT = 1;
 
     private FeedType feedType;
     private FeedAdapter adapter;
@@ -123,7 +130,7 @@ public class FeedFragment extends Fragment {
     private class ResponseListener implements Response.Listener<JSONObject> {
         @Override
         public void onResponse(JSONObject response) {
-            adapter = new FeedAdapter(GsonUtil.getInstance().parseFeed(response),
+            adapter = new FeedAdapter(GsonUtil.getInstance().parseFeed(response), FeedFragment.this,
                     getFragmentManager(), new PostActivityListener());
             rv.setAdapter(adapter);
         }
@@ -145,5 +152,13 @@ public class FeedFragment extends Fragment {
                     postId);
             startActivity(postActivityIntent);
         }
+    }
+
+    @Override
+    public void onClickReactionDialog(ReactDialogFragment dialog) {
+        ReactionType type = ReactionType.values()[dialog.getIndex()];
+        NetworkUtil.getInstance(getContext()).reactToPost(dialog.getPostId(), type,
+                new ResponseListeners.FeedReactionSuccess(adapter, dialog.getAdapterPosition()),
+                new ResponseListeners.DefaultError(getContext()));
     }
 }
