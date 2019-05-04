@@ -31,7 +31,7 @@ def get_feed(feedtype):
 
     return respond({
         'type': feedtype,
-        'posts': [post.serialize_with_extras(user_id) for post in feed]
+        'posts': [post.serialize(user_id) for post in feed]
     })
 
 
