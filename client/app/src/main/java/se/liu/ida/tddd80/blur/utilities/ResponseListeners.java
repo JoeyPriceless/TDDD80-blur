@@ -27,10 +27,10 @@ public class ResponseListeners {
         private TextView tvAuthor;
         private ImageView ivAuthor;
 
-        public ReactionSuccess(Post post, Button reactionButton, TextView tvAuthor,
+        public ReactionSuccess(Post post, Button btnReact, TextView tvAuthor,
                                ImageView ivAuthor) {
             this.post = post;
-            btnReact = reactionButton;
+            this.btnReact = btnReact;
             this.tvAuthor = tvAuthor;
             this.ivAuthor = ivAuthor;
         }
@@ -42,6 +42,10 @@ public class ResponseListeners {
         }
     }
 
+    /**
+     * ResponseListener for a reactToPost reaction call. Let's a FeedAdapter take care of updating
+     * the post's a views.
+     */
     public static class FeedReactionSuccess implements Response.Listener<JSONObject> {
         private FeedAdapter adapter;
         private int position;
@@ -60,6 +64,7 @@ public class ResponseListeners {
     /**
      * Provides a default ErrorListener for Volley requests. Notifies the log and creates a toast.
      */
+    // TODO fix parsing for both JSON and raw responses
     public static class DefaultError implements Response.ErrorListener {
         Context context;
 

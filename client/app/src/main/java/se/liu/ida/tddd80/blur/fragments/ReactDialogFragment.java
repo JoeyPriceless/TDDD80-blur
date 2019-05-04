@@ -45,6 +45,7 @@ public class ReactDialogFragment extends DialogFragment {
     public void setArguments(@Nullable Bundle args) {
         if (args != null) {
             postId = args.getString(KEY_POST_ID);
+            // adapterPosition may be null. Only used when post is interacted with in a recyclerview
             adapterPosition = args.getInt(KEY_ADAPTER_POSITION);
         }
     }
@@ -71,6 +72,8 @@ public class ReactDialogFragment extends DialogFragment {
     @Override
     public void onAttach(Context activityContext) {
         super.onAttach(activityContext);
+        // TargetFragment is set when the dialog is launched through a Fragment rather than an
+        // activity.
         Fragment targetFragment = getTargetFragment();
         if (targetFragment != null) {
             try {

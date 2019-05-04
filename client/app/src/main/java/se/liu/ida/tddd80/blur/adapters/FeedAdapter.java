@@ -83,6 +83,9 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
 
     public void setPostReactions(int position, Reactions reactions) {
         feed.get(position).setReactions(reactions);
+        // It's important not to update a post's views directly in a RecyclerView. Rather, update
+        // the model and notify the adapter.
+        // Useful resource: https://stackoverflow.com/a/48959184/4400799
         notifyItemChanged(position);
     }
 

@@ -17,15 +17,15 @@ import jp.wasabeef.blurry.Blurry;
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.fragments.FeedFragment;
 import se.liu.ida.tddd80.blur.fragments.ReactDialogFragment;
-import se.liu.ida.tddd80.blur.models.Feed;
 import se.liu.ida.tddd80.blur.models.ReactionType;
 import se.liu.ida.tddd80.blur.models.Reactions;
 
 public class ViewUtil {
 
     /**
-     * Update a given reaction button according to a post's reactions. Sets the color of the icon
-     * and text according to the user's vote.
+     * Update a given reaction button according to a post's reactions.
+     * Sets the color of the icon and text according to the user's vote.
+     * Also blurs/unblurs author's name and image.
      * @param button Button which drawable/text should be updated
      * @param reactions The reactions belonging to the post which was voted on.
      */
@@ -48,10 +48,7 @@ public class ViewUtil {
     }
 
     /**
-     * Shows an ReactDialog displaying each of the votes a user can select for a post.
-     * @param context
-     * @param fragmentManager
-     * @param postId
+     * Private message run by the public methods.
      */
     private static void pShowReactionDialog(Context context, FragmentManager fragmentManager,
                                           String postId, @Nullable FeedFragment targetFragment,
@@ -72,12 +69,20 @@ public class ViewUtil {
         dialog.show(fragmentManager, context.getClass().getSimpleName());
     }
 
+    /**
+     * Shows an ReactDialog displaying each of the votes a user can select for a post. This overload
+     * is used by FeedFragments which need to specify the post's adapter position.
+     */
     public static void showReactionDialog(Context context, FragmentManager fragmentManager,
                                           String postId, FeedFragment targetFragment,
                                           Integer adapterPosition) {
         pShowReactionDialog(context, fragmentManager, postId, targetFragment, adapterPosition);
     }
 
+    /**
+     * Shows an ReactDialog displaying each of the votes a user can select for a post in a
+     * PostActivity
+     */
     public static void showReactionDialog(Context context, FragmentManager fragmentManager,
                                           String postId) {
         pShowReactionDialog(context, fragmentManager, postId, null, null);

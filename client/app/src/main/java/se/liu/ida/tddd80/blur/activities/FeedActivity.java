@@ -23,12 +23,13 @@ public class FeedActivity extends AppCompatActivity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_feed);
 
+		// Initiate feed fragments.
+        // TODO TabLayout which 3 fragments
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.replace(R.id.framelayout_fragmentholder,
                 FeedFragment.newInstance(FeedType.HOT.toString()));
         transaction.commit();
-
 	}
 
     @Override public void onFragmentInteraction(final Uri uri) {

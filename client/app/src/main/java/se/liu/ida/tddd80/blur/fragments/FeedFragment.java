@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,9 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
@@ -33,14 +29,6 @@ import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
 import se.liu.ida.tddd80.blur.utilities.ResponseListeners;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link FeedFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link FeedFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class FeedFragment extends Fragment implements ReactDialogFragment.ReactDialogListener {
     private final String TAG = getClass().getSimpleName();
     private static final String ARG_FEED_NAME = "feedName";
@@ -72,7 +60,7 @@ public class FeedFragment extends Fragment implements ReactDialogFragment.ReactD
             feedType = FeedType.valueOf((String)getArguments().get(ARG_FEED_NAME));
         }
         netUtil = NetworkUtil.getInstance(getContext());
-        netUtil.getFeed(feedType, new ResponseListener(), new ResponseErrorListener());
+        netUtil.getFeed(feedType, new FeedResponseListener(), new FeedResponseErrorListener());
     }
 
     @Override
@@ -88,7 +76,6 @@ public class FeedFragment extends Fragment implements ReactDialogFragment.ReactD
         return inflatedView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -127,7 +114,8 @@ public class FeedFragment extends Fragment implements ReactDialogFragment.ReactD
         void onFragmentInteraction(Uri uri);
     }
 
-    private class ResponseListener implements Response.Listener<JSONObject> {
+
+    private class FeedResponseListener implements Response.Listener<JSONObject> {
         @Override
         public void onResponse(JSONObject response) {
             adapter = new FeedAdapter(GsonUtil.getInstance().parseFeed(response), FeedFragment.this,
@@ -136,7 +124,7 @@ public class FeedFragment extends Fragment implements ReactDialogFragment.ReactD
         }
     }
 
-    private class ResponseErrorListener implements Response.ErrorListener {
+    private class FeedResponseErrorListener implements Response.ErrorListener {
         @Override
         public void onErrorResponse(VolleyError error) {
             Log.e(TAG, StringUtil.parsePlainJsonResponse(error));
@@ -144,6 +132,9 @@ public class FeedFragment extends Fragment implements ReactDialogFragment.ReactD
         }
     }
 
+    /**
+     * Starts a PostActivity when user clicks on a post in the feed
+     */
     private class PostActivityListener implements FeedAdapter.OnPostClickListener {
         @Override
         public void onPostClick(String postId) {
@@ -154,6 +145,9 @@ public class FeedFragment extends Fragment implements ReactDialogFragment.ReactD
         }
     }
 
+    /**
+     * Sends the ReactionType chosen in a ReactDialogFragment to the server.
+     */
     @Override
     public void onClickReactionDialog(ReactDialogFragment dialog) {
         ReactionType type = ReactionType.values()[dialog.getIndex()];
