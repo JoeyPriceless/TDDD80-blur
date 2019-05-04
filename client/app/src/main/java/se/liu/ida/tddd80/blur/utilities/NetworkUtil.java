@@ -38,12 +38,12 @@ public class NetworkUtil {
     private String tokenStringKey;
     private String token;
 
-    public void setToken(String token) {
+    public void login(String token) {
         this.token = token;
         storeToken();
     }
 
-    public void clearToken() {
+    public void logout() {
         token = null;
         storeToken();
     }
@@ -165,7 +165,7 @@ public class NetworkUtil {
 
     /**
      * Requests an authorization token for the given credentials. responseListener should call
-     * NetworkUtil.setToken()
+     * NetworkUtil.login()
      */
     public void login(String email, String password, Listener<JSONObject> responseListener,
                        ErrorListener errorListener) {
@@ -179,7 +179,7 @@ public class NetworkUtil {
 
     /**
      * Log out of the server, blacklisting the authorization token. responseListener should call
-     * NetworkUtil.clearToken();
+     * NetworkUtil.logout();
      */
     public void logout(Listener<JSONObject> responseListener, ErrorListener errorListener) {
         requestJsonObject(Url.build(Url.USER_LOGOUT), Method.POST, responseListener, errorListener);
