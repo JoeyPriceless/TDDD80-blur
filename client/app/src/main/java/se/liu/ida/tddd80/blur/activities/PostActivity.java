@@ -30,6 +30,7 @@ import se.liu.ida.tddd80.blur.utilities.ViewUtil;
 public class PostActivity extends AppCompatActivity
         implements ReactDialogFragment.ReactDialogListener {
     private final String TAG = getClass().getSimpleName();
+    public static final String EXTRA_POST_ID = "POST_ID";
     public static final Character AUTHOR_SPACE_PADDING = ' ';
     NetworkUtil netUtil;
     GsonUtil gsonUtil;
@@ -45,11 +46,11 @@ public class PostActivity extends AppCompatActivity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_post);
 		Intent intent = getIntent();
-		String postId = intent.getStringExtra(getResources().getString(R.string.extra_post_id));
+		String postId = intent.getStringExtra(EXTRA_POST_ID);
 
 		netUtil = NetworkUtil.getInstance(this);
 		gsonUtil = GsonUtil.getInstance();
-		netUtil.getPostWithExtras(postId, new postExtraResponseListener(),
+        netUtil.getPost(postId, new GetPostResponseListener(),
                 new ResponseListeners.DefaultError(this));
 		tvAuthor = findViewById(R.id.textview_post_author);
 		ivAuthor = findViewById(R.id.imageview_post_author);
@@ -57,7 +58,7 @@ public class PostActivity extends AppCompatActivity
 
 	}
 
-	private class postExtraResponseListener implements Response.Listener<JSONObject> {
+	private class GetPostResponseListener implements Response.Listener<JSONObject> {
         @Override
         public void onResponse(JSONObject response) {
             try {

@@ -210,16 +210,11 @@ public class NetworkUtil {
                             errorListener, params);
     }
 
-    public void getPost(String id, Listener<JSONObject> responseListener,
-                            ErrorListener errorListener) {
-        requestJsonObject(Url.build(Url.POST_GET, id), Method.GET, responseListener, errorListener);
-    }
-
     /**
      * Request a post of a given id, along with extras such as it's author, reactions and comments.
      */
-    public void getPostWithExtras(String id, Listener<JSONObject> responseListener,
-                                ErrorListener errorListener) {
+    public void getPost(String id, Listener<JSONObject> responseListener,
+                        ErrorListener errorListener) {
         requestJsonObject(Url.build(Url.POST_GET, id), Method.GET, responseListener,
                 errorListener);
     }

@@ -8,8 +8,6 @@
         <item>DOWNVOTE_1</item>
         <item>DOWNVOTE_2</item>
     </string-array>
-    <!-- Intent extra keys -->
-    <string name="extra_post_id">POST_ID</string>
 
     <!-- SharedPreferences keys -->
     <string name="token_pref_key">TOKEN</string>

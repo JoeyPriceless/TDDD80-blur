@@ -11,6 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        <activity android:name=".activities.SubmitPostActivity"
+            android:windowSoftInputMode="adjustResize"/>
         <activity android:name=".activities.RegisterActivity" />
         <activity
             android:name=".activities.LoginActivity"
@@ -26,7 +28,7 @@
             android:exported="true" />
         <activity
             android:name=".activities.FeedActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
     </application>
 
 </manifest>

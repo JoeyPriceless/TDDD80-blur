@@ -33,7 +33,7 @@ public class GsonUtil {
     }
 
     /**
-     * Returns a Post from a successful getPostWithExtras request.
+     * Returns a Post from a successful getPost request.
      */
     public Post parsePost(JSONObject object) {
         return gson.fromJson(object.toString(), Post.class);

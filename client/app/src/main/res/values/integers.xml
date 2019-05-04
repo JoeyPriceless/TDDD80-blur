@@ -4,4 +4,7 @@
     <integer name="username_max_length">24</integer>
 
     <integer name="password_min_length">8</integer>
+    
+    <integer name="post_max_length">240</integer>
+    <integer name="comment_max_length">240</integer>
 </resources>
