@@ -46,7 +46,7 @@ public class ViewUtil {
 
     public static void showReactionDialog(Context context, FragmentManager fragmentManager,
                                           String postId) {
-        showReactionDialog(context, fragmentManager, postId, 0);
+        showReactionDialog(context, fragmentManager, postId, 0, 0, 0);
     }
 
     /**
@@ -57,7 +57,8 @@ public class ViewUtil {
      * @param buttonId
      */
     public static void showReactionDialog(Context context, FragmentManager fragmentManager,
-                                          String postId, int buttonId) {
+                                          String postId, int buttonId, int authorTextViewId,
+                                          int authorImageViewId) {
         if (!NetworkUtil.getInstance(context).isUserLoggedIn()) {
             Toast.makeText(context, "You must be logged in to react",
                     Toast.LENGTH_SHORT).show();
@@ -67,6 +68,8 @@ public class ViewUtil {
         Bundle args = new Bundle();
         args.putString(ReactDialogFragment.KEY_POST_ID, postId);
         args.putInt(ReactDialogFragment.KEY_BUTTON_ID, buttonId);
+        args.putInt(ReactDialogFragment.KEY_AUTHOR_TEXT_ID, authorTextViewId);
+        args.putInt(ReactDialogFragment.KEY_IMAGE_VIEW_ID, authorImageViewId);
         dialog.setArguments(args);
         dialog.show(fragmentManager, context.getClass().getSimpleName());
     }

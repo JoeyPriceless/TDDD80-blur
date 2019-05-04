@@ -41,7 +41,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     ViewUtil.showReactionDialog(v.getContext(), fragmentManager, getPostId(),
-                            reactButton.getId());
+                            reactButton.getId(), authorName.getId(), authorImage.getId());
                 }
             });
             commentButton = v.findViewById(R.id.button_feeditem_comment);
