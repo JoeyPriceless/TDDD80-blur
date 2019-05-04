@@ -81,7 +81,7 @@ def get_comment_chain(commentid):
     return respond(serialize_list(comments))
 
 
-@app.route('/post/react/<postid>')
+@app.route('/post/reactions/<postid>')
 def get_reactions(postid):
     reactions = PostReaction.query.filter_by(post_id=postid).all()
     if reactions is None:
@@ -135,7 +135,7 @@ def post_comment():
     return respond(Comment.query.filter_by(id=comment.id).one().reaction_score())
 
 
-@app.route('/post/react', methods=['POST'])
+@app.route('/post/reactions', methods=['POST'])
 @jwt_required
 def react_to_post():
     reaction = int(request.json['reaction'])
@@ -160,7 +160,7 @@ def react_to_post():
     return respond(post.serialize_reactions(user_id))
 
 
-@app.route('/comment/react', methods=['POST'])
+@app.route('/comment/reactions', methods=['POST'])
 @jwt_required
 def react_to_comment():
     # TODO change from reaction type to binary reaction
