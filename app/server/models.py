@@ -105,6 +105,65 @@ class Post(db.Model):
         }
 
 
+class Comment(db.Model):
+    id = db.Column(db.String, unique=True, primary_key=True)
+    author_id = db.Column(db.String, db.ForeignKey('user.id'), unique=False)
+    time_created = db.Column(db.DateTime, nullable=False)
+    content = db.Column(db.String, nullable=False)
+    parent_id = db.Column(db.String, db.ForeignKey('comment.id'), unique=False, nullable=True)
+    children = db.relationship('Comment', backref=db.backref('parent', remote_side=[id]))
+    post_id = db.Column(db.String, db.ForeignKey('post.id'), nullable=False)
+
+    def __init__(self, author, content, parent_id, post_id):
+        self.id = uuid.uuid4().hex
+        self.author_id = author
+        self.time_created = datetime.datetime.now()
+        self.content = content
+        self.parent_id = parent_id
+        self.post_id = post_id
+
+    def kill_children(self, temp_db):
+        temp_db.session.query(CommentReaction).filter(CommentReaction.id == self.id).delete()
+        temp_db.session.commit()
+
+    def get_reactions(self):
+        return CommentReaction.query.filter_by(comment_id=self.id).all()
+
+    def reaction_score(self):
+        score = 0
+        reactions = self.get_reactions()
+        # Score +1 if reaction type is positive and -1 if it's negative
+        # Reaction type is an int between 0-5, with the first 3 being positive reactions.
+        for reaction in reactions:
+            score += 1 if reaction.reaction_type == 1 else -1
+        return score
+
+    def serialize_reactions(self, user_id=None):
+        reactions = serialize_list(CommentReaction.query.filter_by(comment_id=self.id).all())
+        # Generates the requesters own reaction type if it exists.
+        # If the requester isn't logged in or hasn't reacted, the value is -1.
+        own_reaction_type = "null"
+        if user_id:
+            own_reaction = CommentReaction.query.filter_by(comment_id=self.id, user_id=user_id).scalar()
+            own_reaction_type = own_reaction.reaction_type if own_reaction else "null"
+        return {
+            'score': self.reaction_score(),
+            'own_reaction': own_reaction_type
+        }
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'author_id': self.author_id,
+            'time_created': {
+                'datetime': format_datetime(self.time_created)
+            },
+            'content': self.content,
+            'parent': self.parent_id,
+            'reactions': self.serialize_reactions(self.author_id)
+        }
+
+
 class PostReaction(db.Model):
     id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
     post_id = db.Column(db.String, db.ForeignKey('post.id'), unique=False, nullable=False)
@@ -134,10 +193,10 @@ class CommentReaction(db.Model):
     user_id = db.Column(db.String, db.ForeignKey('user.id'), unique=True, nullable=False)
     reaction_type = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, post_id, user_id, reaction_type):
-        self.post_id = post_id
+    def __init__(self, comment_id, user_id, reaction_type):
+        self.comment_id = comment_id
         self.user_id = user_id
-        if reaction_type > 1 or reaction_type < 0:
+        if int(reaction_type) > 1 or int(reaction_type) < 0:
             self.reaction_type = 0
         else:
             self.reaction_type = reaction_type
@@ -170,44 +229,6 @@ class FeedObject(db.Model):
             'id': self.id,
             'type': self.type,
             'post': self.post,
-        }
-
-
-class Comment(db.Model):
-    id = db.Column(db.String, unique=True, primary_key=True)
-    author_id = db.Column(db.String, db.ForeignKey('user.id'), unique=True)
-    time_created = db.Column(db.DateTime, nullable=False)
-    content = db.Column(db.String, nullable=False)
-    parent_id = db.Column(db.String, db.ForeignKey('comment.id'), unique=False, nullable=True)
-    children = db.relationship('Comment', backref=db.backref('parent', remote_side=[id]))
-    post_id = db.Column(db.String, db.ForeignKey('post.id'), nullable=False)
-
-    def __init__(self, author, content, parent, post_id):
-        self.id = uuid.uuid4().hex
-        self.author = author
-        self.time_created = datetime.datetime.now()
-        self.content = content
-        self.parent = parent
-        self.post_id = post_id
-
-    def get_reactions(self):
-        return CommentReaction.query.filter_by(comment_id=self.id).all()
-
-    def kill_children(self, temp_db):
-        temp_db.session.query(CommentReaction).filter(CommentReaction.id == self.id).delete()
-        temp_db.session.commit()
-
-    def serialize(self):
-        return {
-            'id': self.id,
-            'author_id': self.author,
-            'upvotes': self.upvotes,
-            'downvotes': self.downvotes,
-            'time_created': {
-                'datetime': format_datetime(self.time_created)
-            },
-            'content': self.content,
-            'parent': self.parent,
         }
 
 

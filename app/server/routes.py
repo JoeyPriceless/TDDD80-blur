@@ -43,7 +43,7 @@ def generate_feed():
 
 @app.route('/comments/<postid>')
 def get_comments(postid):
-    comments = Comment.query.filter_by(post=postid).all()
+    comments = Comment.query.filter_by(post_id=postid).all()
     if comments is None:
         post = Post.query.filter_by(id=postid).one()
         if post is None:
@@ -51,6 +51,7 @@ def get_comments(postid):
                 plain_response("Given post ID doesn't exist. Requested resource not found."), 404)
         return respond(plain_response("Requested post has no comments."), 404)
     return respond(comments)
+
 
 @app.route('/post/<postid>')
 @jwt_optional
@@ -63,18 +64,22 @@ def get_post(postid):
         return respond(plain_response("Given post ID doesn't exist. Requested resource not found."), 404)
 
 
+@app.route('/comment/<commentid>')
+def get_comment(commentid):
+    comment = Comment.query.filter_by(id=commentid).scalar()
+    if comment:
+        return respond(comment.serialize())
+    else:
+        return respond(plain_response("Given comment ID doesn't exist. Requested resource not found."), 404)
+
+
 @app.route('/comments/chain/<commentid>')
 def get_comment_chain(commentid):
-    comments = []
     comment = Comment.query.filter_by(id=commentid).one()
     if comment is None:
         return respond(plain_response(
             "The given comment ID doesn't exist. Requested resource not found."), 404)
-    while comment is not None:
-        comment = comment.child
-        if comment is None:
-            break
-        comments.append(comment)
+    comments = comment.children
     if len(comments) == 0:
         return respond(
             plain_response("The given comment has no children. Requested resource not found."), 404)
@@ -132,7 +137,7 @@ def post_comment():
     comment = Comment(user_id, content, parent, post_id)
     db.session.add(comment)
     db.session.commit()
-    return respond(comment.id)
+    return respond(plain_response(comment.id))
 
 
 @app.route('/post/reactions', methods=['POST'])
@@ -165,7 +170,7 @@ def react_to_post():
 def react_to_comment():
     # TODO change from reaction type to binary reaction
     reaction = request.json['reaction']
-    comment_id = request.json['comment']
+    comment_id = request.json['comment_id']
     comment = Comment.query.filter_by(id=comment_id).scalar()
     if not comment:
         return respond(plain_response(
@@ -190,7 +195,7 @@ def react_to_comment():
 @app.route('/post/<postid>', methods=['DELETE'])
 @jwt_required
 def delete_post(postid):
-    post = Post.query.filter_by(id=postid).one()
+    post = Post.query.filter_by(id=postid).scalar()
     if post is None:
         return respond(
             plain_response("The given post ID doesn't exist. Requested resource not found."), 404)
@@ -215,7 +220,7 @@ def delete_comment(commentid):
             plain_response("User is not author of specified post. Permission denied."), 403)
     comment.kill_children(db)
     db.session.delete(comment)
-    db.session.push()
+    db.session.commit()
     return respond('')
 
 
@@ -278,6 +283,13 @@ def logout():
     db.session.add(blacklisted)
     db.session.commit()
     return respond(plain_response(''))
+
+@jwt.token_in_blacklist_loader
+def check_if_token_in_blacklist(decrypted_token):
+    jti = decrypted_token['jti']
+    result = Blacklisted.query.filter_by(token_identifier=jti).scalar()
+    return result != None
+
 
 
 def plain_response(string):
