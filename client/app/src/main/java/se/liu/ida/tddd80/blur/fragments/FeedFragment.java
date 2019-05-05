@@ -139,7 +139,6 @@ public class FeedFragment extends Fragment implements ReactDialogFragment.ReactD
         @Override
         public void onPostClick(String postId) {
             Intent postActivityIntent = new Intent(getContext(), PostActivity.class);
-            postActivityIntent.putExtra(PostActivity.EXTRA_POST_ID, postId);
             startActivity(postActivityIntent);
         }
     }
