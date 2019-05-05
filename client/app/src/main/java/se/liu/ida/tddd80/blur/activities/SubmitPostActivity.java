@@ -16,7 +16,10 @@ import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.content.FileProvider;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -46,6 +49,7 @@ import java.util.List;
 import java.util.Locale;
 
 import se.liu.ida.tddd80.blur.R;
+import se.liu.ida.tddd80.blur.fragments.SubmitImageDialogFragment;
 import se.liu.ida.tddd80.blur.utilities.FileUtil;
 import se.liu.ida.tddd80.blur.utilities.GsonUtil;
 import se.liu.ida.tddd80.blur.utilities.ImageOrienter;
@@ -54,7 +58,7 @@ import se.liu.ida.tddd80.blur.utilities.ResponseListeners;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
 
 public class SubmitPostActivity extends AppCompatActivity implements Response.Listener<JSONObject>,
-        OnSuccessListener<Location> {
+        OnSuccessListener<Location>, SubmitImageDialogFragment.SubmitImageDialogListener {
     private static final int IMAGE_REQUEST_CODE = 78;
     private static final int LOCATION_REQUEST_CODE = 99;
     private static final int THUMBNAIL_HEIGHT = 400;
@@ -221,12 +225,16 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
         }
     }
 
+    public void onClickImageThumbnail(View v) {
+        SubmitImageDialogFragment fragment = new SubmitImageDialogFragment();
+        fragment.show(getSupportFragmentManager(), this.getClass().getSimpleName());
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == IMAGE_REQUEST_CODE && resultCode != RESULT_OK) {
             Toast.makeText(this, "Failed to take picture.", Toast.LENGTH_SHORT).show();
         } else if (requestCode == IMAGE_REQUEST_CODE) {
-            // TODO Display image ivThumbnail
             Bitmap bmFullsize;
             try {
                  bmFullsize = ImageOrienter.getImageAndRotate(this, Uri.fromFile(imageFile));
@@ -237,7 +245,10 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
             int width = (int)Math.round(THUMBNAIL_HEIGHT * aspectRatio);
             Bitmap bmThumbnail = ThumbnailUtils.extractThumbnail(bmFullsize, width,
                     THUMBNAIL_HEIGHT);
-            ivThumbnail.setImageBitmap(bmThumbnail);
+            RoundedBitmapDrawable rounded = RoundedBitmapDrawableFactory
+                    .create(getResources(), bmThumbnail);
+            rounded.setCornerRadius(15);
+            ivThumbnail.setImageDrawable(rounded);
         }
     }
 
@@ -348,5 +359,11 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
                 }
             });
         }
+    }
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        imageFile = null;
+        ivThumbnail.setImageBitmap(null);
     }
 }

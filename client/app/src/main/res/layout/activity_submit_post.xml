@@ -44,6 +44,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginBottom="8dp"
+        android:onClick="onClickImageThumbnail"
         app:layout_constraintBottom_toTopOf="@+id/framelayout_bottombar_submit"
         app:layout_constraintStart_toStartOf="parent" />
 
