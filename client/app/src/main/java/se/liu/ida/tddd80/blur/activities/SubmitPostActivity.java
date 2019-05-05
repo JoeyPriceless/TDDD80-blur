@@ -361,6 +361,9 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
         }
     }
 
+    /**
+     * Listener for SubmitImageDialogFragment
+     */
     @Override
     public void onDialogPositiveClick(DialogFragment dialog) {
         imageFile = null;

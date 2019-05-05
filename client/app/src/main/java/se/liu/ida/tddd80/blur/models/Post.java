@@ -4,20 +4,17 @@ import com.google.gson.annotations.SerializedName;
 
 import org.joda.time.DateTime;
 
-public class Post {
+public class Post extends PictureHolder{
     private String id;
     private User author;
     private String content;
     @SerializedName("time_created")
     private DateTime timeCreated; // Check json compatibility
     private Reactions reactions;
+    private String location;
 
     public User getAuthor() {
         return author;
-    }
-
-    public void setAuthor(User author) {
-        this.author = author;
     }
 
     public String getContent() {
@@ -26,10 +23,6 @@ public class Post {
 
     public DateTime getTimeCreated() {
         return timeCreated;
-    }
-
-    public void setTimeCreated(DateTime timeCreated) {
-        this.timeCreated = timeCreated;
     }
 
     public Reactions getReactions() {
@@ -46,9 +39,5 @@ public class Post {
 
     public String getId() {
         return id;
-    }
-
-    public void applyReaction(ReactionType reaction) {
-
     }
 }
