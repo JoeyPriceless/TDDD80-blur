@@ -178,7 +178,7 @@ class Comment(db.Model):
     author_id = db.Column(db.String, db.ForeignKey('user.id'), unique=True)
     time_created = db.Column(db.DateTime, nullable=False)
     content = db.Column(db.String, nullable=False)
-    parent_id = db.Column(db.String, db.ForeignKey('comment.id'), unique=False)
+    parent_id = db.Column(db.String, db.ForeignKey('comment.id'), unique=False, nullable=True)
     children = db.relationship('Comment', backref=db.backref('parent', remote_side=[id]))
     post_id = db.Column(db.String, db.ForeignKey('post.id'), nullable=False)
 

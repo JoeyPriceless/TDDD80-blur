@@ -24,7 +24,7 @@ class TestServerFunctions(unittest.TestCase):
     def test_1_feed(self):
         if self.__class__.token is None:
             self.test_0_login()
-        requests.get(URL_ROOT + "/feed/", json={'username': 'test_user', 'password': 'password123'})
+        requests.get(URL_ROOT + "feed/", json={'username': 'test_user', 'password': 'password123'})
 
     def test_2_post(self):
         if self.__class__.token is None:
@@ -115,7 +115,7 @@ class TestServerFunctions(unittest.TestCase):
 
         # Test getting the just created comment.
         comment_id = r.text
-        r = requests.get(URL_ROOT + "/comment/" + comment_id)
+        r = requests.get(URL_ROOT + "comment/" + comment_id)
         self.assertEqual(r.status_code, 200)
         comment = json.loads(r.text)
         self.assertEqual(comment.content, content)
@@ -124,12 +124,12 @@ class TestServerFunctions(unittest.TestCase):
 
         # Test that multiple root comments can be created.
         content = 'Mannen som inte är legenden'
-        r = requests.post(URL_ROOT + "/commment", json={'content': content, 'parent': None, 'post_id': post_id},
+        r = requests.post(URL_ROOT + "commment", json={'content': content, 'parent': None, 'post_id': post_id},
                           headers={'Authorization': self.__class__.token})
         self.assertEqual(r.status_code, 200)
         comment_id = r.text
         comment_ids.append(comment_id)
-        r = requests.get(URL_ROOT + "/comment/" + comment_id)
+        r = requests.get(URL_ROOT + "comment/" + comment_id)
         self.assertEqual(r.status_code, 200)
         comment = json.loads(r.text)
         self.assertEqual(comment.content, content)
@@ -139,28 +139,28 @@ class TestServerFunctions(unittest.TestCase):
         # Test that comment chain works.
         parent_id = comment_id
         content = 'Mannen som inte är barn'
-        r = requests.post(URL_ROOT + "/commment", json={'content': content, 'parent': parent_id, 'post_id': post_id},
+        r = requests.post(URL_ROOT + "commment", json={'content': content, 'parent': parent_id, 'post_id': post_id},
                           headers={'Authorization': self.__class__.token})
         self.assertEqual(r.status_code, 200)
         comment_id = r.text
         comment_ids.append(comment_id)
-        r = requests.get(URL_ROOT + "/comment/" + comment_id)
+        r = requests.get(URL_ROOT + "comment/" + comment_id)
         self.assertEqual(r.status_code, 200)
         comment = json.loads(r.text)
         self.assertEqual(comment.content, content)
         self.assertEqual(comment.author_id, self.__class__.user_id)
         self.assertEqual(comment.id, comment_id)
-        r = requests.get(URL_ROOT + "/comments/chain/" + parent_id)
+        r = requests.get(URL_ROOT + "comments/chain/" + parent_id)
         self.assertEqual(r.status_code, 200)
         comments = json.loads(r.text)
         self.assertEqual(comments[0].id, comment_id)
 
         # Test reacting to comment
         reaction = '1'
-        r = requests.post(URL_ROOT + "/comment/react", json={'comment_id': comment_id, 'reaction': reaction},
+        r = requests.post(URL_ROOT + "comment/react", json={'comment_id': comment_id, 'reaction': reaction},
                           headers={'Authorization': self.__class__.token})
         self.assertEqual(r.status_code, 200)
-        r = requests.get(URL_ROOT + "/comment/" + comment_id)
+        r = requests.get(URL_ROOT + "comment/" + comment_id)
         self.assertEqual(r.status_code, 200)
         self.assertEqual(json.loads(r.text).upvotes, 1)
 
@@ -179,13 +179,13 @@ class TestServerFunctions(unittest.TestCase):
 
         # Test deleting all previous comments.
         for comment_id in comment_ids:
-            r = requests.post(URL_ROOT + "/comment/delete/" + comment_id,
+            r = requests.post(URL_ROOT + "comment/delete/" + comment_id,
                               headers={'Authorization': self.__class__.token})
             self.assertEqual(r.status_code, 200)
-            r = requests.get(URL_ROOT + "/comments/" + comment_id,
+            r = requests.get(URL_ROOT + "comments/" + comment_id,
                              headers={'Authorization': self.__class__.token})
             self.assertEqual(r.status_code, 404)
-            r = requests.post(URL_ROOT + "/post/delete/" + post_id,
+            r = requests.post(URL_ROOT + "post/delete/" + post_id,
                               headers={'Authorization': self.__class__.token})
             self.assertEqual(r.status_code, 200)
 
@@ -227,12 +227,13 @@ class TestServerFunctions(unittest.TestCase):
 
         # React to post and comment
         reaction = '1'
-        requests.post(URL_ROOT + "/comment/react", json={'comment_id': comment_id, 'reaction': reaction},
+        requests.post(URL_ROOT + "comment/react", json={'comment_id': comment_id, 'reaction': reaction},
                       headers={'Authorization': self.__class__.token})
         requests.post(URL_ROOT + "post/react", json={'post_id': post_id, 'reaction': reaction},
                       headers={'Authorization': self.__class__.token})
 
-        r = requests.get(URL_ROOT + "/post/extras/" + post_id)
+        r = requests.get(URL_ROOT + "post/extras/" + post_id)
+        self.assertEqual(200, r.status_code)
         post_with_extras = json.loads(r)
 
     def test_5_feed(self):
