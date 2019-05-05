@@ -38,7 +38,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar_submit" />
 
-    <FrameLayout
+    <android.support.constraint.ConstraintLayout
         android:id="@+id/framelayout_bottombar_submit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -52,14 +52,54 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
+        <ImageButton
+            android:id="@+id/button_image_submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:src="@drawable/ic_add_photo_black_24dp"
+            android:text="Button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:onClick="onClickImageButton"/>
+
+        <Button
+            android:id="@+id/button_location_submit"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@null"
+            android:drawableLeft="@drawable/ic_add_location_black_24dp"
+            android:drawablePadding="4dp"
+            android:ellipsize="end"
+            android:gravity="left|center_vertical"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:onClick="onClickSetLocation"
+            android:singleLine="true"
+            android:textAllCaps="false"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/button_image_submit"
+            app:layout_constraintRight_toLeftOf="@+id/textview_charcount_submit"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Linköping, Sweden, Linköping, Sweden, Linköping, Sweden" />
+
         <TextView
             android:id="@+id/textview_charcount_submit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
             android:text="TextView"
+            android:textColor="@android:color/primary_text_light"
             android:textSize="18sp"
             android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="120/240" />
-    </FrameLayout>
+
+    </android.support.constraint.ConstraintLayout>
 </android.support.constraint.ConstraintLayout>

@@ -12,4 +12,6 @@
     <!-- SharedPreferences keys -->
     <string name="token_pref_key">TOKEN</string>
     <string name="title_activity_main">MainActivity</string>
+
+    <string name="location_unknown">Unknown Location</string>
 </resources>

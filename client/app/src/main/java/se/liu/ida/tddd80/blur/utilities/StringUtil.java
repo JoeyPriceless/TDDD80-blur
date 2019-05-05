@@ -1,6 +1,7 @@
 package se.liu.ida.tddd80.blur.utilities;
 
 import android.content.Context;
+import android.location.Address;
 
 import com.android.volley.VolleyError;
 
@@ -11,6 +12,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
 
 import se.liu.ida.tddd80.blur.R;
 
@@ -44,6 +48,32 @@ public class StringUtil {
      */
     public static String formatDateTimeLong(DateTime time) {
         return time.toString("HH:mm - dd MMM yyyy");
+    }
+
+    /**
+     * Returns a location string formatted "SubLocality, Locality/AdminArea, CountryName"
+     * Locality is used if it exists, otherwise AdminArea. Any null values are omitted.
+     * eg: Ryd, Linköping, Sweden or Ryd, Östergötlands Län, Sweden
+     */
+    public static String getLocationString(Context context, List<Address> addresses) {
+        String unknownLocation = context.getString(R.string.location_unknown);
+        if (addresses == null || addresses.isEmpty()) return unknownLocation;
+        Address address = addresses.get(0);
+
+        String localityOrAdmin = address.getLocality() != null ? address.getLocality() :
+                address.getAdminArea();
+
+        StringBuilder builder = new StringBuilder();
+        for (String s : Arrays.asList(address.getSubLocality(), localityOrAdmin,
+                address.getCountryName())) {
+            if (s != null) {
+                if (builder.length() != 0)
+                    builder.append(", ");
+                builder.append(s);
+            }
+        }
+        if (builder.toString().isEmpty()) return unknownLocation;
+        return builder.toString();
     }
 
     /**
