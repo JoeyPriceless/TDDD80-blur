@@ -232,9 +232,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == IMAGE_REQUEST_CODE && resultCode != RESULT_OK) {
-            Toast.makeText(this, "Failed to take picture.", Toast.LENGTH_SHORT).show();
-        } else if (requestCode == IMAGE_REQUEST_CODE) {
+        if (requestCode == IMAGE_REQUEST_CODE && resultCode == RESULT_OK) {
             Bitmap bmFullsize;
             try {
                  bmFullsize = ImageOrienter.getImageAndRotate(this, Uri.fromFile(imageFile));
