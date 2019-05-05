@@ -38,12 +38,12 @@ public class NetworkUtil {
     private String tokenStringKey;
     private String token;
 
-    public void setToken(String token) {
+    public void login(String token) {
         this.token = token;
         storeToken();
     }
 
-    public void clearToken() {
+    public void logout() {
         token = null;
         storeToken();
     }
@@ -165,7 +165,7 @@ public class NetworkUtil {
 
     /**
      * Requests an authorization token for the given credentials. responseListener should call
-     * NetworkUtil.setToken()
+     * NetworkUtil.login()
      */
     public void login(String email, String password, Listener<JSONObject> responseListener,
                        ErrorListener errorListener) {
@@ -179,7 +179,7 @@ public class NetworkUtil {
 
     /**
      * Log out of the server, blacklisting the authorization token. responseListener should call
-     * NetworkUtil.clearToken();
+     * NetworkUtil.logout();
      */
     public void logout(Listener<JSONObject> responseListener, ErrorListener errorListener) {
         requestJsonObject(Url.build(Url.USER_LOGOUT), Method.POST, responseListener, errorListener);
@@ -210,17 +210,12 @@ public class NetworkUtil {
                             errorListener, params);
     }
 
-    public void getPost(String id, Listener<JSONObject> responseListener,
-                            ErrorListener errorListener) {
-        requestJsonObject(Url.build(Url.POST_GET, id), Method.GET, responseListener, errorListener);
-    }
-
     /**
      * Request a post of a given id, along with extras such as it's author, reactions and comments.
      */
-    public void getPostWithExtras(String id, Listener<JSONObject> responseListener,
-                                ErrorListener errorListener) {
-        requestJsonObject(Url.build(Url.POST_GET_EXTRAS, id), Method.GET, responseListener,
+    public void getPost(String id, Listener<JSONObject> responseListener,
+                        ErrorListener errorListener) {
+        requestJsonObject(Url.build(Url.POST_GET, id), Method.GET, responseListener,
                 errorListener);
     }
 
@@ -252,7 +247,6 @@ public class NetworkUtil {
         FEED_GET("/feed/"),
         POST_CREATE("/post"),
         POST_GET("/post/"),
-        POST_GET_EXTRAS("/post/extras/"),
         POST_REACTIONS_ADD("/post/reactions"),
         POST_REACTIONS_GET("/post/reactions/"),
         ROOT("https://tddd80-server.herokuapp.com"),

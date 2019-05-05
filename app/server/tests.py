@@ -63,20 +63,20 @@ class TestServerFunctions(unittest.TestCase):
 
         # Test reacting to post
         reaction = 1
-        r = requests.post(URL_ROOT + "post/react", json={'post_id': post_id, 'reaction': reaction},
+        r = requests.post(URL_ROOT + "post/reactions", json={'post_id': post_id, 'reaction': reaction},
                           headers={'Authorization': self.__class__.token})
         self.assertEqual(r.status_code, 200)
         self.assertEqual(reaction, get_field(r, 'own_reaction'))
 
         # Test changing reaction
         reaction = 3
-        r = requests.post(URL_ROOT + "post/react", json={'post_id': post_id, 'reaction': reaction},
+        r = requests.post(URL_ROOT + "post/reactions", json={'post_id': post_id, 'reaction': reaction},
                           headers={'Authorization': self.__class__.token})
         self.assertEqual(r.status_code, 200)
         self.assertEqual(reaction, get_field(r, 'own_reaction'))
 
         # Test removing reaction
-        r = requests.post(URL_ROOT + "post/react", json={'post_id': post_id, 'reaction': reaction},
+        r = requests.post(URL_ROOT + "post/reactions", json={'post_id': post_id, 'reaction': reaction},
                           headers={'Authorization': self.__class__.token})
         self.assertEqual(r.status_code, 200)
         self.assertEqual('null', get_field(r, 'own_reaction'))
@@ -166,13 +166,13 @@ class TestServerFunctions(unittest.TestCase):
 
         # Test changing reaction
         reaction = '-1'
-        r = requests.post(URL_ROOT + "comment/react", json={'comment_id': comment_id, 'reaction': reaction},
+        r = requests.post(URL_ROOT + "comment/reactions", json={'comment_id': comment_id, 'reaction': reaction},
                           headers={'Authorization': self.__class__.token})
         self.assertEqual(r.status_code, 200)
         self.assertEqual(reaction, get_field(r, 'reactions'))
 
         # Test removing reaction
-        r = requests.post(URL_ROOT + "comment/react", json={'comment_id': comment_id, 'reaction': reaction},
+        r = requests.post(URL_ROOT + "comment/reactions", json={'comment_id': comment_id, 'reaction': reaction},
                           headers={'Authorization': self.__class__.token})
         self.assertEqual(r.status_code, 200)
         self.assertEqual('null', get_field(r, 'reactions'))
@@ -229,7 +229,7 @@ class TestServerFunctions(unittest.TestCase):
         reaction = '1'
         requests.post(URL_ROOT + "comment/react", json={'comment_id': comment_id, 'reaction': reaction},
                       headers={'Authorization': self.__class__.token})
-        requests.post(URL_ROOT + "post/react", json={'post_id': post_id, 'reaction': reaction},
+        requests.post(URL_ROOT + "post/reactions", json={'post_id': post_id, 'reaction': reaction},
                       headers={'Authorization': self.__class__.token})
 
         r = requests.get(URL_ROOT + "post/extras/" + post_id)
@@ -257,7 +257,7 @@ class TestServerFunctions(unittest.TestCase):
         r = requests.post(URL_ROOT + "comment", json={'content': content, 'parent': None, 'post_id': post_id},
                           headers={'Authorization': self.__class__.token})
         self.assertEqual(r.status_code, 401)
-        r = requests.post(URL_ROOT + "post/react", json={'post_id': post_id, 'reaction': 1},
+        r = requests.post(URL_ROOT + "post/reactions", json={'post_id': post_id, 'reaction': 1},
                           headers={'Authorization': self.__class__.token})
         self.assertEqual(r.status_code, 401)
         r = requests.post(URL_ROOT + "post", json={'content': content},
@@ -277,7 +277,7 @@ class TestServerFunctions(unittest.TestCase):
         self.assertEqual(r.status_code, 401)
 
         # Try reacting to the post as a new user
-        r = requests.post(URL_ROOT + "post/react", json={'post_id': post_id, 'reaction': 1},
+        r = requests.post(URL_ROOT + "post/reactions", json={'post_id': post_id, 'reaction': 1},
                           headers={'Authorization': self.__class__.token})
         self.assertEqual(r.status_code, 200)
 

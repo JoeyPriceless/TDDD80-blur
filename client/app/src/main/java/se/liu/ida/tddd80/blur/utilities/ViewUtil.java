@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.BlurMaskFilter;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 
 import jp.wasabeef.blurry.Blurry;
 import se.liu.ida.tddd80.blur.R;
+import se.liu.ida.tddd80.blur.fragments.FeedFragment;
 import se.liu.ida.tddd80.blur.fragments.ReactDialogFragment;
 import se.liu.ida.tddd80.blur.models.ReactionType;
 import se.liu.ida.tddd80.blur.models.Reactions;
@@ -21,8 +23,9 @@ import se.liu.ida.tddd80.blur.models.Reactions;
 public class ViewUtil {
 
     /**
-     * Update a given reaction button according to a post's reactions. Sets the color of the icon
-     * and text according to the user's vote.
+     * Update a given reaction button according to a post's reactions.
+     * Sets the color of the icon and text according to the user's vote.
+     * Also blurs/unblurs author's name and image.
      * @param button Button which drawable/text should be updated
      * @param reactions The reactions belonging to the post which was voted on.
      */
@@ -44,20 +47,12 @@ public class ViewUtil {
         button.setTextColor(color);
     }
 
-    public static void showReactionDialog(Context context, FragmentManager fragmentManager,
-                                          String postId) {
-        showReactionDialog(context, fragmentManager, postId, 0);
-    }
-
     /**
-     * Shows an ReactDialog displaying each of the votes a user can select for a post.
-     * @param context
-     * @param fragmentManager
-     * @param postId
-     * @param buttonId
+     * Private message run by the public methods.
      */
-    public static void showReactionDialog(Context context, FragmentManager fragmentManager,
-                                          String postId, int buttonId) {
+    private static void pShowReactionDialog(Context context, FragmentManager fragmentManager,
+                                          String postId, @Nullable FeedFragment targetFragment,
+                                           @Nullable Integer adapterPosition) {
         if (!NetworkUtil.getInstance(context).isUserLoggedIn()) {
             Toast.makeText(context, "You must be logged in to react",
                     Toast.LENGTH_SHORT).show();
@@ -66,9 +61,31 @@ public class ViewUtil {
         ReactDialogFragment dialog = new ReactDialogFragment();
         Bundle args = new Bundle();
         args.putString(ReactDialogFragment.KEY_POST_ID, postId);
-        args.putInt(ReactDialogFragment.KEY_BUTTON_ID, buttonId);
+        if (targetFragment != null && adapterPosition != null) {
+            args.putInt(ReactDialogFragment.KEY_ADAPTER_POSITION, adapterPosition);
+            dialog.setTargetFragment(targetFragment, FeedFragment.DIALOG_FRAGENT);
+        }
         dialog.setArguments(args);
         dialog.show(fragmentManager, context.getClass().getSimpleName());
+    }
+
+    /**
+     * Shows an ReactDialog displaying each of the votes a user can select for a post. This overload
+     * is used by FeedFragments which need to specify the post's adapter position.
+     */
+    public static void showReactionDialog(Context context, FragmentManager fragmentManager,
+                                          String postId, FeedFragment targetFragment,
+                                          Integer adapterPosition) {
+        pShowReactionDialog(context, fragmentManager, postId, targetFragment, adapterPosition);
+    }
+
+    /**
+     * Shows an ReactDialog displaying each of the votes a user can select for a post in a
+     * PostActivity
+     */
+    public static void showReactionDialog(Context context, FragmentManager fragmentManager,
+                                          String postId) {
+        pShowReactionDialog(context, fragmentManager, postId, null, null);
     }
 
     public static void blurText(TextView tv) {

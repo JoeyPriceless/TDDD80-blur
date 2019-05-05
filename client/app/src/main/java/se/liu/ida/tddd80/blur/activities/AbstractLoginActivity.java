@@ -67,7 +67,7 @@ public abstract class AbstractLoginActivity extends AppCompatActivity {
         public void onResponse(JSONObject response) {
             // TODO: User & UserId should probably be saved somewhere (Singleton?)
             try {
-                netUtil.setToken(response.getString(("token")));
+                netUtil.login(response.getString(("token")));
                 netUtil.setUserId(response.getString("user_id"));
             } catch (JSONException | JsonSyntaxException ex) {
                 parseError(ex);
