@@ -34,7 +34,7 @@ public class FeedActivity extends AppCompatActivity
         setupFAB();
         // Setup ActionBar
         Toolbar toolbar = findViewById(R.id.toolbar_feed);
-        toolbar.setTitle(feedType.toString());
+        toolbar.setTitle(feedType.toStringCapitalized());
         setSupportActionBar(toolbar);
 
 		// Initiate feed fragments.

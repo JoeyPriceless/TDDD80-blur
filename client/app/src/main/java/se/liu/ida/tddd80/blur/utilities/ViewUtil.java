@@ -32,11 +32,10 @@ public class ViewUtil {
     public static void onReactionUpdateViews(Button button, Reactions reactions, TextView tvAuthor,
                                              ImageView ivAuthor) {
         button.setText(String.valueOf(reactions.getScore()));
-        int colorId = R.color.colorReactionNeutral;
+        int colorId = R.color.neutralColor;
         ReactionType ownReaction = reactions.getOwnReaction();
         if (ownReaction != null) {
-            colorId = ownReaction.ordinal() < 3 ? R.color.colorReactionPositive :
-                    R.color.colorReactionNegative;
+            colorId = ownReaction.ordinal() < 3 ? R.color.positiveColor : R.color.negativeColor;
             ViewUtil.unBlurPost(tvAuthor, ivAuthor);
         } else {
             ViewUtil.blurText(tvAuthor);

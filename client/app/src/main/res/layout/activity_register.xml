@@ -90,7 +90,7 @@
         android:layout_marginTop="24dp"
         android:onClick="onClickNoAccount"
         android:text="Continue without signing in"
-        android:textColor="@color/colorPrimary"
+        android:textColor="@color/primaryTextColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
@@ -105,7 +105,7 @@
         android:layout_marginTop="16dp"
         android:onClick="onClickGoToLogin"
         android:text="Already have an account? Sign in"
-        android:textColor="@color/colorPrimary"
+        android:textColor="@color/primaryTextColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_register_register" />
