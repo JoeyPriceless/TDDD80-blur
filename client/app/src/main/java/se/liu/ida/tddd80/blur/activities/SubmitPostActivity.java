@@ -1,16 +1,22 @@
 package se.liu.ida.tddd80.blur.activities;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -33,13 +39,16 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Locale;
 
 import se.liu.ida.tddd80.blur.R;
+import se.liu.ida.tddd80.blur.utilities.FileUtil;
 import se.liu.ida.tddd80.blur.utilities.GsonUtil;
+import se.liu.ida.tddd80.blur.utilities.ImageOrienter;
 import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
 import se.liu.ida.tddd80.blur.utilities.ResponseListeners;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
@@ -48,9 +57,10 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
         OnSuccessListener<Location> {
     private static final int IMAGE_REQUEST_CODE = 78;
     private static final int LOCATION_REQUEST_CODE = 99;
-    private String unknownLocation;
+    private static final int THUMBNAIL_HEIGHT = 400;
 
-    private Intent ImageCaptureIntent;
+    private Intent imageCaptureIntent;
+    private File imageFile = null;
     private FusedLocationProviderClient fusedLocation;
 
     private NetworkUtil netUtil;
@@ -58,6 +68,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
     private Editable contentEditable;
     private TextView tvCharCount;
     private int maxLength;
+    private ImageView ivThumbnail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,13 +77,14 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
 
         setupActionBar();
 
-        unknownLocation = getString(R.string.location_unknown);
+        imageCaptureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         fusedLocation = LocationServices.getFusedLocationProviderClient(this);
         netUtil = NetworkUtil.getInstance(this);
         maxLength = getResources().getInteger(R.integer.post_max_length);
 
         etContent = findViewById(R.id.edittext_content_submit);
         tvCharCount = findViewById(R.id.textview_charcount_submit);
+        ivThumbnail = findViewById(R.id.imageview_thumbnail_submit);
         etContent.addTextChangedListener(new ContentWatcher());
         // Set content box as focused automatically.
         etContent.requestFocus();
@@ -115,11 +127,50 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
     }
 
     public void onClickImageButton(View v) {
+        openCameraIfPermitted();
+    }
 
+    private void openCameraIfPermitted() {
+        String cameraPermission = Manifest.permission.CAMERA;
+        if (checkSelfPermission(cameraPermission) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[] {cameraPermission}, IMAGE_REQUEST_CODE);
+        } else {
+            // Check if there is any activity registered to open the camera intent.
+            if (imageCaptureIntent.resolveActivity(getPackageManager()) == null)
+                Toast.makeText(this, "Could not find a camera app to launch.",
+                        Toast.LENGTH_SHORT).show();
+
+            // Decide where the file is to be stored. If an image URI isn't provided, we only get a
+            // low quality ivThumbnail in the result.
+            imageFile = null;
+            try {
+                imageFile = FileUtil.createImageFile(this);
+            } catch (IOException ex) {
+                Toast.makeText(this, "Could not create image file", Toast.LENGTH_LONG).show();
+            }
+
+            if (imageFile != null) {
+                String providerAuthority = getString(R.string.fileprovider_authority);
+                Uri imageUri = FileProvider.getUriForFile(this, providerAuthority, imageFile);
+
+                // Have to add this to gain Uri access
+                List<ResolveInfo> resInfoList = getPackageManager().queryIntentActivities(
+                        imageCaptureIntent,PackageManager.MATCH_DEFAULT_ONLY);
+                for (ResolveInfo resolveInfo : resInfoList) {
+                    String packageName = resolveInfo.activityInfo.packageName;
+                    grantUriPermission(packageName, imageUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                            | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+
+                imageCaptureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                startActivityForResult(imageCaptureIntent, IMAGE_REQUEST_CODE);
+            }
+
+        }
     }
 
     public void onClickSetLocation(View v) {
-        getLocationifPermitted();
+        getLocationIfPermitted();
     }
 
     public void onClickRemoveLocation(View v) {
@@ -135,7 +186,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
         });
     }
 
-    public void getLocationifPermitted() {
+    private void getLocationIfPermitted() {
         String locationPermission = Manifest.permission.ACCESS_COARSE_LOCATION;
         if (checkSelfPermission(locationPermission) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[] { locationPermission }, LOCATION_REQUEST_CODE);
@@ -150,13 +201,43 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
         if (result == PackageManager.PERMISSION_GRANTED) {
             switch (requestCode) {
                 case LOCATION_REQUEST_CODE:
-                    getLocationifPermitted();
+                    getLocationIfPermitted();
+                    break;
+                case IMAGE_REQUEST_CODE:
+                    openCameraIfPermitted();
             }
         } else if (result == PackageManager.PERMISSION_DENIED) {
+            String toastText = "";
             switch (requestCode) {
                 case LOCATION_REQUEST_CODE:
-                    Toast.makeText(this, "Location permission denied.", Toast.LENGTH_SHORT).show();
+                    toastText = "Location permission denied.";
+                    break;
+                case IMAGE_REQUEST_CODE:
+                    toastText = "Camera permission denied.";
+                    break;
             }
+            if (!toastText.isEmpty())
+                Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == IMAGE_REQUEST_CODE && resultCode != RESULT_OK) {
+            Toast.makeText(this, "Failed to take picture.", Toast.LENGTH_SHORT).show();
+        } else if (requestCode == IMAGE_REQUEST_CODE) {
+            // TODO Display image ivThumbnail
+            Bitmap bmFullsize;
+            try {
+                 bmFullsize = ImageOrienter.getImageAndRotate(this, Uri.fromFile(imageFile));
+            } catch (IOException ex) {
+                return;
+            }
+            double aspectRatio = (double)bmFullsize.getWidth() / bmFullsize.getHeight();
+            int width = (int)Math.round(THUMBNAIL_HEIGHT * aspectRatio);
+            Bitmap bmThumbnail = ThumbnailUtils.extractThumbnail(bmFullsize, width,
+                    THUMBNAIL_HEIGHT);
+            ivThumbnail.setImageBitmap(bmThumbnail);
         }
     }
 

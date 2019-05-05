@@ -14,4 +14,5 @@
     <string name="title_activity_main">MainActivity</string>
 
     <string name="location_unknown">Unknown Location</string>
+    <string name="fileprovider_authority">se.liu.ida.tddd80.blur.fileprovider</string>
 </resources>
