@@ -284,12 +284,12 @@ def logout():
     db.session.commit()
     return respond(plain_response(''))
 
+
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):
     jti = decrypted_token['jti']
     result = Blacklisted.query.filter_by(token_identifier=jti).scalar()
     return result != None
-
 
 
 def plain_response(string):
