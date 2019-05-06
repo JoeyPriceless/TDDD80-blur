@@ -236,10 +236,7 @@ class TestServerFunctions(unittest.TestCase):
 
         r = requests.get(URL_ROOT + "post/extras/" + post_id)
 
-    def test_5_feed(self):
-        pass
-
-    def test_6_unauthorization(self):
+    def test_5_unauthorization(self):
         if self.__class__.token is None:
             self.test_0_login()
 
@@ -274,7 +271,7 @@ class TestServerFunctions(unittest.TestCase):
         # Try deleting the post as a new user
         r = requests.delete(URL_ROOT + "post/" + post_id,
                             headers={'Authorization': new_token})
-        self.assertEqual(r.status_code, 401)
+        self.assertEqual(r.status_code, 403)
 
         # Try reacting to the post as a new user
         r = requests.post(URL_ROOT + "post/reactions", json={'post_id': post_id, 'reaction': 1},

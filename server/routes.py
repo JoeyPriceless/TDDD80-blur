@@ -1,7 +1,7 @@
 from flask import jsonify, request
 from server.models import *
 from flask import current_app as app
-from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
+from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity, get_raw_jwt
 import sys
 import json
 from server.util import serialize_list
@@ -278,18 +278,11 @@ def get_user_token(user):
 @app.route('/user/logout', methods=["POST"])
 @jwt_required
 def logout():
-    jti = get_jwt_identity()
+    jti = get_raw_jwt()['jti']
     blacklisted = Blacklisted(jti)
     db.session.add(blacklisted)
     db.session.commit()
     return respond(plain_response(''))
-
-
-@jwt.token_in_blacklist_loader
-def check_if_token_in_blacklist(decrypted_token):
-    jti = decrypted_token['jti']
-    result = Blacklisted.query.filter_by(token_identifier=jti).scalar()
-    return result != None
 
 
 def plain_response(string):
