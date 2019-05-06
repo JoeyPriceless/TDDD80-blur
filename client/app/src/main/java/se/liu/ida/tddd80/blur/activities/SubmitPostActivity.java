@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
@@ -52,7 +51,7 @@ import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.fragments.SubmitImageDialogFragment;
 import se.liu.ida.tddd80.blur.utilities.FileUtil;
 import se.liu.ida.tddd80.blur.utilities.GsonUtil;
-import se.liu.ida.tddd80.blur.utilities.ImageOrienter;
+import se.liu.ida.tddd80.blur.utilities.ImageUtil;
 import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
 import se.liu.ida.tddd80.blur.utilities.ResponseListeners;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
@@ -235,7 +234,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
         if (requestCode == IMAGE_REQUEST_CODE && resultCode == RESULT_OK) {
             Bitmap bmFullsize;
             try {
-                 bmFullsize = ImageOrienter.getImageAndRotate(this, Uri.fromFile(imageFile));
+                 bmFullsize = ImageUtil.getImageAndRotate(this, Uri.fromFile(imageFile));
             } catch (IOException ex) {
                 return;
             }
