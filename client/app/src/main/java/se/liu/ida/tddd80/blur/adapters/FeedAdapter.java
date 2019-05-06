@@ -94,21 +94,10 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
-
         // Inflate the custom layout
         View contactView = inflater.inflate(R.layout.item_feed, parent, false);
-
         // Return a new holder instance
         return new ViewHolder(contactView);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull List<Object> payloads) {
-        if (payloads.isEmpty()) {
-            super.onBindViewHolder(holder, position, payloads);
-        } else {
-
-        }
     }
 
     @Override

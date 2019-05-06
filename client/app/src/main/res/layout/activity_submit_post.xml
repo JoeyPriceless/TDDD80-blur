@@ -12,7 +12,7 @@
         android:id="@+id/toolbar_submit"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorPrimary"
+        android:background="@color/primaryColor"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:layout_constraintTop_toTopOf="parent"
@@ -33,17 +33,27 @@
         android:inputType="textMultiLine"
         android:maxLength="240"
         android:singleLine="false"
-        app:layout_constraintBottom_toTopOf="@+id/framelayout_bottombar_submit"
+        app:layout_constraintBottom_toTopOf="@+id/imageview_thumbnail_submit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar_submit" />
+
+    <ImageView
+        android:id="@+id/imageview_thumbnail_submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="8dp"
+        android:onClick="onClickImageThumbnail"
+        app:layout_constraintBottom_toTopOf="@+id/framelayout_bottombar_submit"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/framelayout_bottombar_submit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@color/colorAccent"
+        android:background="@color/secondaryColor"
         android:paddingStart="16dp"
         android:paddingTop="8dp"
         android:paddingEnd="16dp"
@@ -57,12 +67,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
+            android:onClick="onClickImageButton"
             android:src="@drawable/ic_add_photo_black_24dp"
             android:text="Button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:onClick="onClickImageButton"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/button_location_submit"
