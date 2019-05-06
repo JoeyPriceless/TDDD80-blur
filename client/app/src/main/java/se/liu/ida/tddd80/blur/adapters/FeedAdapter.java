@@ -18,6 +18,7 @@ import se.liu.ida.tddd80.blur.activities.PostActivity;
 import se.liu.ida.tddd80.blur.fragments.FeedFragment;
 import se.liu.ida.tddd80.blur.models.Feed;
 import se.liu.ida.tddd80.blur.models.Post;
+import se.liu.ida.tddd80.blur.models.ReactionType;
 import se.liu.ida.tddd80.blur.models.Reactions;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
 import se.liu.ida.tddd80.blur.utilities.ViewUtil;
@@ -45,7 +46,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     ViewUtil.showReactionDialog(v.getContext(), fragmentManager, getPostId(),
-                            fragment, getAdapterPosition());
+                            getOwnReaction(), fragment, getAdapterPosition());
                 }
             });
             commentButton = v.findViewById(R.id.button_feeditem_comment);
@@ -61,6 +62,10 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
 
         private String getPostId() {
             return feed.get(getAdapterPosition()).getId();
+        }
+
+        private ReactionType getOwnReaction() {
+            return feed.get(getAdapterPosition()).getReactions().getOwnReaction();
         }
     }
 

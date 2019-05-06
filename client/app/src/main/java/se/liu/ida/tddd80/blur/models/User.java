@@ -1,11 +1,17 @@
 package se.liu.ida.tddd80.blur.models;
 
+import android.graphics.Bitmap;
+
 import com.google.gson.annotations.SerializedName;
 
-public class User extends PictureHolder {
+public class User {
     private String id;
     private String username;
     private String email;
+    @SerializedName("picture_path")
+    private String picturePath = null;
+    private Bitmap picture = null;
+    private Bitmap pictureBlurred = null;
 
     public String getId() {
         return id;
