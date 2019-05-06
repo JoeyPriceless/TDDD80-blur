@@ -6,6 +6,9 @@ import os
 db = SQLAlchemy()
 jwt = JWTManager()
 
+POST_UPLOAD_FOLDER = '/path/to/the/uploads'
+USER_UPLOAD_FOLDER = '/path/to/the/uploads'
+
 
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):
@@ -30,6 +33,8 @@ else:  # when running locally with sqlite
     f.close()
     debug_flag = True
 
+app.config['POST_UPLOAD_FOLDER'] = POST_UPLOAD_FOLDER
+app.config['USER_UPLOAD_FOLDER'] = USER_UPLOAD_FOLDER
 app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = secret
@@ -43,4 +48,5 @@ with app.app_context():
     if not is_remote:
         db.drop_all()
     db.create_all()
+
     jwt.token_in_blacklist_loader(check_if_token_in_blacklist)
