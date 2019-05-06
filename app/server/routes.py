@@ -1,15 +1,16 @@
 from flask import jsonify, request
 from server.models import *
-from flask import current_app as app
+from flask import current_app as app, send_from_directory
 from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity, get_raw_jwt
 import sys
 import json
+import os
 from server.util import serialize_list
 from server.batch_jobs import create_feed
-
 USERNAME_MIN_LENGTH = 3
 USERNAME_MAX_LENGTH = 24
 PASSWORD_MIN_LENGTH = 8
+ALLOWED_EXTENSION = 'jpg'
 
 
 def reset_db():
@@ -104,6 +105,20 @@ def get_user(userid):
     return respond(user.serialize())
 
 
+@app.route('/user/picture/<userid>')
+def get_profile_picture(userid):
+    filename = userid + '.' + ALLOWED_EXTENSION
+    return send_from_directory(app.config['USER_UPLOAD_FOLDER'],
+                               filename)
+
+
+@app.route('/post/attachment/<postid>')
+def get_profile_picture(postid):
+    filename = postid + '.' + ALLOWED_EXTENSION
+    return send_from_directory(app.config['POST_UPLOAD_FOLDER'],
+                               filename)
+
+
 @app.route('/user/pref/')
 @jwt_required
 def get_user_preference():
@@ -121,6 +136,14 @@ def create_post():
     content = request.json['content']
     user_id = get_jwt_identity()
     post = Post(user_id, content)
+    if 'file' in request.files:
+        file = request.files['file']
+        extension = get_file_extention(file.filename)
+        if file and extension in ALLOWED_EXTENSION:
+            filename = post.id + "." + extension
+            path = os.path.join(app.config['POST_UPLOAD_FOLDER'], filename)
+            file.save(path)
+            post.attachment_uri = path
     db.session.add(post)
     db.session.commit()
     return respond(plain_response(post.id))
@@ -243,6 +266,14 @@ def create_user():
 
     user = User(username, email)
     credentials = UserCredentials(user, password)
+    if 'file' in request.files:
+        file = request.files['file']
+        extension = get_file_extention(file.filename)
+        if file and extension in ALLOWED_EXTENSION:
+            filename = user.id + "." + extension
+            path = os.path.join(app.config['USER_UPLOAD_FOLDER'], filename)
+            file.save(path)
+            user.picture_path = path
     db.session.add(user)
     db.session.add(credentials)
     db.session.commit()
@@ -293,3 +324,8 @@ def respond(response, status=200):
     print(f"{status}: {json.dumps(response, indent=2)}")
     sys.stdout.flush()
     return jsonify(response), status
+
+
+def get_file_extention(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower()

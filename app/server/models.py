@@ -11,7 +11,7 @@ class User(db.Model):
     id = db.Column(db.String, unique=True, primary_key=True)
     username = db.Column(db.String, unique=True, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False)
-    picture_path = db.Column(db.String)
+    picture_path = db.Column(db.String, )
 
     def __init__(self, username, email, picture_path=None):
         self.id = uuid.uuid4().hex
@@ -39,12 +39,15 @@ class Post(db.Model):
     author_id = db.Column(db.String, db.ForeignKey('user.id'))
     content = db.Column(db.String, nullable=False)
     time_created = db.Column(db.DateTime, nullable=False)
+    attachment_uri = db.Column(db.String, nullable=True, unique=True)
 
-    def __init__(self, author, content):
+    def __init__(self, author, content, attachment_uri=None):
         self.id = uuid.uuid4().hex
         self.author_id = author
         self.content = content
         self.time_created = datetime.datetime.now()
+        if attachment_uri:
+            self.attachment_uri = attachment_uri
 
     def get_reactions(self):
         return PostReaction.query.filter_by(post_id=self.id).all()
