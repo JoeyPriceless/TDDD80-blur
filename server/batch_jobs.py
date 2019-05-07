@@ -1,4 +1,4 @@
-from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.background import BlockingScheduler
 from server.models import Post, FeedObject, db
 import time
 import datetime
@@ -7,7 +7,7 @@ import sys
 FEED_LENGTH = 100
 SCORE_MULTIPLIER = 10
 
-sched = BackgroundScheduler()
+sched = BlockingScheduler()
 
 
 @sched.scheduled_job('interval', minutes=2)
