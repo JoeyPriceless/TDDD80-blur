@@ -20,6 +20,7 @@ def create_feed(Post, FeedObject, db):
     # Score = total_vote_score * multiplier / time_since_posted
     print(f"Generating feed...")
     sys.stdout.flush()
+    FeedObject.query.delete()
     posts = Post.query.order_by(Post.time_created).limit(FEED_LENGTH)
     for post in posts:
         feed_object = FeedObject(post, post.reaction_score() * SCORE_MULTIPLIER /
