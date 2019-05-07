@@ -45,7 +45,8 @@ app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 
 with app.app_context():
     from . import routes
-    db.drop_all()
+    if not is_remote:
+        db.drop_all()
     db.create_all()
 
     jwt.token_in_blacklist_loader(check_if_token_in_blacklist)
