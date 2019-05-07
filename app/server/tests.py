@@ -19,9 +19,11 @@ class TestServerFunctions(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         self.__class__.token = "Bearer " + get_field(r, 'token')
         self.__class__.user_id = get_field(r, 'user_id')
+
         files = {'file': open('steviewonder.jpg', 'rb')}
         r = requests.post(URL_ROOT + "user/picture/" + self.__class__.user_id, files=files)
         self.assertEqual(r.status_code, 200)
+
         r = requests.get(URL_ROOT + "user/picture/" + self.__class__.user_id)
         self.assertEqual(r.status_code, 200)
         # TODO: Make sure that the image is of Stevie Wonder
