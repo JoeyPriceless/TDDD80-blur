@@ -105,6 +105,25 @@ def get_user(userid):
     return respond(user.serialize())
 
 
+@app.route('/user/picture/<userid>', methods=['POST'])
+def set_profile_picture(userid):
+    user = User.query.filter_by(id=userid).scalar()
+    if user is None:
+        return respond(plain_response('No user with given ID. Resource not found.'), 404)
+    if 'file' in request.files:
+        file = request.files['file']
+        extension = get_file_extention(file.filename)
+        if file and extension == ALLOWED_EXTENSION:
+            filename = user.id + "." + extension
+            path = os.path.join(app.config['USER_UPLOAD_FOLDER'], filename)
+            file.save(path)
+            user.picture_path = path
+            db.session.commit()
+            return respond(plain_response(''), 200)
+        return respond(plain_response('Invalid filename/extension.'), 409)
+    return respond(plain_response('No file sent.'), 409)
+
+
 @app.route('/user/picture/<userid>')
 def get_profile_picture(userid):
     filename = userid + '.' + ALLOWED_EXTENSION
@@ -112,8 +131,27 @@ def get_profile_picture(userid):
                                filename)
 
 
+@app.route('/post/attachment/<postid>', methods=['POST'])
+def set_post_attachment(postid):
+    post = Post.query.filter_by(id=postid).scalar()
+    if post is None:
+        return respond(plain_response('No user with given ID. Resource not found.'), 404)
+    if 'file' in request.files:
+        file = request.files['file']
+        extension = get_file_extention(file.filename)
+        if file and extension == ALLOWED_EXTENSION:
+            filename = post.id + "." + extension
+            path = os.path.join(app.config['POST_UPLOAD_FOLDER'], filename)
+            file.save(path)
+            post.attachment_uri = path
+            db.session.commit()
+            return respond(plain_response(''), 200)
+        return respond(plain_response('Invalid filename/extension.'), 409)
+    return respond(plain_response('No file sent.'), 409)
+
+
 @app.route('/post/attachment/<postid>')
-def get_profile_picture(postid):
+def get_post_attachment(postid):
     filename = postid + '.' + ALLOWED_EXTENSION
     return send_from_directory(app.config['POST_UPLOAD_FOLDER'],
                                filename)
@@ -136,14 +174,6 @@ def create_post():
     content = request.json['content']
     user_id = get_jwt_identity()
     post = Post(user_id, content)
-    if 'file' in request.files:
-        file = request.files['file']
-        extension = get_file_extention(file.filename)
-        if file and extension in ALLOWED_EXTENSION:
-            filename = post.id + "." + extension
-            path = os.path.join(app.config['POST_UPLOAD_FOLDER'], filename)
-            file.save(path)
-            post.attachment_uri = path
     db.session.add(post)
     db.session.commit()
     return respond(plain_response(post.id))
@@ -266,14 +296,6 @@ def create_user():
 
     user = User(username, email)
     credentials = UserCredentials(user, password)
-    if 'file' in request.files:
-        file = request.files['file']
-        extension = get_file_extention(file.filename)
-        if file and extension in ALLOWED_EXTENSION:
-            filename = user.id + "." + extension
-            path = os.path.join(app.config['USER_UPLOAD_FOLDER'], filename)
-            file.save(path)
-            user.picture_path = path
     db.session.add(user)
     db.session.add(credentials)
     db.session.commit()
