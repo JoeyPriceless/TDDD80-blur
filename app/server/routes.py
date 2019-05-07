@@ -25,13 +25,13 @@ def reset_db():
 def get_feed(feedtype):
     user_id = get_jwt_identity()
     # TODO: implement proper feed creation. Currently just returns all posts
-    feed = Post.query.all()
+    feed = FeedObject.query.all()
     if feed is None:
         return respond(plain_response("Feed empty! Requested resource not found."), 404)
 
     return respond({
         'type': feedtype,
-        'posts': [post.serialize(user_id) for post in feed]
+        'posts': [feed_object.post.serialize() for feed_object in feed]
     })
 
 
