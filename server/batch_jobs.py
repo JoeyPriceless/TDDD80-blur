@@ -1,22 +1,17 @@
-from rq import Queue
-from redis import Redis
+from apscheduler.schedulers.background import BackgroundScheduler
+from .models import Post, FeedObject, db
 import time
 import datetime
 import sys
 
-redis_conn = Redis()
-q = Queue(connection=redis_conn)
 FEED_LENGTH = 100
 SCORE_MULTIPLIER = 10
 
-
-def start_timer(Post, FeedObject, db):
-    print(f"Feed creation worker started.")
-    sys.stdout.flush()
-    q.enqueue(create_feed(Post, FeedObject, db))
+sched = BackgroundScheduler()
 
 
-def create_feed(Post, FeedObject, db):
+@sched.scheduled_job('interval', minutes=2)
+def create_feed():
     # Score = total_vote_score * multiplier / time_since_posted
     print(f"Generating feed...")
     sys.stdout.flush()
