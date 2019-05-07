@@ -19,6 +19,12 @@ class TestServerFunctions(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         self.__class__.token = "Bearer " + get_field(r, 'token')
         self.__class__.user_id = get_field(r, 'user_id')
+        files = {'file': open('steviewonder.jpg', 'rb')}
+        r = requests.post(URL_ROOT + "user/picture/" + self.__class__.user_id, files=files)
+        self.assertEqual(r.status_code, 200)
+        r = requests.get(URL_ROOT + "user/picture/" + self.__class__.user_id)
+        self.assertEqual(r.status_code, 200)
+        # TODO: Make sure that the image is of Stevie Wonder
         print("Logged in with jwt token: " + self.__class__.token)
 
     def test_1_feed(self):
@@ -36,10 +42,20 @@ class TestServerFunctions(unittest.TestCase):
         r = requests.post(URL_ROOT + "post", json={'content': content},
                           headers={'Authorization': self.__class__.token})
         self.assertEqual(r.status_code, 200)
+        post_id = get_field(r, 'response')
         post_ids.append(get_field(r, 'response'))
 
+        # Upload post attachment.
+        files = {'file': open('steviewonder.jpg', 'rb')}
+        r = requests.post(URL_ROOT + "post/attachment/" + post_id, files=files)
+        self.assertEqual(r.status_code, 200)
+
+        # Test to see that the attached image uploaded correctly.
+        r = requests.get(URL_ROOT + "post/attachment/" + post_id)
+        self.assertEqual(r.status_code, 200)
+        # TODO: Make sure that the image is of Stevie Wonder
+
         # Test getting the just created post.
-        post_id = get_field(r, 'response')
         r = requests.get(URL_ROOT + "post/" + post_id)
         self.assertEqual(r.status_code, 200)
         post = json.loads(r.text)

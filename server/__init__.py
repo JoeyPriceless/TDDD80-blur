@@ -6,8 +6,10 @@ import os
 db = SQLAlchemy()
 jwt = JWTManager()
 
-POST_UPLOAD_FOLDER = '/path/to/the/uploads'
-USER_UPLOAD_FOLDER = '/path/to/the/uploads'
+seperator = os.path.altsep
+
+POST_UPLOAD_FOLDER = os.path.abspath(os.path.join(".", 'post_uploads'))
+USER_UPLOAD_FOLDER = os.path.abspath(os.path.join(".", 'user_uploads'))
 
 
 @jwt.token_in_blacklist_loader
