@@ -1,5 +1,5 @@
 from apscheduler.schedulers.background import BackgroundScheduler
-from .models import Post, FeedObject, db
+from server.models import Post, FeedObject, db
 import time
 import datetime
 import sys
