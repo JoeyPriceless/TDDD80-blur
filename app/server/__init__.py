@@ -49,7 +49,7 @@ with app.app_context():
         db.drop_all()
     else:
         import server.batch_jobs
-        server.batch_jobs.start_timer(routes.Post, routes.FeedObject, db)
+        #server.batch_jobs.start_timer(routes.Post, routes.FeedObject, db)
     db.create_all()
     jwt.token_in_blacklist_loader(check_if_token_in_blacklist)
 
