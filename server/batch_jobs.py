@@ -1,6 +1,5 @@
 from apscheduler.schedulers.background import BlockingScheduler
 from server.models import Post, FeedObject, db, app
-import time
 import datetime
 import sys
 
@@ -26,7 +25,7 @@ def create_feed():
             db.session.add(feed_object)
 
         db.session.commit()
-        print(f"Feed generated...")
+        print(f"Feed generated.")
         sys.stdout.flush()
         # TODO: Sort through posts and compile the top.
 
