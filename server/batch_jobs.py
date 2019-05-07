@@ -1,6 +1,5 @@
 from rq import Queue
 from redis import Redis
-from server.models import Post, FeedObject
 import time
 import datetime
 import sys
@@ -11,13 +10,13 @@ FEED_LENGTH = 100
 SCORE_MULTIPLIER = 10
 
 
-def start_timer(db):
+def start_timer(Post, FeedObject, db):
     print(f"Feed creation worker started.")
     sys.stdout.flush()
-    q.enqueue(create_feed(db))
+    q.enqueue(create_feed(Post, FeedObject, db))
 
 
-def create_feed(db):
+def create_feed(Post, FeedObject, db):
     # Score = total_vote_score * multiplier / time_since_posted
     print(f"Generating feed...")
     sys.stdout.flush()
