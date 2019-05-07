@@ -49,4 +49,5 @@ with app.app_context():
         db.drop_all()
     db.create_all()
     jwt.token_in_blacklist_loader(check_if_token_in_blacklist)
-    from .batch_jobs import start_timer
+    import server.batch_jobs
+    server.batch_jobs.start_timer(db)
