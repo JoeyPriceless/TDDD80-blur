@@ -32,5 +32,5 @@ def create_feed(Post, FeedObject, db):
     db.session.commit()
     print(f"Feed generated...")
     sys.stdout.flush()
-    time.sleep(10000)
+    time.sleep(500000)
     # TODO: Sort through posts and compile the top.
