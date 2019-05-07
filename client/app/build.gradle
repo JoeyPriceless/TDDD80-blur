@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "se.liu.ida.tddd80.hasBlur"
+        applicationId "se.liu.ida.tddd80.blur"
         minSdkVersion 23
         targetSdkVersion 28
         versionCode 1

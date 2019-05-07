@@ -5,6 +5,7 @@ import android.location.Address;
 
 import com.android.volley.VolleyError;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -143,7 +144,7 @@ public class StringUtil {
      */
     public static boolean isValidPassword(Context context, String password) {
         int minLength = context.getResources().getInteger(R.integer.password_min_length);
-        return password.length() >= minLength;
+        return password.length() >= minLength && !StringUtils.containsWhitespace(password);
     }
 
     /**

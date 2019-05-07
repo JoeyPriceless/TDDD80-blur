@@ -64,7 +64,7 @@ public class PostActivity extends AppCompatActivity
         public void onResponse(JSONObject response) {
             try {
                 post = gsonUtil.parsePost(response);
-                // If there isn't some horizontal padding around the text, the hasBlur ends with a
+                // If there isn't some horizontal padding around the text, the blur ends with a
                 // very noticeable edge rather than fading out. The space is there to provide
                 // padding. I tried adding a layout padding but the filter still used the text's
                 // position rather than it's background.
