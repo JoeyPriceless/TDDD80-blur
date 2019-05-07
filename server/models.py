@@ -1,4 +1,4 @@
-from server import db, jwt
+from server import db, jwt, app
 import uuid
 import datetime
 
