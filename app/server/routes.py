@@ -25,13 +25,13 @@ def reset_db():
 def get_feed(feedtype):
     user_id = get_jwt_identity()
     # TODO: implement proper feed creation. Currently just returns all posts
-    feed = Post.query.all()
+    feed = FeedObject.query.all()
     if feed is None:
         return respond(plain_response("Feed empty! Requested resource not found."), 404)
 
     return respond({
         'type': feedtype,
-        'posts': [post.serialize(user_id) for post in feed]
+        'posts': [feed_object.post.serialize() for feed_object in feed]
     })
 
 
@@ -279,6 +279,9 @@ def create_user():
     if len(username) < USERNAME_MIN_LENGTH or len(username) > USERNAME_MAX_LENGTH:
         return respond(
             plain_response('Invalid username length. Must be between 3-24 characters.'), 409)
+    if ' ' in username:
+        return respond(
+            plain_response('Invalid username. Username can not contain spaces.'), 409)
     if len(password) < PASSWORD_MIN_LENGTH:
         return respond(
             plain_response('Invalid password. Must be longer than 8 characters.'), 409)

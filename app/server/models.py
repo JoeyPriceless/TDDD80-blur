@@ -1,4 +1,4 @@
-from server import db, jwt
+from server import db, jwt, app
 import uuid
 import datetime
 
@@ -59,6 +59,7 @@ class Post(db.Model):
         # TODO: TAKE A LOOK AT THIS
         temp_db.session.query(Comment).filter(Comment.id == self.id).delete()
         temp_db.session.query(PostReaction).filter(PostReaction.post_id == self.id).delete()
+        temp_db.session.query(FeedObject).filter(FeedObject.post_id == self.id).delete()
         temp_db.session.commit()
         
     def reaction_count(self, reaction_type):
