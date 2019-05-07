@@ -47,9 +47,7 @@ with app.app_context():
     from . import routes
     if not is_remote:
         db.drop_all()
-    else:
-        import server.batch_jobs
-        #server.batch_jobs.start_timer(routes.Post, routes.FeedObject, db)
+    from . import batch_jobs
     db.create_all()
     jwt.token_in_blacklist_loader(check_if_token_in_blacklist)
 
