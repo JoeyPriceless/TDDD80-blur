@@ -6,7 +6,6 @@ import sys
 import json
 import os
 from server.util import serialize_list
-from server.batch_jobs import create_feed
 USERNAME_MIN_LENGTH = 3
 USERNAME_MAX_LENGTH = 24
 PASSWORD_MIN_LENGTH = 8
@@ -34,12 +33,6 @@ def get_feed(feedtype):
         'type': feedtype,
         'posts': [post.serialize(user_id) for post in feed]
     })
-
-
-@app.route('/feed/generate')
-def generate_feed():
-    create_feed(db)
-    return respond("New feed generated.", 200)
 
 
 @app.route('/comments/<postid>')
