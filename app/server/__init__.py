@@ -48,5 +48,6 @@ with app.app_context():
     if not is_remote:
         db.drop_all()
     db.create_all()
-
     jwt.token_in_blacklist_loader(check_if_token_in_blacklist)
+    from .batch_jobs import start_timer
+    start_timer(db)
