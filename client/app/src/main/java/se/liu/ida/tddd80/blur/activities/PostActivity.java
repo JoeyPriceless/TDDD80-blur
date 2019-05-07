@@ -38,7 +38,6 @@ public class PostActivity extends AppCompatActivity
 
 	private Button btnReact;
 	private Button btnComment;
-	private Button btnFavorite;
 	private ImageView ivAuthor;
 	private TextView tvAuthor;
 
@@ -78,9 +77,6 @@ public class PostActivity extends AppCompatActivity
                 btnComment = findViewById(R.id.button_post_comment);
                 // TODO
                 btnComment.setText("1024");
-                btnFavorite = findViewById(R.id.button_post_favorite);
-                // TODO
-                btnFavorite.setText("2024");
             } catch (JsonSyntaxException ex) {
                 Log.e(TAG, ExceptionUtils.getStackTrace(ex));
                 Toast.makeText(PostActivity.this, "Error when parsing response",
@@ -90,7 +86,8 @@ public class PostActivity extends AppCompatActivity
     }
 
     public void onClickReactionButton(View v) {
-	    ViewUtil.showReactionDialog(this, getSupportFragmentManager(), post.getId());
+	    ViewUtil.showReactionDialog(this, getSupportFragmentManager(), post.getId(),
+                post.getReactions().getOwnReaction());
     }
 
     @Override

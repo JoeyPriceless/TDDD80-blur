@@ -1,26 +1,30 @@
 package se.liu.ida.tddd80.blur.fragments;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import se.liu.ida.tddd80.blur.R;
-
-import static android.app.AlertDialog.Builder;
+import se.liu.ida.tddd80.blur.models.ReactionType;
 
 public class ReactDialogFragment extends DialogFragment {
     public static String KEY_POST_ID = "POST_ID";
     public static String KEY_ADAPTER_POSITION = "ADAPTER_POSITION";
+    public static String KEY_CURRENT_SELECTION = "CURRENT_SELECTION";
     public ReactDialogListener listener;
     private int index;
     private String postId;
     private int adapterPosition;
+    private int currentSelection;
 
     public int getIndex() {
         return index;
@@ -47,22 +51,50 @@ public class ReactDialogFragment extends DialogFragment {
             postId = args.getString(KEY_POST_ID);
             // adapterPosition may be null. Only used when post is interacted with in a recyclerview
             adapterPosition = args.getInt(KEY_ADAPTER_POSITION);
+            currentSelection = args.getInt(KEY_CURRENT_SELECTION);
         }
     }
 
-    @NonNull
+    @Nullable
     @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Choose a reaction")
-                .setItems(getResources().getStringArray(R.array.reaction_strings),
-                        new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int index) {
-                setIndex(index);
-                listener.onClickReactionDialog(ReactDialogFragment.this);
-            }
-        });
-        return builder.create();
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.dialog_reaction, container);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        LinearLayout linear = view.findViewById(R.id.linearlayout_dialog_reactions);
+        for (int i = 0; i < linear.getChildCount(); i++) {
+            final int j = i;
+            final ImageView iv = (ImageView)linear.getChildAt(j);
+            if (currentSelection == i + 1)
+                // Make current selection larger using layout_weight * 3
+                setWeight(iv, 3f);
+            iv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setIndex(j);
+                    listener.onClickReactionDialog(ReactDialogFragment.this);
+                    dismiss();
+                }
+            });
+        }
+    }
+
+    private void setWeight(View v, float w) {
+        v.setLayoutParams(new LinearLayout.LayoutParams(
+                                ViewGroup.LayoutParams.WRAP_CONTENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT,
+                                w));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Window window = getDialog().getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
     public interface ReactDialogListener {
