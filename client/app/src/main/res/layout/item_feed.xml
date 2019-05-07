@@ -18,7 +18,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <de.hdodenhof.circleimageview.CircleImageView
+        <se.liu.ida.tddd80.blur.utilities.UserImageView
             android:id="@+id/imageview_feeditem_author"
             android:layout_width="0dp"
             android:layout_height="match_parent"

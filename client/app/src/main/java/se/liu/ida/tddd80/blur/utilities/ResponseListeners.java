@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.NetworkImageView;
 
 import org.json.JSONObject;
 
@@ -25,10 +26,10 @@ public class ResponseListeners {
         private Post post;
         private Button btnReact;
         private TextView tvAuthor;
-        private ImageView ivAuthor;
+        private UserImageView ivAuthor;
 
         public ReactionSuccess(Post post, Button btnReact, TextView tvAuthor,
-                               ImageView ivAuthor) {
+                               UserImageView ivAuthor) {
             this.post = post;
             this.btnReact = btnReact;
             this.tvAuthor = tvAuthor;
@@ -38,7 +39,7 @@ public class ResponseListeners {
         @Override
         public void onResponse(JSONObject response) {
             post.setReactions(GsonUtil.getInstance().parseReactions(response));
-            ViewUtil.onReactionUpdateViews(btnReact, post.getReactions(), tvAuthor, ivAuthor);
+            ViewUtil.refreshPostViews(btnReact, post, tvAuthor, ivAuthor);
         }
     }
 

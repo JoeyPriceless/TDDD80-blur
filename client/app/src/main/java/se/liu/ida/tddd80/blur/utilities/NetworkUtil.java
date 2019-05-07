@@ -2,6 +2,7 @@ package se.liu.ida.tddd80.blur.utilities;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -9,8 +10,10 @@ import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
+import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.NetworkImageView;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
@@ -34,6 +37,7 @@ public class NetworkUtil {
     private Context appContext;
     private static NetworkUtil instance;
     private RequestQueue queue;
+    private ImageLoader imageLoader;
     private String userId;
     private String tokenStringKey;
     private String token;
@@ -60,6 +64,17 @@ public class NetworkUtil {
         // Application context to make it last throughout app lifetime.
         appContext = context.getApplicationContext();
         this.queue = Volley.newRequestQueue(appContext);
+        this.imageLoader = new ImageLoader(queue, new ImageLoader.ImageCache() {
+            @Override
+            public Bitmap getBitmap(String url) {
+                return null;
+            }
+
+            @Override
+            public void putBitmap(String url, Bitmap bitmap) {
+
+            }
+        });
         tokenStringKey = appContext.getResources().getString(R.string.token_pref_key);
         loadToken();
     }
@@ -240,11 +255,29 @@ public class NetworkUtil {
                 responseListener, errorListener);
     }
 
+    public static String getPostAttachmentUrl(String postId) {
+        return Url.build(Url.POST_ATTACHMENT_GET, postId);
+    }
+
+    public static String getUserPictureUrl(String userId) {
+        return Url.build(Url.USER_PICTURE_GET, userId);
+    }
+
+    public void setImageUrl(NetworkImageView imageView, String url) {
+        imageView.setImageUrl(url, imageLoader);
+    }
+
+    public void setImageUrl(NetworkImageView imageView, String url, int defaultResId) {
+        imageView.setDefaultImageResId(defaultResId);
+        setImageUrl(imageView, url);
+    }
+
     /**
      * Contains endpoints for server requests which can be used to build URLs.
      */
     private enum Url {
         FEED_GET("/feed/"),
+        POST_ATTACHMENT_GET("/post/attachment/"),
         POST_CREATE("/post"),
         POST_GET("/post/"),
         POST_REACTIONS_ADD("/post/reactions"),
@@ -253,7 +286,8 @@ public class NetworkUtil {
         USER_CREATE("/user"),
         USER_GET("/user/"),
         USER_LOGIN("/user/login"),
-        USER_LOGOUT("/user/logout");
+        USER_LOGOUT("/user/logout"),
+        USER_PICTURE_GET("/user/picture/");
 
         private String address;
 

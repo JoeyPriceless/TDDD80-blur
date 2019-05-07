@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
+import com.android.volley.toolbox.NetworkImageView;
 import com.google.gson.JsonSyntaxException;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -24,6 +25,7 @@ import se.liu.ida.tddd80.blur.utilities.GsonUtil;
 import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
 import se.liu.ida.tddd80.blur.utilities.ResponseListeners;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
+import se.liu.ida.tddd80.blur.utilities.UserImageView;
 import se.liu.ida.tddd80.blur.utilities.ViewUtil;
 
 
@@ -38,7 +40,7 @@ public class PostActivity extends AppCompatActivity
 
 	private Button btnReact;
 	private Button btnComment;
-	private ImageView ivAuthor;
+	private UserImageView ivAuthor;
 	private TextView tvAuthor;
 
 	@Override protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +64,7 @@ public class PostActivity extends AppCompatActivity
         public void onResponse(JSONObject response) {
             try {
                 post = gsonUtil.parsePost(response);
-                // If there isn't some horizontal padding around the text, the blur ends with a
+                // If there isn't some horizontal padding around the text, the hasBlur ends with a
                 // very noticeable edge rather than fading out. The space is there to provide
                 // padding. I tried adding a layout padding but the filter still used the text's
                 // position rather than it's background.
@@ -73,7 +75,7 @@ public class PostActivity extends AppCompatActivity
                 ((TextView)findViewById(R.id.textview_post_content)).setText(post.getContent());
 
                 btnReact = findViewById(R.id.button_post_react);
-                ViewUtil.onReactionUpdateViews(btnReact, post.getReactions(), tvAuthor, ivAuthor);
+                ViewUtil.refreshPostViews(btnReact, post, tvAuthor, ivAuthor);
                 btnComment = findViewById(R.id.button_post_comment);
                 // TODO
                 btnComment.setText("1024");

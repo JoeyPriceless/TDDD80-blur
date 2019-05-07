@@ -20,6 +20,6 @@ public class ExampleInstrumentedTest {
 		// Context of the app under test.
 		Context appContext = InstrumentationRegistry.getTargetContext();
 
-		assertEquals("se.liu.ida.tddd80.blur", appContext.getPackageName());
+		assertEquals("se.liu.ida.tddd80.hasBlur", appContext.getPackageName());
 	}
 }
