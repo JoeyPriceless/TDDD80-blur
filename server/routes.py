@@ -279,6 +279,9 @@ def create_user():
     if len(username) < USERNAME_MIN_LENGTH or len(username) > USERNAME_MAX_LENGTH:
         return respond(
             plain_response('Invalid username length. Must be between 3-24 characters.'), 409)
+    if ' ' in username:
+        return respond(
+            plain_response('Invalid username. Username can not contain spaces.'), 409)
     if len(password) < PASSWORD_MIN_LENGTH:
         return respond(
             plain_response('Invalid password. Must be longer than 8 characters.'), 409)
