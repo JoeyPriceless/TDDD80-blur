@@ -8,8 +8,6 @@ public class User {
     private String id;
     private String username;
     private String email;
-    @SerializedName("picture_path")
-    private String picturePath = null;
     private Bitmap picture = null;
     private Bitmap pictureBlurred = null;
 

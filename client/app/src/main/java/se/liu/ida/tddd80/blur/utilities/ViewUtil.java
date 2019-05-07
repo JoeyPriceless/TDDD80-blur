@@ -36,18 +36,18 @@ public class ViewUtil {
         Context context = button.getContext();
         button.setText(String.valueOf(reactions.getScore()));
         int colorId = R.color.neutralColor;
-        ReactionType sentiment = reactions.getSentiment();
-        button.setCompoundDrawablesWithIntrinsicBounds(sentiment.getDrawable(context), null,
-                null, null);
+        Drawable buttonDrawable = reactions.getOwnReaction().getDrawable(context);
+        button.setCompoundDrawablesWithIntrinsicBounds(buttonDrawable, null, null, null);
         ReactionType ownReaction = reactions.getOwnReaction();
-        if (ownReaction != null) {
+        if (ownReaction == null || ownReaction == ReactionType.NEUTRAL) {
+            ViewUtil.blurText(tvAuthor);
+            ViewUtil.blurImage(ivAuthor);
+        } else {
             colorId = ownReaction.ordinal() < ReactionType.DOWNVOTE_0.ordinal()
                     ? R.color.positiveColor
                     : R.color.negativeColor;
             ViewUtil.unBlurPost(tvAuthor, ivAuthor);
-        } else {
-            ViewUtil.blurText(tvAuthor);
-            ViewUtil.blurImage(ivAuthor);
+
         }
         int color = ContextCompat.getColor(context, colorId);
         button.setTextColor(color);

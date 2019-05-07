@@ -11,9 +11,7 @@ public class Post {
     @SerializedName("time_created")
     private DateTime timeCreated; // Check json compatibility
     private Reactions reactions;
-    @SerializedName("picture_path")
     private String picturePath = null;
-    private String localPicturePath = null;
     private String location;
 
 

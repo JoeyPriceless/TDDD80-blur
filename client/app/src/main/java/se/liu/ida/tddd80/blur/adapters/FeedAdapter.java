@@ -32,7 +32,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
         public TextView content;
         public Button reactButton;
         public Button commentButton;
-        public Button favoriteButton;
 
         public ViewHolder(@NonNull View v) {
             super(v);
@@ -50,7 +49,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
                 }
             });
             commentButton = v.findViewById(R.id.button_feeditem_comment);
-            favoriteButton = v.findViewById(R.id.button_feeditem_favorite);
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -117,7 +115,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
         // TODO
         vh.commentButton.setText("1024");
         // TODO
-        vh.favoriteButton.setText("2048");
     }
 
     @Override
