@@ -1,2 +1,2 @@
 web: gunicorn server:app --log-file=-
-clock: python clock.py
+clock: python server/batch_jobs.py
