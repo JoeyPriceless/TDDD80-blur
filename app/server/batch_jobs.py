@@ -12,7 +12,7 @@ SCORE_MULTIPLIER = 10
 
 
 def start_timer(db):
-    q.enqueue(create_feed(), db)
+    q.enqueue(create_feed(db))
     print(f"Feed creation worker started.")
     sys.stdout.flush()
 
