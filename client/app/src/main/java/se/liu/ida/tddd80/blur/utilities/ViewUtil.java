@@ -111,7 +111,7 @@ public class ViewUtil {
         tv.invalidate();
     }
 
-    public static void setImageByUrl(final NetworkImageView iv, final String url) {
+    public static void setImageByUrl(final UserImageView iv, final String url) {
         NetworkUtil.getInstance(iv.getContext()).setImageUrl(iv, url);
     }
 

@@ -263,12 +263,11 @@ public class NetworkUtil {
         return Url.build(Url.USER_PICTURE_GET, userId);
     }
 
-    public void setImageUrl(NetworkImageView imageView, String url) {
+    public void setImageUrl(UserImageView imageView, String url) {
         imageView.setImageUrl(url, imageLoader);
     }
 
-    public void setImageUrl(NetworkImageView imageView, String url, int defaultResId) {
-        imageView.setDefaultImageResId(defaultResId);
+    public void setImageUrl(UserImageView imageView, String url, int defaultResId) {
         setImageUrl(imageView, url);
     }
 
