@@ -136,15 +136,12 @@ def set_post_attachment(postid):
         return respond(plain_response('No user with given ID. Resource not found.'), 404)
     if 'file' in request.json:
         file = request.json['file']
-        extension = get_file_extention(file.filename)
-        if file and extension == ALLOWED_EXTENSION:
-            filename = post.id + "." + extension
-            path = os.path.join(app.config['POST_UPLOAD_FOLDER'], filename)
-            file.save(path)
+        path = os.path.join(app.config['USER_UPLOAD_FOLDER'], postid + '.jpg')
+        with open(path, 'wb') as fh:
+            fh.write(file.decode('base64'))
             post.attachment_uri = path
             db.session.commit()
             return respond(plain_response(''), 200)
-        return respond(plain_response('Invalid filename/extension.'), 409)
     return respond(plain_response('No file sent.'), 409)
 
 
