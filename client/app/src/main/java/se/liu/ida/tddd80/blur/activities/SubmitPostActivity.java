@@ -72,6 +72,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
     private TextView tvCharCount;
     private int maxLength;
     private ImageView ivThumbnail;
+    private Button btnLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +89,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
         etContent = findViewById(R.id.edittext_content_submit);
         tvCharCount = findViewById(R.id.textview_charcount_submit);
         ivThumbnail = findViewById(R.id.imageview_thumbnail_submit);
+        btnLocation = findViewById(R.id.button_location_submit);
         etContent.addTextChangedListener(new ContentWatcher());
         // Set content box as focused automatically.
         etContent.requestFocus();
@@ -261,7 +263,10 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
                     Toast.LENGTH_SHORT).show();
             return false;
         }
-        netUtil.createPost(contentEditable.toString(), netUtil.getUserId(), this,
+        String locationString = btnLocation.getText().toString();
+        // Return null rather than empty string.
+        locationString = locationString.isEmpty() ? null : locationString;
+        netUtil.createPost(contentEditable.toString(), netUtil.getUserId(), locationString, this,
                 new ResponseListeners.DefaultError(this));
         return true;
     }

@@ -216,11 +216,12 @@ public class NetworkUtil {
         requestJsonObject(Url.build(Url.USER_GET, id), Method.GET, responseListener, errorListener);
     }
 
-    public void createPost(String content, String authorId, Listener<JSONObject> responseListener,
-                               ErrorListener errorListener) {
+    public void createPost(String content, String authorId, String location,
+                           Listener<JSONObject> responseListener, ErrorListener errorListener) {
         Map<String, String> params = new HashMap<>();
             params.put("content", content);
             params.put("user_id", authorId);
+            params.put("location", location);
         requestJsonObject(Url.build(Url.POST_CREATE), Method.POST, responseListener,
                             errorListener, params);
     }

@@ -39,13 +39,15 @@ class Post(db.Model):
     author_id = db.Column(db.String, db.ForeignKey('user.id'))
     content = db.Column(db.String, nullable=False)
     time_created = db.Column(db.DateTime, nullable=False)
+    location = db.Column(db.String, nullable=True)
     attachment_uri = db.Column(db.String, nullable=True, unique=True)
 
-    def __init__(self, author, content, attachment_uri=None):
+    def __init__(self, author, content, location=None, attachment_uri=None):
         self.id = uuid.uuid4().hex
         self.author_id = author
         self.content = content
         self.time_created = datetime.datetime.now()
+        self.location = location
         if attachment_uri:
             self.attachment_uri = attachment_uri
 
@@ -69,8 +71,6 @@ class Post(db.Model):
             .join(sq, sq.c.post_id == self.id, sq.c.reaction_type == reaction_type).all()
         return result
 
-    # TODO: Should probably contain more complicated logic involving interaction count and not just
-    #       negative / positive
     def reaction_score(self):
         score = 0
         reactions = self.get_reactions()
