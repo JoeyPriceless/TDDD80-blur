@@ -103,8 +103,8 @@ def set_profile_picture(userid):
     user = User.query.filter_by(id=userid).scalar()
     if user is None:
         return respond(plain_response('No user with given ID. Resource not found.'), 404)
-    if 'file' in request.files:
-        file = request.files['file']
+    if 'file' in request.json:
+        file = request.json['file']
         extension = get_file_extention(file.filename)
         if file and extension == ALLOWED_EXTENSION:
             filename = user.id + "." + extension
