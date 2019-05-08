@@ -140,7 +140,7 @@ def set_post_attachment(postid):
         with open(path, 'wb') as fh:
             print(type(file))
             sys.stdout.flush()
-            fh.write(bytes(file))
+            fh.write(file.encode('base64'))
             post.attachment_uri = path
             db.session.commit()
             return respond(plain_response(''), 200)
