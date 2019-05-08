@@ -113,7 +113,14 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
         vh.authorName.setText(PostActivity.AUTHOR_SPACE_PADDING + post.getAuthor().getUsername());
         vh.timestamp.setText(StringUtil.formatDateTimeShort(post.getTimeCreated()));
         vh.content.setText(post.getContent());
-        vh.location.setText(post.getLocation());
+        String location = post.getLocation();
+        if (location != null) {
+            vh.location.setText(PostActivity.AUTHOR_SPACE_PADDING + location);
+            vh.location.setVisibility(View.VISIBLE);
+        } else {
+            vh.location.setText("");
+            vh.location.setVisibility(View.GONE);
+        }
         ViewUtil.refreshPostViews(vh.reactButton, post, vh.authorName, vh.location, vh.authorImage);
         // TODO
         vh.commentButton.setText("1024");

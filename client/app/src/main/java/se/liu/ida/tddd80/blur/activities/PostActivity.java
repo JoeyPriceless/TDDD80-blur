@@ -69,16 +69,18 @@ public class PostActivity extends AppCompatActivity
                 // very noticeable edge rather than fading out. The space is there to provide
                 // padding. I tried adding a layout padding but the filter still used the text's
                 // position rather than it's background.
-                tvAuthor.setText(AUTHOR_SPACE_PADDING +
-                        post.getAuthor().getUsername());
+                tvAuthor.setText(AUTHOR_SPACE_PADDING + post.getAuthor().getUsername());
                 ((TextView)findViewById(R.id.textview_post_time)).setText(
                         StringUtil.formatDateTimeLong(post.getTimeCreated()));
 
                 tvLocation = findViewById(R.id.textview_post_location);
                 String location = post.getLocation();
                 if (location != null) {
-                    tvLocation.setText(location);
+                    tvLocation.setText(AUTHOR_SPACE_PADDING + location);
                     tvLocation.setVisibility(View.VISIBLE);
+                } else {
+                    tvLocation.setText("");
+                    tvLocation.setVisibility(View.GONE);
                 }
 
                 ((TextView)findViewById(R.id.textview_post_content)).setText(post.getContent());

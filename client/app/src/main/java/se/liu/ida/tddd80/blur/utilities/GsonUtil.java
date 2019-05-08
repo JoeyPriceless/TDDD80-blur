@@ -19,6 +19,10 @@ public class GsonUtil {
     private static GsonUtil instance;
     private Gson gson;
 
+    public Gson getGson() {
+        return gson;
+    }
+
     public static GsonUtil getInstance() {
         if (instance == null)
             instance = new GsonUtil();

@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
@@ -14,11 +15,13 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NetworkImageView;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -108,9 +111,9 @@ public class NetworkUtil {
     /**
      * Adds default headers onto HTTP request.
      */
-    private Map<String, String> getHeadersAuth() {
+    private Map<String, String> getHeadersAuth(String contentType) {
         Map<String, String> headers = new HashMap<>();
-        headers.put("Content-Type", "application/json");
+        headers.put("Content-Type", contentType);
         // Only send authorization if there is a token.
         if (token != null && !token.isEmpty())
             headers.put("Authorization", "Bearer ".concat(token));
@@ -129,7 +132,7 @@ public class NetworkUtil {
   		JsonObjectRequest request = new JsonObjectRequest(method, url, null,
                 responseListener, errorListener) {
             @Override
-            public Map<String, String> getHeaders() { return getHeadersAuth(); }
+            public Map<String, String> getHeaders() { return getHeadersAuth("application/json"); }
         };
   		addToQueue(request);
   	}
@@ -142,13 +145,41 @@ public class NetworkUtil {
      * @param errorListener Listener which contains actions upon failure
      * @param data JSON data mapped in key/value format
      */
-  	private void requestJsonObject(String url, int method, Listener<JSONObject> responseListener,
-                                   ErrorListener errorListener, final Map<String, String> data) {
+  	private void requestJsonObject(String url, int method,
+                                   Listener<JSONObject> responseListener,
+                                   ErrorListener errorListener,
+                                   final Map<String, String> data) {
         JsonObjectRequest request = new JsonObjectRequest(method, url, new JSONObject(data),
                 responseListener, errorListener) {
             @Override
             public Map<String, String> getHeaders() {
-                return getHeadersAuth();
+                return getHeadersAuth("application/json");
+            }
+        };
+        addToQueue(request);
+    }
+
+    /**
+     * Sends a payload data and requests JSON response from url using method (Usually POST or PUT).
+     * @param url target URL. Complete URL including prefix and hostname
+     * @param method HTTP method from enum
+     * @param responseListener Listener which contains actions upon success
+     * @param errorListener Listener which contains actions upon failure
+     * @param data JSON data mapped in key/value format
+     */
+    private void requestJsonObject(String url,
+                                   Listener<JSONObject> responseListener,
+                                   ErrorListener errorListener,
+                                   final Map<String, String> params) {
+        JsonObjectRequest request = new JsonObjectRequest(Method.POST, url, null,
+                responseListener, errorListener) {
+            @Override
+            public Map<String, String> getHeaders() {
+                return getHeadersAuth("multipart/form-data");
+            }
+            @Override
+            protected Map<String, String> getParams() {
+                return params;
             }
         };
         addToQueue(request);
@@ -166,7 +197,7 @@ public class NetworkUtil {
         JsonArrayRequest request = new JsonArrayRequest(method, url, null,
                 responseListener, errorListener) {
             @Override
-            public Map<String, String> getHeaders() { return getHeadersAuth(); }
+            public Map<String, String> getHeaders() { return getHeadersAuth("application/json"); }
         };
         addToQueue(request);
     }
@@ -268,8 +299,21 @@ public class NetworkUtil {
         imageView.setImageUrl(url, imageLoader);
     }
 
-    public void setImageUrl(UserImageView imageView, String url, int defaultResId) {
-        setImageUrl(imageView, url);
+    public void sendPostAttachment(Bitmap bitmap, String postId,
+                                   Listener<JSONObject> responseListener,
+                                   ErrorListener errorListener) {
+        String encoded = FileUtil.encodeImageFile(bitmap);
+        Map<String, String> params = new HashMap<>();
+        Map<String, String> inner = new HashMap<>();
+        inner.put("file", encoded);
+        params.put("files", GsonUtil.getInstance().getGson().toJson(inner));
+//        params.put("file", );
+//        requestJsonObject(Url.build(Url.POST_ATTACHMENT_GET, postId),
+//                responseListener, errorListener, params);
+
+        JsonObjectRequest request = new JsonObjectRequest(Method.POST, Url.build(Url.POST_ATTACHMENT_GET, postId),
+                new JSONObject(inner), responseListener, errorListener);
+        addToQueue(request);
     }
 
     /**

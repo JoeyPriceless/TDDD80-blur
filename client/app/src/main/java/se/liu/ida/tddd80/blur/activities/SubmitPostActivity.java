@@ -35,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -63,7 +64,8 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
     private static final int THUMBNAIL_HEIGHT = 400;
 
     private Intent imageCaptureIntent;
-    private File imageFile = null;
+    private Uri imageUri = null;
+    Bitmap bmFullsize = null;
     private FusedLocationProviderClient fusedLocation;
 
     private NetworkUtil netUtil;
@@ -147,7 +149,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
 
             // Decide where the file is to be stored. If an image URI isn't provided, we only get a
             // low quality ivThumbnail in the result.
-            imageFile = null;
+            File imageFile = null;
             try {
                 imageFile = FileUtil.createImageFile(this);
             } catch (IOException ex) {
@@ -156,7 +158,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
 
             if (imageFile != null) {
                 String providerAuthority = getString(R.string.fileprovider_authority);
-                Uri imageUri = FileProvider.getUriForFile(this, providerAuthority, imageFile);
+                imageUri = FileProvider.getUriForFile(this, providerAuthority, imageFile);
 
                 // Have to add this to gain Uri access
                 List<ResolveInfo> resInfoList = getPackageManager().queryIntentActivities(
@@ -234,9 +236,8 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == IMAGE_REQUEST_CODE && resultCode == RESULT_OK) {
-            Bitmap bmFullsize;
             try {
-                 bmFullsize = ImageUtil.getImageAndRotate(this, Uri.fromFile(imageFile));
+                 bmFullsize = ImageUtil.getImageAndRotate(this, imageUri);
             } catch (IOException ex) {
                 return;
             }
@@ -263,6 +264,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
                     Toast.LENGTH_SHORT).show();
             return false;
         }
+
         String locationString = btnLocation.getText().toString();
         // Return null rather than empty string.
         locationString = locationString.isEmpty() ? null : locationString;
@@ -291,6 +293,16 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
     @Override
     public void onResponse(JSONObject response) {
         String postId = GsonUtil.getInstance().parseString(response);
+
+        if (bmFullsize == null) {
+            continueToPost(postId);
+        } else {
+            netUtil.sendPostAttachment(bmFullsize, postId, new ImageResponseListener(postId),
+                    new ImageErrorListener(postId));
+        }
+    }
+
+    private void continueToPost(String postId) {
         Intent postIntent = new Intent(SubmitPostActivity.this, PostActivity.class);
         postIntent.putExtra(PostActivity.EXTRA_POST_ID, postId);
         // TODO remove this Activity from history so back button doesn't navigate to
@@ -298,6 +310,33 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
         startActivity(postIntent);
     }
 
+    private class ImageResponseListener implements Response.Listener<JSONObject> {
+        private String postId;
+
+        public ImageResponseListener(String postId) {
+            this.postId = postId;
+        }
+
+        @Override
+        public void onResponse(JSONObject response) {
+            continueToPost(postId);
+        }
+    }
+
+    private class ImageErrorListener implements Response.ErrorListener {
+        private String postId;
+
+        public ImageErrorListener(String postId) {
+            this.postId = postId;
+        }
+
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            Toast.makeText(SubmitPostActivity.this, "Unable to upload image.",
+                    Toast.LENGTH_SHORT).show();
+            continueToPost(postId);
+        }
+    }
     /**
      * Watches changes to etContent in order to update character counter
      */
@@ -368,7 +407,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
      */
     @Override
     public void onDialogPositiveClick(DialogFragment dialog) {
-        imageFile = null;
+        imageUri = null;
         ivThumbnail.setImageBitmap(null);
     }
 }

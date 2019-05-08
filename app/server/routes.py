@@ -138,7 +138,7 @@ def set_post_attachment(postid):
         file = request.json['file']
         path = os.path.join(app.config['USER_UPLOAD_FOLDER'], postid + '.jpg')
         with open(path, 'wb') as fh:
-            fh.write(file.decode('base64'))
+            fh.write(file)
             post.attachment_uri = path
             db.session.commit()
             return respond(plain_response(''), 200)
