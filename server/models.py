@@ -92,7 +92,8 @@ class Post(db.Model):
             'time_created': {
                 'datetime': format_datetime(self.time_created)
             },
-            'reactions': self.serialize_reactions(user_id)
+            'location': self.location,
+            'reactions': self.serialize_reactions(user_id),
         }
 
     def serialize_reactions(self, user_id=None):
