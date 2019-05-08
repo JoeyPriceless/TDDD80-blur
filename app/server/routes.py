@@ -5,6 +5,8 @@ from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity, get
 import sys
 import json
 import os
+import base64
+
 from server.util import serialize_list
 USERNAME_MIN_LENGTH = 3
 USERNAME_MAX_LENGTH = 24
@@ -140,7 +142,7 @@ def set_post_attachment(postid):
         with open(path, 'wb') as fh:
             print(type(file))
             sys.stdout.flush()
-            fh.write(file.encode('base64'))
+            fh.write(base64.b64encode(file))
             post.attachment_uri = path
             db.session.commit()
             return respond(plain_response(''), 200)
