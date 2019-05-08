@@ -31,7 +31,7 @@ def get_feed(feedtype):
 
     return respond({
         'type': feedtype,
-        'posts': [feed_object.post.serialize() for feed_object in feed]
+        'posts': [feed_object.post.serialize(user_id) for feed_object in feed]
     })
 
 
@@ -165,8 +165,10 @@ def get_user_preference():
 @jwt_required
 def create_post():
     content = request.json['content']
+    location = request.json['location'] if request.json != "null" else None
+
     user_id = get_jwt_identity()
-    post = Post(user_id, content)
+    post = Post(user_id, content, location=location)
     db.session.add(post)
     db.session.commit()
     return respond(plain_response(post.id))
