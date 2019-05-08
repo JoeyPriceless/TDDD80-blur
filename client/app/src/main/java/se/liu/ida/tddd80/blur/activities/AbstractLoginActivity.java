@@ -128,7 +128,8 @@ public abstract class AbstractLoginActivity extends AppCompatActivity {
             if (isPasswordValid)
                 etPassword.setError(null);
             else
-                etPassword.setError(String.format("Minimum %d characters", passwordMinLength));
+                etPassword.setError(String.format("Minimum %d characters and no spaces.",
+                        passwordMinLength));
             setButton();
         }
 

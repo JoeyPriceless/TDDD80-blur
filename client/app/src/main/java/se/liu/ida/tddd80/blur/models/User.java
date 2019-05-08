@@ -4,12 +4,19 @@ import android.graphics.Bitmap;
 
 import com.google.gson.annotations.SerializedName;
 
+import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
+
 public class User {
     private String id;
     private String username;
     private String email;
-    private Bitmap picture = null;
-    private Bitmap pictureBlurred = null;
+    private String pictureUrl;
+    private Bitmap bmPicture = null;
+    private Bitmap bmPictureBlurred = null;
+
+    public String getPictureUrl() {
+        return NetworkUtil.getUserPictureUrl(id);
+    }
 
     public String getId() {
         return id;

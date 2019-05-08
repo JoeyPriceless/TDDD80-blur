@@ -11,7 +11,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.List;
 
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.activities.PostActivity;
@@ -20,15 +19,18 @@ import se.liu.ida.tddd80.blur.models.Feed;
 import se.liu.ida.tddd80.blur.models.Post;
 import se.liu.ida.tddd80.blur.models.ReactionType;
 import se.liu.ida.tddd80.blur.models.Reactions;
+import se.liu.ida.tddd80.blur.models.User;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
+import se.liu.ida.tddd80.blur.utilities.UserImageView;
 import se.liu.ida.tddd80.blur.utilities.ViewUtil;
 
 public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView authorImage;
+        public UserImageView authorImage;
         public TextView authorName;
         public TextView timestamp;
+        public TextView location;
         public TextView content;
         public Button reactButton;
         public Button commentButton;
@@ -39,6 +41,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
             authorImage = v.findViewById(R.id.imageview_feeditem_author);
             authorName = v.findViewById(R.id.textview_feeditem_author);
             timestamp = v.findViewById(R.id.textview_feeditem_time);
+            location = v.findViewById(R.id.textview_feeditem_location);
             content = v.findViewById(R.id.textview_feeditem_content);
             reactButton = v.findViewById(R.id.button_feeditem_react);
             reactButton.setOnClickListener(new View.OnClickListener() {
@@ -110,11 +113,10 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
         vh.authorName.setText(PostActivity.AUTHOR_SPACE_PADDING + post.getAuthor().getUsername());
         vh.timestamp.setText(StringUtil.formatDateTimeShort(post.getTimeCreated()));
         vh.content.setText(post.getContent());
-        ViewUtil.onReactionUpdateViews(vh.reactButton, post.getReactions(), vh.authorName,
-                vh.authorImage);
+        vh.location.setText(post.getLocation());
+        ViewUtil.refreshPostViews(vh.reactButton, post, vh.authorName, vh.location, vh.authorImage);
         // TODO
         vh.commentButton.setText("1024");
-        // TODO
     }
 
     @Override

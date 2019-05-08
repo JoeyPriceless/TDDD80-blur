@@ -1,7 +1,7 @@
 package se.liu.ida.tddd80.blur.utilities;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
 import android.graphics.BlurMaskFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -9,46 +9,49 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.android.volley.toolbox.NetworkImageView;
 
 import jp.wasabeef.blurry.Blurry;
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.fragments.FeedFragment;
 import se.liu.ida.tddd80.blur.fragments.ReactDialogFragment;
+import se.liu.ida.tddd80.blur.models.Post;
 import se.liu.ida.tddd80.blur.models.ReactionType;
 import se.liu.ida.tddd80.blur.models.Reactions;
 
 public class ViewUtil {
-
     /**
      * Update a given reaction button according to a post's reactions.
      * Sets the color of the icon and text according to the user's vote.
      * Also blurs/unblurs author's name and image.
      * @param button Button which drawable/text should be updated
-     * @param reactions The reactions belonging to the post which was voted on.
      */
-    public static void onReactionUpdateViews(Button button, Reactions reactions, TextView tvAuthor,
-                                             ImageView ivAuthor) {
+    public static void refreshPostViews(Button button, Post post, TextView tvAuthor,
+                                        TextView tvLocation, UserImageView ivAuthor) {
         Context context = button.getContext();
+        Reactions reactions = post.getReactions();
         button.setText(String.valueOf(reactions.getScore()));
         int colorId = R.color.neutralColor;
         Drawable buttonDrawable = reactions.getOwnReaction().getDrawable(context);
         button.setCompoundDrawablesWithIntrinsicBounds(buttonDrawable, null, null, null);
         ReactionType ownReaction = reactions.getOwnReaction();
-        if (ownReaction == null || ownReaction == ReactionType.NEUTRAL) {
-            ViewUtil.blurText(tvAuthor);
-            ViewUtil.blurImage(ivAuthor);
+        if (post.hasBlur()) {
+            blurTextView(tvAuthor);
+            blurTextView(tvLocation);
         } else {
             colorId = ownReaction.ordinal() < ReactionType.DOWNVOTE_0.ordinal()
                     ? R.color.positiveColor
                     : R.color.negativeColor;
-            ViewUtil.unBlurPost(tvAuthor, ivAuthor);
-
+            unblurTextView(tvAuthor);
+            unblurTextView(tvLocation);
         }
+        ivAuthor.setBlur(post.hasBlur());
+        setImageByUrl(ivAuthor, post.getAuthorPictureUrl());
+
         int color = ContextCompat.getColor(context, colorId);
         button.setTextColor(color);
     }
@@ -97,33 +100,30 @@ public class ViewUtil {
         pShowReactionDialog(context, fragmentManager, postId, ownReaction, null, null);
     }
 
-    public static void blurText(TextView tv) {
+    public static void blurTextView(TextView tv) {
         tv.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         float radius = tv.getTextSize() / (float)3.5;
         BlurMaskFilter filter = new BlurMaskFilter(radius, BlurMaskFilter.Blur.NORMAL);
         tv.getPaint().setMaskFilter(filter);
     }
 
-    public static void blurImage(final ImageView iv) {
-        // TODO set actual image
-        // The Blurry library cannot be run on the UI thread as it often fails a race condition
-        // with the ImageView.
-        iv.post(new Runnable() {
-            @Override
-            public void run() {
-                Context context = iv.getContext();
-                iv.setImageDrawable(context.getDrawable(R.mipmap.img_profile_default));
-                Blurry.with(context).radius(iv.getWidth() / 50).sampling(10).capture(iv).into(iv);
-            }
-        });
-    }
-
-    public static void unBlurPost(TextView tv, ImageView iv) {
-        // TODO include custom image
-        // Can't find any info on how to unblur an ImageView through Blurry so have to reset the
-        // drawable. Look into overlay blur on image?
-        iv.setImageDrawable(tv.getContext().getDrawable(R.mipmap.img_profile_default_round));
+    public static void unblurTextView(TextView tv) {
         tv.getPaint().setMaskFilter(null);
         tv.invalidate();
+    }
+
+    public static void setImageByUrl(final UserImageView iv, final String url) {
+        NetworkUtil.getInstance(iv.getContext()).setImageUrl(iv, url);
+    }
+
+    public static void blurImageView(final NetworkImageView iv) {
+        // The Blurry library cannot be run on the UI thread as it often fails a race condition
+        // with the ImageView. Use iv.post() to delay it.
+        Blurry.with(iv.getContext()).radius(iv.getWidth() / 50).sampling(10).capture(iv).into(iv);
+    }
+
+    public static Bitmap blurBitmap(Bitmap bitmap) {
+        // TODO
+        return bitmap;
     }
 }
