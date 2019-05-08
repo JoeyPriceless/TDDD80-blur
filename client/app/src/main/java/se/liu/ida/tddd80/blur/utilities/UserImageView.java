@@ -2,17 +2,8 @@ package se.liu.ida.tddd80.blur.utilities;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.Bitmap.Config;
-import android.graphics.PorterDuff.Mode;
-import android.graphics.drawable.BitmapDrawable;
-import android.util.AttributeSet;
 import android.text.TextUtils;
-import android.widget.ImageView;
+import android.util.AttributeSet;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.ImageLoader.ImageContainer;
@@ -27,7 +18,6 @@ import se.liu.ida.tddd80.blur.R;
  * associated request.
  */
 public class UserImageView extends CircleImageView {
-	private static final int sDefaultImageRes = R.mipmap.img_profile_default;
 	private boolean mBlur;
 
 	/** The URL of the network image to load */
@@ -35,7 +25,7 @@ public class UserImageView extends CircleImageView {
 	/**
 	 * Resource ID of the image to be used as a placeholder until the network image is loaded.
 	 */
-	private int mDefaultImageId = R.mipmap.img_profile_default;
+	private int mDefaultImageId;
 	/**
 	 * Resource ID of the image to be used if the network response fails.
 	 */
