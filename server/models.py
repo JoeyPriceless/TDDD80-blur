@@ -236,18 +236,6 @@ class FeedObject(db.Model):
         }
 
 
-class UserPreference(db.Model):
-    id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
-    user = db.Column(db.String, db.ForeignKey('user.id'), unique=True)
-    language = db.Column(db.String)
-    locale = db.Column(db.String)
-
-    def __init__(self, user, language="eng", locale="se"):
-        self.user = user
-        self.language = language
-        self.locale = locale
-
-
 class UserCredentials(db.Model):
     id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
     user_id = db.Column(db.String, db.ForeignKey('user.id'), unique=True)
