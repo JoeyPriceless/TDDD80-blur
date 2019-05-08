@@ -1,6 +1,7 @@
 package se.liu.ida.tddd80.blur.activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -37,6 +38,9 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
@@ -67,6 +71,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
     private Uri imageUri = null;
     Bitmap bmFullsize = null;
     private FusedLocationProviderClient fusedLocation;
+    LocationCallback locationCallback;
 
     private NetworkUtil netUtil;
     private EditText etContent;
@@ -280,9 +285,28 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
     /**
      * Called by fusedLocation.getLastLocation() upon success.
      */
+    @SuppressLint("MissingPermission")
     @Override
     public void onSuccess(Location location) {
-        if (location == null) return;
+        if (location == null) {
+            locationCallback = new LocationCallback() {
+                @Override
+                public void onLocationResult(LocationResult locationResult) {
+                    if (locationResult == null || locationResult.getLocations().isEmpty()) {
+                        Toast.makeText(SubmitPostActivity.this, "Location unknown",
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    startLocationFetchTask(locationResult.getLastLocation());
+                    fusedLocation.removeLocationUpdates(locationCallback);
+                }
+            };
+            fusedLocation.requestLocationUpdates(LocationRequest.create(), locationCallback, null);
+        }
+        startLocationFetchTask(location);
+    }
+
+    private void startLocationFetchTask(Location location) {
         Geocoder geo = new Geocoder(this, Locale.getDefault());
         new LocationFetchTask(this).execute(location, geo);
     }

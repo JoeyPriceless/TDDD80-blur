@@ -75,7 +75,6 @@ public class FeedFragment extends Fragment implements ReactDialogFragment.ReactD
 
         swipeLayout = inflatedView.findViewById(R.id.swiperefreshlayout_feed);
         swipeLayout.setOnRefreshListener(this);
-//        swipeLayout.setColo
 
         rv = inflatedView.findViewById(R.id.recyclerview_feed);
         LinearLayoutManager lm = new LinearLayoutManager(getContext());
