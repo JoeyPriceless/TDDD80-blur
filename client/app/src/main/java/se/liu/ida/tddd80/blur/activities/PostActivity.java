@@ -72,6 +72,14 @@ public class PostActivity extends AppCompatActivity
                         post.getAuthor().getUsername());
                 ((TextView)findViewById(R.id.textview_post_time)).setText(
                         StringUtil.formatDateTimeLong(post.getTimeCreated()));
+
+                String location = post.getLocation();
+                if (location != null) {
+                    TextView tvLocation = findViewById(R.id.textview_post_location);
+                    tvLocation.setText(location);
+                    tvLocation.setVisibility(View.VISIBLE);
+                }
+
                 ((TextView)findViewById(R.id.textview_post_content)).setText(post.getContent());
 
                 btnReact = findViewById(R.id.button_post_react);

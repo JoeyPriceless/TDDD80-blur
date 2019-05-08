@@ -52,6 +52,10 @@ public class Post {
         return id;
     }
 
+    public String getLocation() {
+        return location;
+    }
+
     public boolean hasBlur() {
         if (reactions == null) return true;
         ReactionType ownReaction = reactions.getOwnReaction();

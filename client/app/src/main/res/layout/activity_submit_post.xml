@@ -20,7 +20,7 @@
         app:title="Submit post" />
 
     <EditText
-        android:id="@+id/edittext_content_submit"
+        android:id="@+id/edittext_submit_content"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
@@ -33,23 +33,23 @@
         android:inputType="textMultiLine"
         android:maxLength="240"
         android:singleLine="false"
-        app:layout_constraintBottom_toTopOf="@+id/imageview_thumbnail_submit"
+        app:layout_constraintBottom_toTopOf="@+id/imageview_submit_thumbnail"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar_submit" />
 
     <ImageView
-        android:id="@+id/imageview_thumbnail_submit"
+        android:id="@+id/imageview_submit_thumbnail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginBottom="8dp"
         android:onClick="onClickImageThumbnail"
-        app:layout_constraintBottom_toTopOf="@+id/framelayout_bottombar_submit"
+        app:layout_constraintBottom_toTopOf="@+id/contraintlayout_submit_bottombar"
         app:layout_constraintStart_toStartOf="parent" />
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/framelayout_bottombar_submit"
+        android:id="@+id/contraintlayout_submit_bottombar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
@@ -63,7 +63,7 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <ImageButton
-            android:id="@+id/button_image_submit"
+            android:id="@+id/button_submit_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
@@ -75,7 +75,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
-            android:id="@+id/button_location_submit"
+            android:id="@+id/button_submit_location"
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -93,13 +93,13 @@
             android:textAllCaps="false"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@+id/button_image_submit"
-            app:layout_constraintRight_toLeftOf="@+id/textview_charcount_submit"
+            app:layout_constraintLeft_toRightOf="@+id/button_submit_image"
+            app:layout_constraintRight_toLeftOf="@+id/textview_submit_charcount"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Linköping, Sweden, Linköping, Sweden, Linköping, Sweden" />
 
         <TextView
-            android:id="@+id/textview_charcount_submit"
+            android:id="@+id/textview_submit_charcount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="TextView"

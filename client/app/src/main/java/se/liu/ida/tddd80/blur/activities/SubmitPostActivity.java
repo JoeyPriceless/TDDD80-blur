@@ -86,10 +86,10 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
         netUtil = NetworkUtil.getInstance(this);
         maxLength = getResources().getInteger(R.integer.post_max_length);
 
-        etContent = findViewById(R.id.edittext_content_submit);
-        tvCharCount = findViewById(R.id.textview_charcount_submit);
-        ivThumbnail = findViewById(R.id.imageview_thumbnail_submit);
-        btnLocation = findViewById(R.id.button_location_submit);
+        etContent = findViewById(R.id.edittext_submit_content);
+        tvCharCount = findViewById(R.id.textview_submit_charcount);
+        ivThumbnail = findViewById(R.id.imageview_submit_thumbnail);
+        btnLocation = findViewById(R.id.button_submit_location);
         etContent.addTextChangedListener(new ContentWatcher());
         // Set content box as focused automatically.
         etContent.requestFocus();
@@ -179,7 +179,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
     }
 
     public void onClickRemoveLocation(View v) {
-        Button btnLocation = findViewById(R.id.button_location_submit);
+        Button btnLocation = findViewById(R.id.button_submit_location);
         btnLocation.setText("");
         Drawable drawableLocAdd = getDrawable(R.drawable.ic_add_location_black_24dp);
         btnLocation.setCompoundDrawablesWithIntrinsicBounds(drawableLocAdd, null, null, null);
@@ -350,7 +350,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
             // execution was finished.
             final SubmitPostActivity activity = activityReference.get();
             if (activity == null || activity.isFinishing()) return;
-            Button btnLocation = activity.findViewById(R.id.button_location_submit);
+            Button btnLocation = activity.findViewById(R.id.button_submit_location);
             btnLocation.setText(s);
             Drawable drawableLocOff = activity.getDrawable(R.drawable.ic_location_off_black_24dp);
             btnLocation.setCompoundDrawablesWithIntrinsicBounds(drawableLocOff, null, null, null);
