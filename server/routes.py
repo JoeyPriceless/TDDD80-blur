@@ -126,6 +126,11 @@ def get_profile_picture(userid):
 
 @app.route('/post/attachment/<postid>', methods=['POST'])
 def set_post_attachment(postid):
+    print('request.files[\'file\']: ' + str(request.files))
+    print('request.json ' + str(request.json))
+    print('request.forms ' + str(request.form))
+    sys.stdout.flush()
+
     post = Post.query.filter_by(id=postid).scalar()
     if post is None:
         return respond(plain_response('No user with given ID. Resource not found.'), 404)
