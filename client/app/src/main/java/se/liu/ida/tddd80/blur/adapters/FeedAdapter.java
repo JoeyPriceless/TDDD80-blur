@@ -30,6 +30,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
         public UserImageView authorImage;
         public TextView authorName;
         public TextView timestamp;
+        public TextView location;
         public TextView content;
         public Button reactButton;
         public Button commentButton;
@@ -40,6 +41,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
             authorImage = v.findViewById(R.id.imageview_feeditem_author);
             authorName = v.findViewById(R.id.textview_feeditem_author);
             timestamp = v.findViewById(R.id.textview_feeditem_time);
+            location = v.findViewById(R.id.textview_feeditem_location);
             content = v.findViewById(R.id.textview_feeditem_content);
             reactButton = v.findViewById(R.id.button_feeditem_react);
             reactButton.setOnClickListener(new View.OnClickListener() {
@@ -111,7 +113,8 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
         vh.authorName.setText(PostActivity.AUTHOR_SPACE_PADDING + post.getAuthor().getUsername());
         vh.timestamp.setText(StringUtil.formatDateTimeShort(post.getTimeCreated()));
         vh.content.setText(post.getContent());
-        ViewUtil.refreshPostViews(vh.reactButton, post, vh.authorName, vh.authorImage);
+        vh.location.setText(post.getLocation());
+        ViewUtil.refreshPostViews(vh.reactButton, post, vh.authorName, vh.location, vh.authorImage);
         // TODO
         vh.commentButton.setText("1024");
     }

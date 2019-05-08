@@ -31,7 +31,7 @@ public class ViewUtil {
      * @param button Button which drawable/text should be updated
      */
     public static void refreshPostViews(Button button, Post post, TextView tvAuthor,
-                                        UserImageView ivAuthor) {
+                                        TextView tvLocation, UserImageView ivAuthor) {
         Context context = button.getContext();
         Reactions reactions = post.getReactions();
         button.setText(String.valueOf(reactions.getScore()));
@@ -40,13 +40,14 @@ public class ViewUtil {
         button.setCompoundDrawablesWithIntrinsicBounds(buttonDrawable, null, null, null);
         ReactionType ownReaction = reactions.getOwnReaction();
         if (post.hasBlur()) {
-            blurText(tvAuthor);
+            blurTextView(tvAuthor);
+            blurTextView(tvLocation);
         } else {
             colorId = ownReaction.ordinal() < ReactionType.DOWNVOTE_0.ordinal()
                     ? R.color.positiveColor
                     : R.color.negativeColor;
             unblurTextView(tvAuthor);
-
+            unblurTextView(tvLocation);
         }
         ivAuthor.setBlur(post.hasBlur());
         setImageByUrl(ivAuthor, post.getAuthorPictureUrl());
@@ -99,7 +100,7 @@ public class ViewUtil {
         pShowReactionDialog(context, fragmentManager, postId, ownReaction, null, null);
     }
 
-    public static void blurText(TextView tv) {
+    public static void blurTextView(TextView tv) {
         tv.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         float radius = tv.getTextSize() / (float)3.5;
         BlurMaskFilter filter = new BlurMaskFilter(radius, BlurMaskFilter.Blur.NORMAL);

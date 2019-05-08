@@ -41,6 +41,7 @@ public class PostActivity extends AppCompatActivity
 	private Button btnReact;
 	private Button btnComment;
 	private UserImageView ivAuthor;
+    private TextView tvLocation;
 	private TextView tvAuthor;
 
 	@Override protected void onCreate(Bundle savedInstanceState) {
@@ -73,9 +74,9 @@ public class PostActivity extends AppCompatActivity
                 ((TextView)findViewById(R.id.textview_post_time)).setText(
                         StringUtil.formatDateTimeLong(post.getTimeCreated()));
 
+                tvLocation = findViewById(R.id.textview_post_location);
                 String location = post.getLocation();
                 if (location != null) {
-                    TextView tvLocation = findViewById(R.id.textview_post_location);
                     tvLocation.setText(location);
                     tvLocation.setVisibility(View.VISIBLE);
                 }
@@ -83,7 +84,7 @@ public class PostActivity extends AppCompatActivity
                 ((TextView)findViewById(R.id.textview_post_content)).setText(post.getContent());
 
                 btnReact = findViewById(R.id.button_post_react);
-                ViewUtil.refreshPostViews(btnReact, post, tvAuthor, ivAuthor);
+                ViewUtil.refreshPostViews(btnReact, post, tvAuthor, tvLocation, ivAuthor);
                 btnComment = findViewById(R.id.button_post_comment);
                 // TODO
                 btnComment.setText("1024");
@@ -104,7 +105,7 @@ public class PostActivity extends AppCompatActivity
     public void onClickReactionDialog(ReactDialogFragment dialog) {
         ReactionType type = ReactionType.values()[dialog.getIndex()];
         netUtil.reactToPost(post.getId(), type,
-                new ResponseListeners.ReactionSuccess(post, btnReact, tvAuthor, ivAuthor),
+                new ResponseListeners.ReactionSuccess(post, btnReact, tvAuthor, tvLocation, ivAuthor),
                 new ResponseListeners.DefaultError(this));
     }
 }

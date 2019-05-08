@@ -26,20 +26,22 @@ public class ResponseListeners {
         private Post post;
         private Button btnReact;
         private TextView tvAuthor;
+        private TextView tvLocation;
         private UserImageView ivAuthor;
 
-        public ReactionSuccess(Post post, Button btnReact, TextView tvAuthor,
+        public ReactionSuccess(Post post, Button btnReact, TextView tvAuthor, TextView tvLocation,
                                UserImageView ivAuthor) {
             this.post = post;
             this.btnReact = btnReact;
             this.tvAuthor = tvAuthor;
+            this.tvLocation = tvLocation;
             this.ivAuthor = ivAuthor;
         }
 
         @Override
         public void onResponse(JSONObject response) {
             post.setReactions(GsonUtil.getInstance().parseReactions(response));
-            ViewUtil.refreshPostViews(btnReact, post, tvAuthor, ivAuthor);
+            ViewUtil.refreshPostViews(btnReact, post, tvAuthor, tvLocation, ivAuthor);
         }
     }
 
