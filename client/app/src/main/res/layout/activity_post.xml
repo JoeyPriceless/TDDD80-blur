@@ -81,6 +81,14 @@
             app:layout_constraintTop_toBottomOf="@+id/linearlayout_post_header"
             tools:text="Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat mas" />
 
+        <com.android.volley.toolbox.NetworkImageView
+            android:id="@+id/imageview_post_attachment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
         <LinearLayout
             android:id="@+id/linearlayout_post_buttons"
             style="?android:attr/buttonBarStyle"

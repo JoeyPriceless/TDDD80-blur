@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,6 +23,7 @@ import org.json.JSONObject;
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.activities.PostActivity;
 import se.liu.ida.tddd80.blur.adapters.FeedAdapter;
+import se.liu.ida.tddd80.blur.models.Feed;
 import se.liu.ida.tddd80.blur.models.FeedType;
 import se.liu.ida.tddd80.blur.models.ReactionType;
 import se.liu.ida.tddd80.blur.utilities.GsonUtil;
@@ -29,7 +31,8 @@ import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
 import se.liu.ida.tddd80.blur.utilities.ResponseListeners;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
 
-public class FeedFragment extends Fragment implements ReactDialogFragment.ReactDialogListener {
+public class FeedFragment extends Fragment implements ReactDialogFragment.ReactDialogListener,
+        Response.Listener<JSONObject>, Response.ErrorListener, SwipeRefreshLayout.OnRefreshListener {
     private final String TAG = getClass().getSimpleName();
     private static final String ARG_FEED_NAME = "feedName";
     public static final int DIALOG_FRAGENT = 1;
@@ -38,6 +41,7 @@ public class FeedFragment extends Fragment implements ReactDialogFragment.ReactD
     private FeedAdapter adapter;
     private NetworkUtil netUtil;
     private RecyclerView rv;
+    private SwipeRefreshLayout swipeLayout;
 
     private OnFragmentInteractionListener mListener;
 
@@ -60,7 +64,7 @@ public class FeedFragment extends Fragment implements ReactDialogFragment.ReactD
             feedType = FeedType.valueOf((String)getArguments().get(ARG_FEED_NAME));
         }
         netUtil = NetworkUtil.getInstance(getContext());
-        netUtil.getFeed(feedType, new FeedResponseListener(), new FeedResponseErrorListener());
+        netUtil.getFeed(feedType, this, this);
     }
 
     @Override
@@ -68,12 +72,65 @@ public class FeedFragment extends Fragment implements ReactDialogFragment.ReactD
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View inflatedView = inflater.inflate(R.layout.fragment_feed, container, false);
+
+        swipeLayout = inflatedView.findViewById(R.id.swiperefreshlayout_feed);
+        swipeLayout.setOnRefreshListener(this);
+//        swipeLayout.setColo
+
         rv = inflatedView.findViewById(R.id.recyclerview_feed);
         LinearLayoutManager lm = new LinearLayoutManager(getContext());
         rv.setLayoutManager(lm);
         rv.addItemDecoration(new DividerItemDecoration(rv.getContext(), lm.getOrientation()));
         rv.setHasFixedSize(true);
         return inflatedView;
+    }
+
+    @Override
+    public void onRefresh() {
+        netUtil.getFeed(feedType, this, this);
+    }
+
+    @Override
+    public void onResponse(JSONObject response) {
+        Feed feed = GsonUtil.getInstance().parseFeed(response);
+        if (adapter == null) {
+            adapter = new FeedAdapter(feed, FeedFragment.this,
+                    getFragmentManager(), new PostActivityListener());
+            rv.setAdapter(adapter);
+        } else {
+            adapter.replaceFeed(feed);
+        }
+        swipeLayout.setRefreshing(false);
+    }
+
+    @Override
+    public void onErrorResponse(VolleyError error) {
+        Log.e(TAG, StringUtil.parsePlainJsonResponse(error));
+        Toast.makeText(getContext(), "Failed to fetch feed.", Toast.LENGTH_LONG).show();
+        swipeLayout.setRefreshing(false);
+    }
+
+    /**
+     * Starts a PostActivity when user clicks on a post in the feed
+     */
+    private class PostActivityListener implements FeedAdapter.OnPostClickListener {
+        @Override
+        public void onPostClick(String postId) {
+            Intent postActivityIntent = new Intent(getContext(), PostActivity.class);
+            postActivityIntent.putExtra(PostActivity.EXTRA_POST_ID, postId);
+            startActivity(postActivityIntent);
+        }
+    }
+
+    /**
+     * Sends the ReactionType chosen in a ReactDialogFragment to the server.
+     */
+    @Override
+    public void onClickReactionDialog(ReactDialogFragment dialog) {
+        ReactionType type = ReactionType.values()[dialog.getIndex()];
+        NetworkUtil.getInstance(getContext()).reactToPost(dialog.getPostId(), type,
+                new ResponseListeners.FeedReactionSuccess(adapter, dialog.getAdapterPosition()),
+                new ResponseListeners.DefaultError(getContext()));
     }
 
     public void onButtonPressed(Uri uri) {
@@ -112,46 +169,5 @@ public class FeedFragment extends Fragment implements ReactDialogFragment.ReactD
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
-    }
-
-
-    private class FeedResponseListener implements Response.Listener<JSONObject> {
-        @Override
-        public void onResponse(JSONObject response) {
-            adapter = new FeedAdapter(GsonUtil.getInstance().parseFeed(response), FeedFragment.this,
-                    getFragmentManager(), new PostActivityListener());
-            rv.setAdapter(adapter);
-        }
-    }
-
-    private class FeedResponseErrorListener implements Response.ErrorListener {
-        @Override
-        public void onErrorResponse(VolleyError error) {
-            Log.e(TAG, StringUtil.parsePlainJsonResponse(error));
-            Toast.makeText(getContext(), "Failed to fetch feed.", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    /**
-     * Starts a PostActivity when user clicks on a post in the feed
-     */
-    private class PostActivityListener implements FeedAdapter.OnPostClickListener {
-        @Override
-        public void onPostClick(String postId) {
-            Intent postActivityIntent = new Intent(getContext(), PostActivity.class);
-            postActivityIntent.putExtra(PostActivity.EXTRA_POST_ID, postId);
-            startActivity(postActivityIntent);
-        }
-    }
-
-    /**
-     * Sends the ReactionType chosen in a ReactDialogFragment to the server.
-     */
-    @Override
-    public void onClickReactionDialog(ReactDialogFragment dialog) {
-        ReactionType type = ReactionType.values()[dialog.getIndex()];
-        NetworkUtil.getInstance(getContext()).reactToPost(dialog.getPostId(), type,
-                new ResponseListeners.FeedReactionSuccess(adapter, dialog.getAdapterPosition()),
-                new ResponseListeners.DefaultError(getContext()));
     }
 }

@@ -132,4 +132,8 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
     }
 
 
+    public void replaceFeed(Feed feed) {
+        this.feed = feed;
+        notifyDataSetChanged();
+    }
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.util.Log;
+import android.widget.ImageView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -299,20 +300,20 @@ public class NetworkUtil {
         imageView.setImageUrl(url, imageLoader);
     }
 
+    public void setImageUrl(NetworkImageView imageView, String url) {
+        imageView.setImageUrl(url, imageLoader);
+    }
+
     public void sendPostAttachment(Bitmap bitmap, String postId,
                                    Listener<JSONObject> responseListener,
                                    ErrorListener errorListener) {
         String encoded = FileUtil.encodeImageFile(bitmap);
         Map<String, String> params = new HashMap<>();
-        Map<String, String> inner = new HashMap<>();
-        inner.put("file", encoded);
-        params.put("files", GsonUtil.getInstance().getGson().toJson(inner));
-//        params.put("file", );
-//        requestJsonObject(Url.build(Url.POST_ATTACHMENT_GET, postId),
-//                responseListener, errorListener, params);
+        params.put("file", encoded);
 
-        JsonObjectRequest request = new JsonObjectRequest(Method.POST, Url.build(Url.POST_ATTACHMENT_GET, postId),
-                new JSONObject(inner), responseListener, errorListener);
+        JsonObjectRequest request = new JsonObjectRequest(Method.POST,
+                Url.build(Url.POST_ATTACHMENT_GET, postId),
+                new JSONObject(params), responseListener, errorListener);
         addToQueue(request);
     }
 

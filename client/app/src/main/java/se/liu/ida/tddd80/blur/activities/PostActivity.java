@@ -86,7 +86,10 @@ public class PostActivity extends AppCompatActivity
                 ((TextView)findViewById(R.id.textview_post_content)).setText(post.getContent());
 
                 btnReact = findViewById(R.id.button_post_react);
+                NetworkImageView attachment = findViewById(R.id.imageview_post_attachment);
+                netUtil.setImageUrl(attachment, post.getPictureUrl());
                 ViewUtil.refreshPostViews(btnReact, post, tvAuthor, tvLocation, ivAuthor);
+
                 btnComment = findViewById(R.id.button_post_comment);
                 // TODO
                 btnComment.setText("1024");
