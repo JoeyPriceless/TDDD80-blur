@@ -1,5 +1,8 @@
 package se.liu.ida.tddd80.blur.fragments;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -65,16 +69,17 @@ public class ReactDialogFragment extends DialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        LinearLayout linear = view.findViewById(R.id.linearlayout_dialog_reactions);
+        final LinearLayout linear = view.findViewById(R.id.linearlayout_dialog_reactions);
         for (int i = 0; i < linear.getChildCount(); i++) {
             final int j = i;
             final ImageView iv = (ImageView)linear.getChildAt(j);
-            if (currentSelection == i + 1)
-                // Make current selection larger using layout_weight * 3
+            if (currentSelection == i + 1) {
                 setWeight(iv, 3f);
+            }
             iv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    setWeight(iv, 3f);
                     setIndex(j);
                     listener.onClickReactionDialog(ReactDialogFragment.this);
                     dismiss();
@@ -83,11 +88,11 @@ public class ReactDialogFragment extends DialogFragment {
         }
     }
 
-    private void setWeight(View v, float w) {
-        v.setLayoutParams(new LinearLayout.LayoutParams(
-                                ViewGroup.LayoutParams.WRAP_CONTENT,
-                                ViewGroup.LayoutParams.WRAP_CONTENT,
-                                w));
+    private void setWeight(View v, float weight) {
+            v.setLayoutParams(new LinearLayout.LayoutParams(
+                                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                                    weight));
     }
 
     @Override

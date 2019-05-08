@@ -14,7 +14,6 @@ public class Reactions {
     private int score;
     @SerializedName("own_reaction")
     private ReactionType ownReaction;
-    private ReactionType sentiment;
 
     public Reactions(Pair<ReactionType, Integer>... pairs) {
         for (Pair<ReactionType, Integer> pair : pairs) {
@@ -26,10 +25,6 @@ public class Reactions {
         return ownReaction;
     }
 
-    public ReactionType getSentiment() {
-        // TODO implement in response and remove placeholder value
-        return sentiment == null ? ReactionType.NEUTRAL : sentiment;
-    }
 
     public int getScore() {
         return score;

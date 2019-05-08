@@ -24,12 +24,11 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <de.hdodenhof.circleimageview.CircleImageView
+            <se.liu.ida.tddd80.blur.utilities.UserImageView
                 android:id="@+id/imageview_post_author"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="22"
-                tools:src="@mipmap/img_profile_default" />
+                android:layout_weight="22" />
 
             <LinearLayout
                 android:id="@+id/linearlayout_post_title"
@@ -57,6 +56,17 @@
                     android:layout_marginLeft="4dp"
                     android:layout_marginTop="4dp"
                     tools:text="00:34 - 1 April 2019" />
+
+                <TextView
+                    android:id="@+id/textview_post_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginTop="4dp"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:visibility="gone"
+                    tools:text="Ryd, Östergötlands Län, Sweden" />
             </LinearLayout>
         </LinearLayout>
 

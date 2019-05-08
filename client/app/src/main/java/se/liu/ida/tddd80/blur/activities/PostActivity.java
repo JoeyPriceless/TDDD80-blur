@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
+import com.android.volley.toolbox.NetworkImageView;
 import com.google.gson.JsonSyntaxException;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -24,6 +25,7 @@ import se.liu.ida.tddd80.blur.utilities.GsonUtil;
 import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
 import se.liu.ida.tddd80.blur.utilities.ResponseListeners;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
+import se.liu.ida.tddd80.blur.utilities.UserImageView;
 import se.liu.ida.tddd80.blur.utilities.ViewUtil;
 
 
@@ -38,7 +40,8 @@ public class PostActivity extends AppCompatActivity
 
 	private Button btnReact;
 	private Button btnComment;
-	private ImageView ivAuthor;
+	private UserImageView ivAuthor;
+    private TextView tvLocation;
 	private TextView tvAuthor;
 
 	@Override protected void onCreate(Bundle savedInstanceState) {
@@ -70,10 +73,18 @@ public class PostActivity extends AppCompatActivity
                         post.getAuthor().getUsername());
                 ((TextView)findViewById(R.id.textview_post_time)).setText(
                         StringUtil.formatDateTimeLong(post.getTimeCreated()));
+
+                tvLocation = findViewById(R.id.textview_post_location);
+                String location = post.getLocation();
+                if (location != null) {
+                    tvLocation.setText(location);
+                    tvLocation.setVisibility(View.VISIBLE);
+                }
+
                 ((TextView)findViewById(R.id.textview_post_content)).setText(post.getContent());
 
                 btnReact = findViewById(R.id.button_post_react);
-                ViewUtil.onReactionUpdateViews(btnReact, post.getReactions(), tvAuthor, ivAuthor);
+                ViewUtil.refreshPostViews(btnReact, post, tvAuthor, tvLocation, ivAuthor);
                 btnComment = findViewById(R.id.button_post_comment);
                 // TODO
                 btnComment.setText("1024");
@@ -94,7 +105,7 @@ public class PostActivity extends AppCompatActivity
     public void onClickReactionDialog(ReactDialogFragment dialog) {
         ReactionType type = ReactionType.values()[dialog.getIndex()];
         netUtil.reactToPost(post.getId(), type,
-                new ResponseListeners.ReactionSuccess(post, btnReact, tvAuthor, ivAuthor),
+                new ResponseListeners.ReactionSuccess(post, btnReact, tvAuthor, tvLocation, ivAuthor),
                 new ResponseListeners.DefaultError(this));
     }
 }

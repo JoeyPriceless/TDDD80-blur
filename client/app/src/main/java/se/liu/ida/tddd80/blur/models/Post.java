@@ -4,6 +4,8 @@ import com.google.gson.annotations.SerializedName;
 
 import org.joda.time.DateTime;
 
+import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
+
 public class Post {
     private String id;
     private User author;
@@ -11,11 +13,16 @@ public class Post {
     @SerializedName("time_created")
     private DateTime timeCreated; // Check json compatibility
     private Reactions reactions;
-    @SerializedName("picture_path")
-    private String picturePath = null;
-    private String localPicturePath = null;
+    private String pictureUrl;
     private String location;
 
+    public String getAuthorPictureUrl() {
+        return author.getPictureUrl();
+    }
+
+    public String getPictureUrl() {
+        return NetworkUtil.getPostAttachmentUrl(id);
+    }
 
     public User getAuthor() {
         return author;
@@ -43,5 +50,15 @@ public class Post {
 
     public String getId() {
         return id;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public boolean hasBlur() {
+        if (reactions == null) return true;
+        ReactionType ownReaction = reactions.getOwnReaction();
+        return ownReaction == null || ownReaction == ReactionType.NEUTRAL;
     }
 }
