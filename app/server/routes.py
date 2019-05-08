@@ -138,23 +138,23 @@ def set_post_attachment(postid):
         return respond(plain_response('No user with given ID. Resource not found.'), 404)
     if 'file' in request.json:
         file = request.json['file']
-        #path = os.path.join(app.config['USER_UPLOAD_FOLDER'], postid + '.jpg')
-        post.attachment_uri = file
-        # with open(path, 'wb') as fh:
-        #     print(type(file))
-        #     sys.stdout.flush()
-        db.session.commit()
-        return respond(plain_response(''), 200)
+        path = os.path.join(app.config['USER_UPLOAD_FOLDER'], postid + '.jpg')
+        with open(path, 'wb') as fh:
+            print(type(file))
+            sys.stdout.flush()
+            encoded = bytes(file, 'utf-8')
+            fh.write(encoded)
+            post.attachment_uri = path
+            db.session.commit()
+            return respond(plain_response(''), 200)
     return respond(plain_response('No file sent.'), 409)
 
 
 @app.route('/post/attachment/<postid>')
 def get_post_attachment(postid):
-    post = Post.query.filter_by(id=postid)
-    return (post.attachment_uri, 200)
-    # filename = postid + '.' + ALLOWED_EXTENSION
-    # return send_from_directory(app.config['POST_UPLOAD_FOLDER'],
-    #                            filename)
+    filename = postid + '.' + ALLOWED_EXTENSION
+    return send_from_directory(app.config['POST_UPLOAD_FOLDER'],
+                               filename)
 
 
 @app.route('/user/pref/')
