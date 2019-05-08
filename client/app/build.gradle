@@ -42,5 +42,5 @@ dependencies {
     implementation 'com.android.volley:volley:1.1.1'
     implementation 'joda-time:joda-time:2.10.1'
     implementation 'de.hdodenhof:circleimageview:3.0.0'
-    implementation 'jp.wasabeef:blurry:3.0.0'
+    implementation 'com.github.jrvansuita:GaussianBlur:v1.0.3'
 }

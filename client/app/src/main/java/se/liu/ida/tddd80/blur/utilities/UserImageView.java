@@ -7,6 +7,7 @@ import android.util.AttributeSet;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.ImageLoader.ImageContainer;
+import com.vansuita.gaussianblur.GaussianBlur;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import se.liu.ida.tddd80.blur.R;
@@ -18,7 +19,15 @@ import se.liu.ida.tddd80.blur.R;
  * associated request.
  */
 public class UserImageView extends CircleImageView {
-	private boolean mBlur;
+	public interface BitmapLoadedListener {
+		Bitmap applyBlur(Bitmap bitmap);
+	}
+
+	private BitmapLoadedListener listener;
+
+	public void setBitmapLoadedListener(BitmapLoadedListener listener) {
+		this.listener = listener;
+	}
 
 	/** The URL of the network image to load */
 	private String mUrl;
@@ -33,16 +42,11 @@ public class UserImageView extends CircleImageView {
 	/** Local copy of the ImageLoader. */
 	private ImageLoader mImageLoader;
 
-	public void setBlur(boolean mBlur) {
-		this.mBlur = mBlur;
-	}
-
 	public UserImageView(Context context) {
 		this(context, null);
 	}
 	public UserImageView(Context context, boolean blur) {
 		this(context);
-		this.mBlur = blur;
 	}
 	public UserImageView(Context context, AttributeSet attrs) {
 		this(context, attrs, 0);
@@ -65,8 +69,8 @@ public class UserImageView extends CircleImageView {
 
 	@Override
 	public void setImageBitmap(Bitmap bm) {
-		if (mBlur)
-			bm = ViewUtil.blurBitmap(bm);
+		if (listener != null)
+			bm = listener.applyBlur(bm);
 		super.setImageBitmap(bm);
 	}
 

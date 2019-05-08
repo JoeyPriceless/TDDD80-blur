@@ -14,8 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.toolbox.NetworkImageView;
+import com.vansuita.gaussianblur.GaussianBlur;
 
-import jp.wasabeef.blurry.Blurry;
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.fragments.FeedFragment;
 import se.liu.ida.tddd80.blur.fragments.ReactDialogFragment;
@@ -49,11 +49,24 @@ public class ViewUtil {
             unblurTextView(tvAuthor);
             unblurTextView(tvLocation);
         }
-        ivAuthor.setBlur(post.hasBlur());
+        ivAuthor.setBitmapLoadedListener(new DefaultBitmapListener(context));
         setImageByUrl(ivAuthor, post.getAuthorPictureUrl());
 
         int color = ContextCompat.getColor(context, colorId);
         button.setTextColor(color);
+    }
+
+    public static class DefaultBitmapListener implements UserImageView.BitmapLoadedListener {
+        private Context context;
+
+        public DefaultBitmapListener(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        public Bitmap applyBlur(Bitmap bitmap) {
+            return GaussianBlur.with(context).render(bitmap);
+        }
     }
 
     /**
@@ -119,11 +132,12 @@ public class ViewUtil {
     public static void blurImageView(final NetworkImageView iv) {
         // The Blurry library cannot be run on the UI thread as it often fails a race condition
         // with the ImageView. Use iv.post() to delay it.
-        Blurry.with(iv.getContext()).radius(iv.getWidth() / 50).sampling(10).capture(iv).into(iv);
+        //Blurry.with(iv.getContext()).radius(iv.getWidth() / 50).sampling(10).capture(iv).into(iv);
     }
 
-    public static Bitmap blurBitmap(Bitmap bitmap) {
+    public static Bitmap blurBitmap(Context context, Bitmap bitmap) {
         // TODO
-        return bitmap;
+        Bitmap blurred = GaussianBlur.with(context).size(300).radius(10).render(bitmap);
+        return blurred;
     }
 }
