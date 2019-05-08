@@ -165,8 +165,10 @@ def get_user_preference():
 @jwt_required
 def create_post():
     content = request.json['content']
+    location = request.json['location'] if request.json != "null" else None
+    
     user_id = get_jwt_identity()
-    post = Post(user_id, content)
+    post = Post(user_id, content, location=location)
     db.session.add(post)
     db.session.commit()
     return respond(plain_response(post.id))
