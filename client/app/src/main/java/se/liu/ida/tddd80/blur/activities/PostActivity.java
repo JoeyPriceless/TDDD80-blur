@@ -25,7 +25,6 @@ import se.liu.ida.tddd80.blur.utilities.GsonUtil;
 import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
 import se.liu.ida.tddd80.blur.utilities.ResponseListeners;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
-import se.liu.ida.tddd80.blur.utilities.UserImageView;
 import se.liu.ida.tddd80.blur.utilities.ViewUtil;
 
 
@@ -40,7 +39,7 @@ public class PostActivity extends AppCompatActivity
 
 	private Button btnReact;
 	private Button btnComment;
-	private UserImageView ivAuthor;
+	private ImageView ivAuthor;
     private TextView tvLocation;
 	private TextView tvAuthor;
 
@@ -87,7 +86,6 @@ public class PostActivity extends AppCompatActivity
 
                 btnReact = findViewById(R.id.button_post_react);
                 NetworkImageView attachment = findViewById(R.id.imageview_post_attachment);
-                netUtil.setImageUrl(attachment, post.getPictureUrl());
                 ViewUtil.refreshPostViews(btnReact, post, tvAuthor, tvLocation, ivAuthor);
 
                 btnComment = findViewById(R.id.button_post_comment);

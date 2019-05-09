@@ -4,9 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.util.Log;
-import android.widget.ImageView;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
@@ -15,14 +13,11 @@ import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.NetworkImageView;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -294,14 +289,6 @@ public class NetworkUtil {
 
     public static String getUserPictureUrl(String userId) {
         return Url.build(Url.USER_PICTURE_GET, userId);
-    }
-
-    public void setImageUrl(UserImageView imageView, String url) {
-        imageView.setImageUrl(url, imageLoader);
-    }
-
-    public void setImageUrl(NetworkImageView imageView, String url) {
-        imageView.setImageUrl(url, imageLoader);
     }
 
     public void sendPostAttachment(Bitmap bitmap, String postId,

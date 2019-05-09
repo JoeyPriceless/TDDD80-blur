@@ -11,7 +11,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.activities.PostActivity;
 import se.liu.ida.tddd80.blur.fragments.FeedFragment;
@@ -19,15 +18,13 @@ import se.liu.ida.tddd80.blur.models.Feed;
 import se.liu.ida.tddd80.blur.models.Post;
 import se.liu.ida.tddd80.blur.models.ReactionType;
 import se.liu.ida.tddd80.blur.models.Reactions;
-import se.liu.ida.tddd80.blur.models.User;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
-import se.liu.ida.tddd80.blur.utilities.UserImageView;
 import se.liu.ida.tddd80.blur.utilities.ViewUtil;
 
 public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public UserImageView authorImage;
+        public ImageView authorImage;
         public TextView authorName;
         public TextView timestamp;
         public TextView location;

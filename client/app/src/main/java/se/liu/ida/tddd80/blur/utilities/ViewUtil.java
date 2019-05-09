@@ -10,10 +10,12 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.toolbox.NetworkImageView;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Transformation;
 import com.vansuita.gaussianblur.GaussianBlur;
 
 import se.liu.ida.tddd80.blur.R;
@@ -31,8 +33,9 @@ public class ViewUtil {
      * @param button Button which drawable/text should be updated
      */
     public static void refreshPostViews(Button button, Post post, TextView tvAuthor,
-                                        TextView tvLocation, UserImageView ivAuthor) {
+                                        TextView tvLocation, ImageView ivAuthor) {
         Context context = button.getContext();
+        Picasso picasso = Picasso.get();
         Reactions reactions = post.getReactions();
         button.setText(String.valueOf(reactions.getScore()));
         int colorId = R.color.neutralColor;
@@ -42,30 +45,44 @@ public class ViewUtil {
         if (post.hasBlur()) {
             blurTextView(tvAuthor);
             blurTextView(tvLocation);
+            picasso.load(post.getAuthorPictureUrl())
+                    .error(R.mipmap.img_profile_default_blurred)
+                    .transform(new BlurTransformation(context))
+                    .into(ivAuthor);
         } else {
             colorId = ownReaction.ordinal() < ReactionType.DOWNVOTE_0.ordinal()
                     ? R.color.positiveColor
                     : R.color.negativeColor;
             unblurTextView(tvAuthor);
             unblurTextView(tvLocation);
+            picasso.load(post.getAuthorPictureUrl())
+                    .error(R.mipmap.img_profile_default)
+                    .into(ivAuthor);
         }
-        ivAuthor.setBitmapLoadedListener(new DefaultBitmapListener(context));
-        setImageByUrl(ivAuthor, post.getAuthorPictureUrl());
 
         int color = ContextCompat.getColor(context, colorId);
         button.setTextColor(color);
     }
 
-    public static class DefaultBitmapListener implements UserImageView.BitmapLoadedListener {
+    public static class BlurTransformation implements Transformation {
         private Context context;
 
-        public DefaultBitmapListener(Context context) {
+        public BlurTransformation(Context context) {
             this.context = context;
         }
 
         @Override
-        public Bitmap applyBlur(Bitmap bitmap) {
-            return GaussianBlur.with(context).render(bitmap);
+        public Bitmap transform(Bitmap source) {
+            Bitmap blurred = blurBitmap(context, source);
+
+            if (blurred != source)
+                source.recycle();
+            return blurred;
+        }
+
+        @Override
+        public String key() {
+            return "blur()";
         }
     }
 
@@ -125,19 +142,9 @@ public class ViewUtil {
         tv.invalidate();
     }
 
-    public static void setImageByUrl(final UserImageView iv, final String url) {
-        NetworkUtil.getInstance(iv.getContext()).setImageUrl(iv, url);
-    }
-
-    public static void blurImageView(final NetworkImageView iv) {
-        // The Blurry library cannot be run on the UI thread as it often fails a race condition
-        // with the ImageView. Use iv.post() to delay it.
-        //Blurry.with(iv.getContext()).radius(iv.getWidth() / 50).sampling(10).capture(iv).into(iv);
-    }
 
     public static Bitmap blurBitmap(Context context, Bitmap bitmap) {
-        // TODO
-        Bitmap blurred = GaussianBlur.with(context).size(300).radius(10).render(bitmap);
+        Bitmap blurred = GaussianBlur.with(context).size(200).radius(25).render(bitmap);
         return blurred;
     }
 }
