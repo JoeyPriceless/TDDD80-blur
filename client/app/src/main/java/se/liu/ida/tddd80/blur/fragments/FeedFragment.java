@@ -81,6 +81,7 @@ public class FeedFragment extends Fragment implements ReactDialogFragment.ReactD
         rv.setLayoutManager(lm);
         rv.addItemDecoration(new DividerItemDecoration(rv.getContext(), lm.getOrientation()));
         rv.setHasFixedSize(true);
+        rv.setNestedScrollingEnabled(false);
         return inflatedView;
     }
 

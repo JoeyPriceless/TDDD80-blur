@@ -3,21 +3,28 @@ package se.liu.ida.tddd80.blur.utilities;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BlurMaskFilter;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.text.TextPaint;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.toolbox.NetworkImageView;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.Transformation;
 import com.vansuita.gaussianblur.GaussianBlur;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+import jp.wasabeef.picasso.transformations.BlurTransformation;
+import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.fragments.FeedFragment;
 import se.liu.ida.tddd80.blur.fragments.ReactDialogFragment;
@@ -35,30 +42,32 @@ public class ViewUtil {
     public static void refreshPostViews(Button button, Post post, TextView tvAuthor,
                                         TextView tvLocation, ImageView ivAuthor) {
         Context context = button.getContext();
-        Picasso picasso = Picasso.get();
         Reactions reactions = post.getReactions();
         button.setText(String.valueOf(reactions.getScore()));
         int colorId = R.color.neutralColor;
         Drawable buttonDrawable = reactions.getOwnReaction().getDrawable(context);
         button.setCompoundDrawablesWithIntrinsicBounds(buttonDrawable, null, null, null);
         ReactionType ownReaction = reactions.getOwnReaction();
+        int errorRes;
         if (post.hasBlur()) {
             blurTextView(tvAuthor);
             blurTextView(tvLocation);
-            picasso.load(post.getAuthorPictureUrl())
-                    .error(R.mipmap.img_profile_default_blurred)
-                    .transform(new BlurTransformation(context))
-                    .into(ivAuthor);
+            errorRes = R.mipmap.img_profile_default_blurred_fore;
         } else {
             colorId = ownReaction.ordinal() < ReactionType.DOWNVOTE_0.ordinal()
                     ? R.color.positiveColor
                     : R.color.negativeColor;
             unblurTextView(tvAuthor);
             unblurTextView(tvLocation);
-            picasso.load(post.getAuthorPictureUrl())
-                    .error(R.mipmap.img_profile_default)
-                    .into(ivAuthor);
+            errorRes = R.mipmap.img_profile_default_fore;
         }
+
+         RequestCreator picasso = Picasso.get().load(post.getAuthorPictureUrl())
+                .noFade()
+                .error(errorRes);
+        if (post.hasBlur())
+            picasso.transform(new BlurTransformation(context));
+        picasso.into(ivAuthor);
 
         int color = ContextCompat.getColor(context, colorId);
         button.setTextColor(color);
@@ -131,13 +140,17 @@ public class ViewUtil {
     }
 
     public static void blurTextView(TextView tv) {
+        TextPaint paint = tv.getPaint();
+        if (paint.getMaskFilter() != null) return;
         tv.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        float radius = tv.getTextSize() / (float)3.5;
+        float radius = tv.getTextSize() / (float)3;
         BlurMaskFilter filter = new BlurMaskFilter(radius, BlurMaskFilter.Blur.NORMAL);
-        tv.getPaint().setMaskFilter(filter);
+        paint.setMaskFilter(filter);
     }
 
     public static void unblurTextView(TextView tv) {
+        TextPaint paint = tv.getPaint();
+        if (paint.getMaskFilter() == null) return;
         tv.getPaint().setMaskFilter(null);
         tv.invalidate();
     }

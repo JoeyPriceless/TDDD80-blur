@@ -11,6 +11,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.activities.PostActivity;
 import se.liu.ida.tddd80.blur.fragments.FeedFragment;
@@ -106,7 +108,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder vh, int i) {
         final Post post = feed.get(i);
-        // TODO
         vh.authorName.setText(PostActivity.AUTHOR_SPACE_PADDING + post.getAuthor().getUsername());
         vh.timestamp.setText(StringUtil.formatDateTimeShort(post.getTimeCreated()));
         vh.content.setText(post.getContent());
