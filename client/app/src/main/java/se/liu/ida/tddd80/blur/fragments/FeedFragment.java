@@ -105,8 +105,9 @@ public class FeedFragment extends Fragment implements ReactDialogFragment.ReactD
 
     @Override
     public void onErrorResponse(VolleyError error) {
+        int statusCode = error.networkResponse.statusCode;
         Log.e(TAG, StringUtil.parsePlainJsonResponse(error));
-        Toast.makeText(getContext(), "Failed to fetch feed.", Toast.LENGTH_LONG).show();
+        Toast.makeText(getContext(), statusCode + " Failed to fetch feed.", Toast.LENGTH_LONG).show();
         swipeLayout.setRefreshing(false);
     }
 
@@ -167,7 +168,6 @@ public class FeedFragment extends Fragment implements ReactDialogFragment.ReactD
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 }

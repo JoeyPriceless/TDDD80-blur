@@ -329,8 +329,6 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
     private void continueToPost(String postId) {
         Intent postIntent = new Intent(SubmitPostActivity.this, PostActivity.class);
         postIntent.putExtra(PostActivity.EXTRA_POST_ID, postId);
-        // TODO remove this Activity from history so back button doesn't navigate to
-        //  SubmitPostActivity
         startActivity(postIntent);
     }
 

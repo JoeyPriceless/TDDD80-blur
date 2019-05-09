@@ -92,7 +92,6 @@ public class FeedActivity extends AppCompatActivity
                     menu.removeItem(item.getItemId());
                     netUtil.logout();
                     setLoginMenuItem();
-                    // TODO reload posts in order to blur them.
                     fab.hide();
                     Toast.makeText(FeedActivity.this, "Logged out successfully",
                             Toast.LENGTH_SHORT).show();

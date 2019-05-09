@@ -65,7 +65,6 @@ public abstract class AbstractLoginActivity extends AppCompatActivity {
     protected class LoginSuccess implements Response.Listener<JSONObject> {
         @Override
         public void onResponse(JSONObject response) {
-            // TODO: User & UserId should probably be saved somewhere (Singleton?)
             try {
                 netUtil.login(response.getString(("token")));
                 netUtil.setUserId(response.getString("user_id"));

@@ -120,7 +120,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
             vh.location.setVisibility(View.GONE);
         }
         ViewUtil.refreshPostViews(vh.reactButton, post, vh.authorName, vh.location, vh.authorImage);
-        // TODO
         vh.commentButton.setText("1024");
     }
 

@@ -89,7 +89,6 @@ public class PostActivity extends AppCompatActivity
                 ViewUtil.refreshPostViews(btnReact, post, tvAuthor, tvLocation, ivAuthor);
 
                 btnComment = findViewById(R.id.button_post_comment);
-                // TODO
                 btnComment.setText("1024");
             } catch (JsonSyntaxException ex) {
                 Log.e(TAG, ExceptionUtils.getStackTrace(ex));
