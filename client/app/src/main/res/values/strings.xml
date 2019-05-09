@@ -1,12 +1,18 @@
 <resources>
     <string name="app_name">Blur</string>
-    <string-array name="reaction_strings">
-        <item>UPVOTE_0</item>
-        <item>UPVOTE_1</item>
-        <item>UPVOTE_2</item>
-        <item>DOWNVOTE_0</item>
-        <item>DOWNVOTE_1</item>
-        <item>DOWNVOTE_2</item>
+    <string-array name="reactions">
+        <item>Funny</item>
+        <item>Interesting</item>
+        <item>Educational</item>
+        <item>Hateful</item>
+        <item>Suspect</item>
+        <item>Unamusing</item>
+    </string-array>
+    <string-array name="spinner_items">
+        <item>Top</item>
+        <item>Funny</item>
+        <item>Interesting</item>
+        <item>Educational</item>
     </string-array>
 
     <!-- SharedPreferences keys -->
