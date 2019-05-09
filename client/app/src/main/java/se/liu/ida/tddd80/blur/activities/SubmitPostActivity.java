@@ -403,8 +403,8 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
                 List<Address> addresses = geo.getFromLocation(location.getLatitude(),
                         location.getLongitude(), 1);
                 return StringUtil.getLocationString(activity, addresses);
-            } catch (IOException ex) {
-                return activity.getString(R.string.location_unknown);
+            } catch (Exception ex) {
+                return "";
             }
         }
 
@@ -413,6 +413,10 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
             // execution was finished.
             final SubmitPostActivity activity = activityReference.get();
             if (activity == null || activity.isFinishing()) return;
+            if (s == null || s.isEmpty()) {
+                Toast.makeText(activity, activity.getString(R.string.location_unknown), Toast.LENGTH_SHORT).show();
+                return;
+            }
             Button btnLocation = activity.findViewById(R.id.button_submit_location);
             btnLocation.setText(s);
             Drawable drawableLocOff = activity.getDrawable(R.drawable.ic_location_off_black_24dp);
