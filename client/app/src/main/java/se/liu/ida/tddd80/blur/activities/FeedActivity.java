@@ -12,22 +12,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
-
-import java.lang.reflect.Array;
 
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.adapters.SpinnerAdapter;
 import se.liu.ida.tddd80.blur.fragments.FeedFragment;
-import se.liu.ida.tddd80.blur.models.Feed;
+import se.liu.ida.tddd80.blur.fragments.ProfileDialogFragment;
 import se.liu.ida.tddd80.blur.models.FeedType;
-import se.liu.ida.tddd80.blur.models.ReactionType;
 import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
 
 public class FeedActivity extends AppCompatActivity
-        implements FeedFragment.OnFragmentInteractionListener, AdapterView.OnItemSelectedListener {
+        implements FeedFragment.OnFragmentInteractionListener, AdapterView.OnItemSelectedListener,
+        ProfileDialogFragment.ProfileDialogListener {
     private Menu menu;
     FloatingActionButton fab;
     private NetworkUtil netUtil = NetworkUtil.getInstance(this);
@@ -88,14 +85,14 @@ public class FeedActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
 	    this.menu = menu;
 	    if (netUtil.isUserLoggedIn())
-	        setLogoutMenuItem();
+	        setLoggedInMenu();
         else
-            setLoginMenuItem();
+            setLoggedOutMenu();
         return true;
     }
 
-    private void setLoginMenuItem() {
-        menu.add(0, 0, 0, "Login").setOnMenuItemClickListener(
+    private void setLoggedOutMenu() {
+        menu.add("Login").setOnMenuItemClickListener(
             new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
@@ -104,24 +101,41 @@ public class FeedActivity extends AppCompatActivity
                     startActivity(loginIntent);
                     return true;
                 }
-            });
+            }
+        );
     }
 
-    private void setLogoutMenuItem() {
-        menu.add(0, 0, 0, "Logout").setOnMenuItemClickListener(
+    private void setLoggedInMenu() {
+        menu.add("Choose profile picture").setOnMenuItemClickListener(
+            new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    ProfileDialogFragment dialog = new ProfileDialogFragment();
+                    Bundle args = new Bundle();
+                    args.putString(ProfileDialogFragment.KEY_IMAGE_URL,
+                            netUtil.getUserPictureUrl());
+                    dialog.setArguments(args);
+                    dialog.show(getSupportFragmentManager(), getClass().getSimpleName());
+                    return true;
+                }
+            }
+        );
+
+        menu.add("Logout").setOnMenuItemClickListener(
             new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
                     netUtil = NetworkUtil.getInstance(FeedActivity.this);
                     menu.removeItem(item.getItemId());
                     netUtil.logout();
-                    setLoginMenuItem();
+                    setLoggedOutMenu();
                     fab.hide();
                     Toast.makeText(FeedActivity.this, "Logged out successfully",
                             Toast.LENGTH_SHORT).show();
                     return true;
                 }
-            });
+            }
+        );
     }
 
     @Override
@@ -132,6 +146,11 @@ public class FeedActivity extends AppCompatActivity
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+    @Override
+    public void onSetPicture(ProfileDialogFragment dialog) {
 
     }
 

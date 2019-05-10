@@ -145,39 +145,16 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
     private void openCameraIfPermitted() {
         String cameraPermission = Manifest.permission.CAMERA;
         if (checkSelfPermission(cameraPermission) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[] {cameraPermission}, IMAGE_REQUEST_CODE);
+            requestPermissions(new String[] { cameraPermission }, IMAGE_REQUEST_CODE);
         } else {
             // Check if there is any activity registered to open the camera intent.
             if (imageCaptureIntent.resolveActivity(getPackageManager()) == null)
                 Toast.makeText(this, "Could not find a camera app to launch.",
                         Toast.LENGTH_SHORT).show();
 
-            // Decide where the file is to be stored. If an image URI isn't provided, we only get a
-            // low quality ivThumbnail in the result.
-            File imageFile = null;
-            try {
-                imageFile = FileUtil.createImageFile(this);
-            } catch (IOException ex) {
-                Toast.makeText(this, "Could not create image file", Toast.LENGTH_LONG).show();
-            }
-
-            if (imageFile != null) {
-                String providerAuthority = getString(R.string.fileprovider_authority);
-                imageUri = FileProvider.getUriForFile(this, providerAuthority, imageFile);
-
-                // Have to add this to gain Uri access
-                List<ResolveInfo> resInfoList = getPackageManager().queryIntentActivities(
-                        imageCaptureIntent,PackageManager.MATCH_DEFAULT_ONLY);
-                for (ResolveInfo resolveInfo : resInfoList) {
-                    String packageName = resolveInfo.activityInfo.packageName;
-                    grantUriPermission(packageName, imageUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                            | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                }
-
+                imageUri = FileUtil.generateImageUri(this, imageCaptureIntent);
                 imageCaptureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                 startActivityForResult(imageCaptureIntent, IMAGE_REQUEST_CODE);
-            }
-
         }
     }
 

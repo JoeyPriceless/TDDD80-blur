@@ -38,21 +38,20 @@ public class NetworkUtil {
     private RequestQueue queue;
     private ImageLoader imageLoader;
     private String userId;
+    private String userIdStringKey;
     private String tokenStringKey;
     private String token;
 
-    public void login(String token) {
+    public void login(String token, String userId) {
         this.token = token;
-        storeToken();
+        this.userId = userId;
+        storeLogin();
     }
 
     public void logout() {
         token = null;
-        storeToken();
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
+        userId = null;
+        storeLogin();
     }
 
     public String getUserId() {
@@ -75,7 +74,8 @@ public class NetworkUtil {
             }
         });
         tokenStringKey = appContext.getResources().getString(R.string.token_pref_key);
-        loadToken();
+        userIdStringKey = appContext.getResources().getString(R.string.userid_pref_key);
+        loadLogin();
     }
 
     public static NetworkUtil getInstance(Context context) {
@@ -85,18 +85,20 @@ public class NetworkUtil {
         return instance;
     }
 
-    private void storeToken() {
+    private void storeLogin() {
         SharedPreferences prefs = appContext.getSharedPreferences(appContext.getPackageName(),
                 Context.MODE_PRIVATE);
         Editor editor = prefs.edit();
         editor.putString(tokenStringKey, token);
+        editor.putString(userIdStringKey, userId);
         editor.apply();
     }
 
-    private void loadToken() {
+    private void loadLogin() {
         SharedPreferences prefs = appContext.getSharedPreferences(appContext.getPackageName(),
                 Context.MODE_PRIVATE);
         token = prefs.getString(tokenStringKey, null);
+        userId = prefs.getString(userIdStringKey, null);
     }
 
     public boolean isUserLoggedIn() {
@@ -288,6 +290,10 @@ public class NetworkUtil {
     }
 
     public static String getUserPictureUrl(String userId) {
+        return Url.build(Url.USER_PICTURE_GET, userId);
+    }
+
+    public String getUserPictureUrl() {
         return Url.build(Url.USER_PICTURE_GET, userId);
     }
 

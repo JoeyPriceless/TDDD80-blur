@@ -66,8 +66,7 @@ public abstract class AbstractLoginActivity extends AppCompatActivity {
         @Override
         public void onResponse(JSONObject response) {
             try {
-                netUtil.login(response.getString(("token")));
-                netUtil.setUserId(response.getString("user_id"));
+                netUtil.login(response.getString(("token")), response.getString("user_id"));
             } catch (JSONException | JsonSyntaxException ex) {
                 parseError(ex);
             }

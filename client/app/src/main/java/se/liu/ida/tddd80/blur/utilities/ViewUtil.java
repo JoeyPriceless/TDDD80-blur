@@ -3,7 +3,6 @@ package se.liu.ida.tddd80.blur.utilities;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BlurMaskFilter;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -44,29 +43,35 @@ public class ViewUtil {
         Drawable buttonDrawable = reactions.getOwnReaction().getDrawable(context);
         button.setCompoundDrawablesWithIntrinsicBounds(buttonDrawable, null, null, null);
         ReactionType ownReaction = reactions.getOwnReaction();
-        int errorRes;
         if (post.hasBlur()) {
             blurTextView(tvAuthor);
             blurTextView(tvLocation);
-            errorRes = R.mipmap.img_profile_default_blurred_fore;
         } else {
             colorId = ownReaction.ordinal() < ReactionType.DOWNVOTE_0.ordinal()
                     ? R.color.positiveColor
                     : R.color.negativeColor;
             unblurTextView(tvAuthor);
             unblurTextView(tvLocation);
-            errorRes = R.mipmap.img_profile_default_fore;
         }
-
-         RequestCreator picasso = Picasso.get().load(post.getAuthorPictureUrl())
-                .noFade()
-                .error(errorRes);
-        if (post.hasBlur())
-            picasso.transform(new BlurTransformation(context));
-        picasso.into(ivAuthor);
+        loadProfileImage(Picasso.get(), post.getAuthorPictureUrl(), post.hasBlur(), ivAuthor);
 
         int color = ContextCompat.getColor(context, colorId);
         button.setTextColor(color);
+    }
+
+    public static void loadProfileImage(Picasso singleton, String url, boolean hasBlur,
+                                        ImageView target) {
+        int errorRes;
+        RequestCreator picasso = singleton.load(url)
+                .noFade();
+        if (hasBlur) {
+            errorRes = R.mipmap.img_profile_default_blurred_fore;
+            picasso.transform(new BlurTransformation(target.getContext()));
+        } else {
+            errorRes = R.mipmap.img_profile_default_fore;
+        }
+        picasso.error(errorRes)
+        .into(target);
     }
 
     public static class BlurTransformation implements Transformation {
