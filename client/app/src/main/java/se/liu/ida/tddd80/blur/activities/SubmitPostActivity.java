@@ -221,7 +221,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
             try {
                  bmFullsize = ImageUtil.getImageAndRotate(this, imageUri);
             } catch (IOException ex) {
-                return;
+                Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
             }
             double aspectRatio = (double)bmFullsize.getWidth() / bmFullsize.getHeight();
             int width = (int)Math.round(THUMBNAIL_HEIGHT * aspectRatio);

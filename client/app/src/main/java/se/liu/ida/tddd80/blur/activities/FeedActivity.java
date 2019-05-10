@@ -23,8 +23,7 @@ import se.liu.ida.tddd80.blur.models.FeedType;
 import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
 
 public class FeedActivity extends AppCompatActivity
-        implements FeedFragment.OnFragmentInteractionListener, AdapterView.OnItemSelectedListener,
-        ProfileDialogFragment.ProfileDialogListener {
+        implements FeedFragment.OnFragmentInteractionListener, AdapterView.OnItemSelectedListener {
     private Menu menu;
     FloatingActionButton fab;
     private NetworkUtil netUtil = NetworkUtil.getInstance(this);
@@ -146,11 +145,6 @@ public class FeedActivity extends AppCompatActivity
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-
-    }
-
-    @Override
-    public void onSetPicture(ProfileDialogFragment dialog) {
 
     }
 

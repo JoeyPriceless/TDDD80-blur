@@ -310,6 +310,11 @@ public class NetworkUtil {
         addToQueue(request);
     }
 
+    public void sendProfilePicture(Bitmap bitmap, Listener<JSONObject> responseListener,
+                                   ErrorListener errorListener) {
+
+    }
+
     /**
      * Contains endpoints for server requests which can be used to build URLs.
      */
