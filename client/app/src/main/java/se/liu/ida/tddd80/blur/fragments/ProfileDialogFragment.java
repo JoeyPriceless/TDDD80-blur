@@ -120,6 +120,7 @@ public class ProfileDialogFragment extends DialogFragment implements Response.Li
             if (imageBitmap == null) dismiss();
             netUtil.sendProfilePicture(imageBitmap, ProfileDialogFragment.this,
                     ProfileDialogFragment.this);
+            dismiss();
         }
     }
 
