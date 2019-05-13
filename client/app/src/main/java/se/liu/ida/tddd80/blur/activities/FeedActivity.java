@@ -95,7 +95,6 @@ public class FeedActivity extends AppCompatActivity
             new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
-                    menu.removeItem(item.getItemId());
                     Intent loginIntent = new Intent(FeedActivity.this, LoginActivity.class);
                     startActivity(loginIntent);
                     return true;
@@ -105,6 +104,7 @@ public class FeedActivity extends AppCompatActivity
     }
 
     private void setLoggedInMenu() {
+        menu.clear();
         menu.add("Choose profile picture").setOnMenuItemClickListener(
             new MenuItem.OnMenuItemClickListener() {
                 @Override
@@ -112,7 +112,7 @@ public class FeedActivity extends AppCompatActivity
                     ProfileDialogFragment dialog = new ProfileDialogFragment();
                     Bundle args = new Bundle();
                     args.putString(ProfileDialogFragment.KEY_IMAGE_URL,
-                            netUtil.getUserPictureUrl());
+                            netUtil.getUserPictureUri());
                     dialog.setArguments(args);
                     dialog.show(getSupportFragmentManager(), getClass().getSimpleName());
                     return true;
@@ -125,9 +125,8 @@ public class FeedActivity extends AppCompatActivity
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
                     netUtil = NetworkUtil.getInstance(FeedActivity.this);
-                    menu.removeItem(item.getItemId());
                     netUtil.logout();
-                    setLoggedOutMenu();
+                    invalidateOptionsMenu();
                     fab.hide();
                     Toast.makeText(FeedActivity.this, "Logged out successfully",
                             Toast.LENGTH_SHORT).show();

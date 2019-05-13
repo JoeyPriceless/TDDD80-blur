@@ -1,15 +1,16 @@
 package se.liu.ida.tddd80.blur.models;
 
-import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
+import com.google.gson.annotations.SerializedName;
 
 public class User {
     private String id;
     private String username;
     private String email;
-    private String pictureUrl;
+    @SerializedName("picture")
+    private String pictureUri;
 
-    public String getPictureUrl() {
-        return NetworkUtil.getUserPictureUrl(id);
+    public String getPictureUri() {
+        return pictureUri;
     }
 
     public String getId() {
@@ -24,8 +25,7 @@ public class User {
         return username;
     }
 
-    public User(String username, String email) {
-        this.username = username;
-        this.email = email;
+    public User(String id) {
+        this.id = id;
     }
 }

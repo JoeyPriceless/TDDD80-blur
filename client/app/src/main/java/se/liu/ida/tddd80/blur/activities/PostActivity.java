@@ -11,12 +11,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
-import com.android.volley.toolbox.NetworkImageView;
 import com.google.gson.JsonSyntaxException;
+import com.squareup.picasso.Picasso;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.JSONObject;
 
+import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.fragments.ReactDialogFragment;
 import se.liu.ida.tddd80.blur.models.Post;
@@ -86,6 +87,10 @@ public class PostActivity extends AppCompatActivity
 
                 btnReact = findViewById(R.id.button_post_react);
                 ImageView attachment = findViewById(R.id.imageview_post_attachment);
+                Picasso.get().load(post.getAttachmentUri())
+                        .noFade()
+                        .transform(new RoundedCornersTransformation(20, 0))
+                        .into(attachment);
                 ViewUtil.refreshPostViews(btnReact, post, tvAuthor, tvLocation, ivAuthor);
 
                 btnComment = findViewById(R.id.button_post_comment);

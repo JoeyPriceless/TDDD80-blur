@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.text.TextPaint;
 import android.view.View;
 import android.widget.Button;
@@ -37,23 +39,29 @@ public class ViewUtil {
     public static void refreshPostViews(Button button, Post post, TextView tvAuthor,
                                         TextView tvLocation, ImageView ivAuthor) {
         Context context = button.getContext();
+        String currentUserId = NetworkUtil.getInstance(context).getUserId();
+        boolean hasBlur = !(post.hasReacted() || post.getAuthor().getId().equals(currentUserId));
         Reactions reactions = post.getReactions();
         button.setText(String.valueOf(reactions.getScore()));
         int colorId = R.color.neutralColor;
         Drawable buttonDrawable = reactions.getOwnReaction().getDrawable(context);
         button.setCompoundDrawablesWithIntrinsicBounds(buttonDrawable, null, null, null);
         ReactionType ownReaction = reactions.getOwnReaction();
-        if (post.hasBlur()) {
+        if (hasBlur) {
             blurTextView(tvAuthor);
             blurTextView(tvLocation);
         } else {
-            colorId = ownReaction.ordinal() < ReactionType.DOWNVOTE_0.ordinal()
-                    ? R.color.positiveColor
-                    : R.color.negativeColor;
             unblurTextView(tvAuthor);
             unblurTextView(tvLocation);
         }
-        loadProfileImage(Picasso.get(), post.getAuthorPictureUrl(), post.hasBlur(), ivAuthor);
+
+        if (!post.hasReacted()) {
+            colorId = ownReaction.ordinal() < ReactionType.DOWNVOTE_0.ordinal()
+                    ? R.color.positiveColor
+                    : R.color.negativeColor;
+        }
+
+        loadProfileImage(Picasso.get(), post.getAuthorPictureUri(), hasBlur, ivAuthor);
 
         int color = ContextCompat.getColor(context, colorId);
         button.setTextColor(color);
@@ -61,6 +69,7 @@ public class ViewUtil {
 
     public static void loadProfileImage(Picasso singleton, String url, boolean hasBlur,
                                         ImageView target) {
+        singleton.setLoggingEnabled(true);
         int errorRes;
         RequestCreator picasso = singleton.load(url)
                 .noFade();
@@ -156,9 +165,15 @@ public class ViewUtil {
         tv.invalidate();
     }
 
-
     public static Bitmap blurBitmap(Context context, Bitmap bitmap) {
         Bitmap blurred = GaussianBlur.with(context).size(200).radius(25).render(bitmap);
         return blurred;
+    }
+
+    public static RoundedBitmapDrawable roundCorners(Context context, Bitmap bitmap, float radius) {
+        RoundedBitmapDrawable rounded = RoundedBitmapDrawableFactory
+                .create(context.getResources(), bitmap);
+        rounded.setCornerRadius(radius);
+        return rounded;
     }
 }

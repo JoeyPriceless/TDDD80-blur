@@ -4,9 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
@@ -14,16 +12,13 @@ import android.location.Location;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.content.FileProvider;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -47,9 +42,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Locale;
@@ -62,6 +55,7 @@ import se.liu.ida.tddd80.blur.utilities.ImageUtil;
 import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
 import se.liu.ida.tddd80.blur.utilities.ResponseListeners;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
+import se.liu.ida.tddd80.blur.utilities.ViewUtil;
 
 public class SubmitPostActivity extends AppCompatActivity implements Response.Listener<JSONObject>,
         OnSuccessListener<Location>, SubmitImageDialogFragment.SubmitImageDialogListener {
@@ -229,10 +223,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
             int width = (int)Math.round(THUMBNAIL_HEIGHT * aspectRatio);
             Bitmap bmThumbnail = ThumbnailUtils.extractThumbnail(bmFullsize, width,
                     THUMBNAIL_HEIGHT);
-            RoundedBitmapDrawable rounded = RoundedBitmapDrawableFactory
-                    .create(getResources(), bmThumbnail);
-            rounded.setCornerRadius(15);
-            ivThumbnail.setImageDrawable(rounded);
+            ivThumbnail.setImageDrawable(ViewUtil.roundCorners(this, bmThumbnail, 15));
         }
     }
 
@@ -300,13 +291,8 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
         if (bmFullsize == null) {
             continueToPost(postId);
         } else {
-//            netUtil.sendPostAttachment(imageUri, postId, new ImageResponseListener(postId),
-//                    new ImageErrorListener(postId));
-            new Thread(new Runnable() {
-                public void run() {
-                    netUtil.multipartRequest(postId, bmFullsize, imageUri.getPath(), "file", "image/jpeg");
-                }
-            }).start();
+            netUtil.sendPostAttachment(postId, bmFullsize, imageUri.getPath(),
+                    new ImageResponseListener(postId), new ImageErrorListener(postId));
         }
     }
 
@@ -338,8 +324,6 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
 
         @Override
         public void onErrorResponse(VolleyError error) {
-            Toast.makeText(SubmitPostActivity.this, "Unable to upload image.",
-                    Toast.LENGTH_SHORT).show();
             continueToPost(postId);
         }
     }

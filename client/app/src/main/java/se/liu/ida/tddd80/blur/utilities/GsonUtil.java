@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import se.liu.ida.tddd80.blur.models.Feed;
 import se.liu.ida.tddd80.blur.models.Post;
 import se.liu.ida.tddd80.blur.models.Reactions;
+import se.liu.ida.tddd80.blur.models.User;
 
 /**
  * Singleton class which contains a Gson instance and methods to deserialize JSONObjects into java
@@ -41,6 +42,10 @@ public class GsonUtil {
      */
     public Post parsePost(JSONObject object) {
         return gson.fromJson(object.toString(), Post.class);
+    }
+
+    public User parseUser(JSONObject object) {
+        return gson.fromJson(object.toString(), User.class);
     }
 
     public Feed parseFeed(JSONObject object) {

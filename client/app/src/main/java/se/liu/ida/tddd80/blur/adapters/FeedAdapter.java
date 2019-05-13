@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.activities.PostActivity;
 import se.liu.ida.tddd80.blur.fragments.FeedFragment;
@@ -119,6 +120,15 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
             vh.location.setText("");
             vh.location.setVisibility(View.GONE);
         }
+
+        if (post.getAttachmentUri() != null) {
+            ImageView attachment = vh.itemView.findViewById(R.id.imageview_feeditem_attachment);
+            Picasso.get().load(post.getAttachmentUri())
+                    .noFade()
+                    .transform(new RoundedCornersTransformation(20, 0))
+                    .into(attachment);
+        }
+
         ViewUtil.refreshPostViews(vh.reactButton, post, vh.authorName, vh.location, vh.authorImage);
         vh.commentButton.setText("1024");
     }

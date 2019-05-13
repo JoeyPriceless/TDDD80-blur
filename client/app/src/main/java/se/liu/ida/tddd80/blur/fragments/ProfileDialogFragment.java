@@ -1,10 +1,7 @@
 package se.liu.ida.tddd80.blur.fragments;
 
 import android.Manifest;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -26,8 +23,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONObject;
-
 import java.io.IOException;
 
 import se.liu.ida.tddd80.blur.R;
@@ -38,7 +33,7 @@ import se.liu.ida.tddd80.blur.utilities.ViewUtil;
 
 import static android.app.Activity.RESULT_OK;
 
-public class ProfileDialogFragment extends DialogFragment implements Response.Listener<JSONObject>,
+public class ProfileDialogFragment extends DialogFragment implements Response.Listener<String>,
         Response.ErrorListener {
     public static String KEY_IMAGE_URL = "IMAGE_URL";
 
@@ -118,7 +113,7 @@ public class ProfileDialogFragment extends DialogFragment implements Response.Li
         @Override
         public void onClick(View v) {
             if (imageBitmap == null) dismiss();
-            netUtil.sendProfilePicture(imageBitmap, ProfileDialogFragment.this,
+            netUtil.sendProfilePicture(imageBitmap, imageUri.getPath(), ProfileDialogFragment.this,
                     ProfileDialogFragment.this);
             dismiss();
         }
@@ -192,7 +187,7 @@ public class ProfileDialogFragment extends DialogFragment implements Response.Li
     }
 
     @Override
-    public void onResponse(JSONObject response) {
+    public void onResponse(String response) {
 
     }
 
