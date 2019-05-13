@@ -96,7 +96,7 @@ class Post(db.Model):
             },
             'location': self.location,
             'reactions': self.serialize_reactions(user_id),
-            'attatchment_uri': self.attachment_uri,
+            'attachment_uri': self.attachment_uri,
         }
 
     def serialize_reactions(self, user_id=None):

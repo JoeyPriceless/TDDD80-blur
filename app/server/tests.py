@@ -3,7 +3,6 @@ import unittest
 import json
 
 URL_ROOT = "http://127.0.0.1:5000/"
-#URL_ROOT = "https://tddd80-server.herokuapp.com/"
 
 
 class TestServerFunctions(unittest.TestCase):
@@ -38,8 +37,8 @@ class TestServerFunctions(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         post_id = get_field(r, 'response')
         reaction = 1
-        r = requests.post(URL_ROOT + "post/reactions", json={'post_id': post_id, 'reaction': reaction},
-                          headers={'Authorization': self.__class__.token})
+        requests.post(URL_ROOT + "post/reactions", json={'post_id': post_id, 'reaction': reaction},
+                      headers={'Authorization': self.__class__.token})
 
         r = requests.post(URL_ROOT + "post", json={'content': "TESTESTEST"},
                           headers={'Authorization': self.__class__.token})
