@@ -15,12 +15,6 @@ public class Reactions {
     @SerializedName("own_reaction")
     private ReactionType ownReaction;
 
-    public Reactions(Pair<ReactionType, Integer>... pairs) {
-        for (Pair<ReactionType, Integer> pair : pairs) {
-            map.put(pair.first, pair.second);
-        }
-    }
-
     public ReactionType getOwnReaction() {
         return ownReaction;
     }

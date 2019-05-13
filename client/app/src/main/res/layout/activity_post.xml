@@ -8,8 +8,8 @@
     tools:context=".activities.PostActivity">
 
     <android.support.constraint.ConstraintLayout
-        android:layout_height="wrap_content"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp">
 
@@ -32,11 +32,11 @@
 
             <LinearLayout
                 android:id="@+id/linearlayout_post_title"
-                android:gravity="center_vertical"
                 android:layout_width="0dp"
                 android:layout_height="80dp"
                 android:layout_marginLeft="10dp"
                 android:layout_weight="78"
+                android:gravity="center_vertical"
                 android:orientation="vertical">
 
                 <TextView
@@ -45,10 +45,10 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
                     android:paddingTop="2dp"
                     android:paddingBottom="4dp"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
                     tools:text=" Username can be super duper long" />
 
                 <TextView
@@ -62,9 +62,9 @@
                     android:id="@+id/textview_post_location"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:ellipsize="end"
                     android:paddingTop="4dp"
                     android:paddingBottom="2dp"
-                    android:ellipsize="end"
                     android:singleLine="true"
                     android:visibility="gone"
                     tools:text="Ryd, Östergötlands Län, Sweden" />
@@ -84,13 +84,13 @@
             app:layout_constraintTop_toBottomOf="@+id/linearlayout_post_header"
             tools:text="Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat mas" />
 
-        <com.android.volley.toolbox.NetworkImageView
+        <ImageView
             android:id="@+id/imageview_post_attachment"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_width="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/linearlayout_post_buttons" />
 
         <LinearLayout
             android:id="@+id/linearlayout_post_buttons"

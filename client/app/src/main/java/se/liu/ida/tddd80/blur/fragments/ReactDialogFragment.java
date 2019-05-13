@@ -70,6 +70,7 @@ public class ReactDialogFragment extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         final LinearLayout linear = view.findViewById(R.id.linearlayout_dialog_reactions);
+        // Make the currently selected reaction 3 times bigger than the others.
         for (int i = 0; i < linear.getChildCount(); i++) {
             final int j = i;
             final ImageView iv = (ImageView)linear.getChildAt(j);
@@ -79,7 +80,6 @@ public class ReactDialogFragment extends DialogFragment {
             iv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    setWeight(iv, 3f);
                     setIndex(j);
                     listener.onClickReactionDialog(ReactDialogFragment.this);
                     dismiss();
@@ -98,6 +98,7 @@ public class ReactDialogFragment extends DialogFragment {
     @Override
     public void onResume() {
         super.onResume();
+        // Force dialog width to match parent.
         Window window = getDialog().getWindow();
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
     }

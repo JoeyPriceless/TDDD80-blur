@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
@@ -48,6 +49,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Locale;
@@ -145,39 +147,16 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
     private void openCameraIfPermitted() {
         String cameraPermission = Manifest.permission.CAMERA;
         if (checkSelfPermission(cameraPermission) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[] {cameraPermission}, IMAGE_REQUEST_CODE);
+            requestPermissions(new String[] { cameraPermission }, IMAGE_REQUEST_CODE);
         } else {
             // Check if there is any activity registered to open the camera intent.
             if (imageCaptureIntent.resolveActivity(getPackageManager()) == null)
                 Toast.makeText(this, "Could not find a camera app to launch.",
                         Toast.LENGTH_SHORT).show();
 
-            // Decide where the file is to be stored. If an image URI isn't provided, we only get a
-            // low quality ivThumbnail in the result.
-            File imageFile = null;
-            try {
-                imageFile = FileUtil.createImageFile(this);
-            } catch (IOException ex) {
-                Toast.makeText(this, "Could not create image file", Toast.LENGTH_LONG).show();
-            }
-
-            if (imageFile != null) {
-                String providerAuthority = getString(R.string.fileprovider_authority);
-                imageUri = FileProvider.getUriForFile(this, providerAuthority, imageFile);
-
-                // Have to add this to gain Uri access
-                List<ResolveInfo> resInfoList = getPackageManager().queryIntentActivities(
-                        imageCaptureIntent,PackageManager.MATCH_DEFAULT_ONLY);
-                for (ResolveInfo resolveInfo : resInfoList) {
-                    String packageName = resolveInfo.activityInfo.packageName;
-                    grantUriPermission(packageName, imageUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                            | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                }
-
+                imageUri = FileUtil.generateImageUri(this, imageCaptureIntent);
                 imageCaptureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                 startActivityForResult(imageCaptureIntent, IMAGE_REQUEST_CODE);
-            }
-
         }
     }
 
@@ -244,7 +223,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
             try {
                  bmFullsize = ImageUtil.getImageAndRotate(this, imageUri);
             } catch (IOException ex) {
-                return;
+                Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
             }
             double aspectRatio = (double)bmFullsize.getWidth() / bmFullsize.getHeight();
             int width = (int)Math.round(THUMBNAIL_HEIGHT * aspectRatio);
@@ -316,25 +295,28 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
      */
     @Override
     public void onResponse(JSONObject response) {
-        String postId = GsonUtil.getInstance().parseString(response);
+        final String postId = GsonUtil.getInstance().parseString(response);
 
         if (bmFullsize == null) {
             continueToPost(postId);
         } else {
-            netUtil.sendPostAttachment(bmFullsize, postId, new ImageResponseListener(postId),
-                    new ImageErrorListener(postId));
+//            netUtil.sendPostAttachment(imageUri, postId, new ImageResponseListener(postId),
+//                    new ImageErrorListener(postId));
+            new Thread(new Runnable() {
+                public void run() {
+                    netUtil.multipartRequest(postId, bmFullsize, imageUri.getPath(), "file", "image/jpeg");
+                }
+            }).start();
         }
     }
 
     private void continueToPost(String postId) {
         Intent postIntent = new Intent(SubmitPostActivity.this, PostActivity.class);
         postIntent.putExtra(PostActivity.EXTRA_POST_ID, postId);
-        // TODO remove this Activity from history so back button doesn't navigate to
-        //  SubmitPostActivity
         startActivity(postIntent);
     }
 
-    private class ImageResponseListener implements Response.Listener<JSONObject> {
+    private class ImageResponseListener implements Response.Listener<String> {
         private String postId;
 
         public ImageResponseListener(String postId) {
@@ -342,7 +324,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
         }
 
         @Override
-        public void onResponse(JSONObject response) {
+        public void onResponse(String response) {
             continueToPost(postId);
         }
     }
