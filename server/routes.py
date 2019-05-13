@@ -146,6 +146,8 @@ def get_profile_picture(userid):
     user = User.query.filter_by(id=userid).scalar()
     if user is None:
         return respond(plain_response('No user exists with given ID. Resource not found.'), 404)
+    if user.picture_uri == 'null':
+        respond(plain_response('No image found for user.'), 404)
     return respond(user.picture_uri, 200)
 
 
@@ -158,7 +160,7 @@ def set_post_attachment(postid):
 
     post = Post.query.filter_by(id=postid).scalar()
     if post is None:
-        return respond(plain_response('No user with given ID. Resource not found.'), 404)
+        return respond(plain_response('No post with given ID. Resource not found.'), 404)
     if 'file' in request.files:
         file = request.files['file']
         extension = get_file_extention(file.filename)
@@ -176,6 +178,8 @@ def get_post_attachment(postid):
     post = Post.query.filter_by(id=postid).scalar()
     if post is None:
         return respond(plain_response('No post exists with given ID. Resource not found.'), 404)
+    if post.picture_uri == 'null':
+        respond(plain_response('No image found for post.'), 404)
     return respond(post.attachment_uri, 200)
 
 
