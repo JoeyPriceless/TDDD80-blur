@@ -16,10 +16,9 @@ def create_feed():
         print(f"Generating feed...")
         sys.stdout.flush()
         FeedObject.query.delete()
-        posts = Post.query.order_by(Post.time_created).limit(FEED_LENGTH)
+        posts = Post.query.order_by(Post.time_created).limit(FEED_BUFFER)
         for post in posts:
-            feed_object = FeedObject(post, post.reaction_score() * SCORE_MULTIPLIER /
-                                     (datetime.datetime.today() - post.time_created).total_seconds())
+            feed_object = FeedObject(post, post.reaction_score() * SCORE_MULTIPLIER / (datetime.datetime.today() - post.time_created).total_seconds())
             print(f"{feed_object.serialize()}")
             sys.stdout.flush()
             db.session.add(feed_object)
