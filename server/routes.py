@@ -5,7 +5,7 @@ from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity, get
 import sys
 import json
 import os
-import cloudinary
+from cloudinary import uploader
 from server.util import serialize_list
 USERNAME_MIN_LENGTH = 3
 USERNAME_MAX_LENGTH = 24
@@ -129,11 +129,11 @@ def set_profile_picture(userid):
     user = User.query.filter_by(id=userid).scalar()
     if user is None:
         return respond(plain_response('No user with given ID. Resource not found.'), 404)
-    if 'file' in request.json:
-        file = request.json['file']
+    if 'file' in request.files:
+        file = request.files['file']
         extension = get_file_extention(file.filename)
         if file and extension == ALLOWED_EXTENSION:
-            url = cloudinary.uploader.upload(file)['url']
+            url = uploader.upload(file)['url']
             user.picture_uri = url
             db.session.commit()
             return respond(url, 200)
@@ -163,7 +163,7 @@ def set_post_attachment(postid):
         file = request.files['file']
         extension = get_file_extention(file.filename)
         if file and extension == ALLOWED_EXTENSION:
-            url = cloudinary.uploader.upload(file)
+            url = uploader.upload(file)
             post.attachment_uri = url
             db.session.commit()
             return respond(url, 200)
