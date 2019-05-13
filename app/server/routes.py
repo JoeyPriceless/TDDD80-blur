@@ -163,7 +163,7 @@ def set_post_attachment(postid):
         file = request.files['file']
         extension = get_file_extention(file.filename)
         if file and extension == ALLOWED_EXTENSION:
-            url = uploader.upload(file)
+            url = uploader.upload(file)['url']
             post.attachment_uri = url
             db.session.commit()
             return respond(url, 200)
