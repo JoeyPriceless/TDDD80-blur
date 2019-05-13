@@ -327,5 +327,6 @@ fabric.properties
 # Own definitions
 *.idea/
 *.db
+*.jpg
 .secret
 steviewonder*
