@@ -178,7 +178,7 @@ def get_post_attachment(postid):
     post = Post.query.filter_by(id=postid).scalar()
     if post is None:
         return respond(plain_response('No post exists with given ID. Resource not found.'), 404)
-    if post.picture_uri == 'null':
+    if post.attachment_uri == 'null':
         respond(plain_response('No image found for post.'), 404)
     return respond(post.attachment_uri, 200)
 
