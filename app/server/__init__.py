@@ -1,13 +1,11 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
+import cloudinary
 import os
 
 db = SQLAlchemy()
 jwt = JWTManager()
-
-POST_UPLOAD_FOLDER = '/tmp'
-USER_UPLOAD_FOLDER = '/tmp'
 
 
 @jwt.token_in_blacklist_loader
@@ -33,8 +31,6 @@ else:  # when running locally with sqlite
     f.close()
     debug_flag = True
 
-app.config['POST_UPLOAD_FOLDER'] = POST_UPLOAD_FOLDER
-app.config['USER_UPLOAD_FOLDER'] = USER_UPLOAD_FOLDER
 app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = secret
@@ -42,6 +38,10 @@ app.config['SECRET_KEY'] = secret
 app.config['JWT_BLACKLIST_ENABLED'] = True
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 
+cloudinary.config(
+        cloud_name='de4coclvb',
+        api_key='826314483324221',
+        api_secret='PtFyJxm6yRxcxeZpVWdK4IxMgRY')
 
 with app.app_context():
     from . import routes

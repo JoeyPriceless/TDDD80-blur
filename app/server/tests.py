@@ -3,7 +3,6 @@ import unittest
 import json
 
 URL_ROOT = "http://127.0.0.1:5000/"
-#URL_ROOT = "https://tddd80-server.herokuapp.com/"
 
 
 class TestServerFunctions(unittest.TestCase):
@@ -32,7 +31,25 @@ class TestServerFunctions(unittest.TestCase):
     def test_1_feed(self):
         if self.__class__.token is None:
             self.test_0_login()
-        requests.get(URL_ROOT + "feed/", json={'username': 'test_user', 'password': 'password123'})
+
+        r = requests.post(URL_ROOT + "post", json={'content': "TESTESTEST"},
+                          headers={'Authorization': self.__class__.token})
+        self.assertEqual(r.status_code, 200)
+        post_id = get_field(r, 'response')
+        reaction = 1
+        requests.post(URL_ROOT + "post/reactions", json={'post_id': post_id, 'reaction': reaction},
+                      headers={'Authorization': self.__class__.token})
+
+        r = requests.post(URL_ROOT + "post", json={'content': "TESTESTEST"},
+                          headers={'Authorization': self.__class__.token})
+        self.assertEqual(r.status_code, 200)
+        post_id = get_field(r, 'response')
+        reaction = 2
+        r = requests.post(URL_ROOT + "post/reactions", json={'post_id': post_id, 'reaction': reaction},
+                          headers={'Authorization': self.__class__.token})
+        self.assertEqual(r.status_code, 200)
+        print(requests.get(URL_ROOT + "feed/" + "1").text)
+        print(requests.get(URL_ROOT + "feed/" + "2").text)
 
     def test_2_post(self):
         if self.__class__.token is None:

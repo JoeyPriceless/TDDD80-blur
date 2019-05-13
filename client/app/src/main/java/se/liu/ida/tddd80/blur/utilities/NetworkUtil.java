@@ -178,10 +178,9 @@ public class NetworkUtil {
     /**
      * Sends a payload data and requests JSON response from url using method (Usually POST or PUT).
      * @param url target URL. Complete URL including prefix and hostname
-     * @param method HTTP method from enum
      * @param responseListener Listener which contains actions upon success
      * @param errorListener Listener which contains actions upon failure
-     * @param data JSON data mapped in key/value format
+     * @param params JSON data mapped in key/value format
      */
     private void requestJsonObject(String url,
                                    Listener<JSONObject> responseListener,

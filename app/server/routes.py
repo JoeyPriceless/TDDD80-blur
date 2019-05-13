@@ -5,8 +5,7 @@ from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity, get
 import sys
 import json
 import os
-import base64
-
+from cloudinary import uploader
 from server.util import serialize_list
 USERNAME_MIN_LENGTH = 3
 USERNAME_MAX_LENGTH = 24
@@ -27,7 +26,7 @@ def reset_db():
 def get_feed(feedtype):
     user_id = get_jwt_identity()
     # TODO: implement proper feed creation. Currently just returns all posts
-    feed = FeedObject.query.all()
+    feed = FeedObject.get_type_sorted_feed(feedtype)
     if feed is None:
         return respond(plain_response("Feed empty! Requested resource not found."), 404)
 
@@ -105,25 +104,26 @@ def set_profile_picture(userid):
     user = User.query.filter_by(id=userid).scalar()
     if user is None:
         return respond(plain_response('No user with given ID. Resource not found.'), 404)
-    if 'file' in request.json:
-        file = request.json['file']
+    if 'file' in request.files:
+        file = request.files['file']
         extension = get_file_extention(file.filename)
         if file and extension == ALLOWED_EXTENSION:
-            filename = user.id + "." + extension
-            path = os.path.join(app.config['USER_UPLOAD_FOLDER'], filename)
-            file.save(path)
-            user.picture_path = path
+            url = uploader.upload(file)['url']
+            user.picture_uri = url
             db.session.commit()
-            return respond(plain_response(''), 200)
+            return respond(url, 200)
         return respond(plain_response('Invalid filename/extension.'), 409)
     return respond(plain_response('No file sent.'), 409)
 
 
 @app.route('/user/picture/<userid>')
 def get_profile_picture(userid):
-    filename = userid + '.' + ALLOWED_EXTENSION
-    return send_from_directory(app.config['USER_UPLOAD_FOLDER'],
-                               filename)
+    user = User.query.filter_by(id=userid).scalar()
+    if user is None:
+        return respond(plain_response('No user exists with given ID. Resource not found.'), 404)
+    if user.picture_uri == 'null':
+        respond(plain_response('No image found for user.'), 404)
+    return respond(user.picture_uri, 200)
 
 
 @app.route('/post/attachment/<postid>', methods=['POST'])
@@ -135,44 +135,34 @@ def set_post_attachment(postid):
 
     post = Post.query.filter_by(id=postid).scalar()
     if post is None:
-        return respond(plain_response('No user with given ID. Resource not found.'), 404)
-    if 'file' in request.json:
-        file = request.json['file']
-        path = os.path.join(app.config['USER_UPLOAD_FOLDER'], postid + '.jpg')
-        with open(path, 'wb') as fh:
-            print(type(file))
-            sys.stdout.flush()
-            encoded = bytes(file, 'utf-8')
-            fh.write(encoded)
-            post.attachment_uri = path
+        return respond(plain_response('No post with given ID. Resource not found.'), 404)
+    if 'file' in request.files:
+        file = request.files['file']
+        extension = get_file_extention(file.filename)
+        if file and extension == ALLOWED_EXTENSION:
+            url = uploader.upload(file)['url']
+            post.attachment_uri = url
             db.session.commit()
-            return respond(plain_response(''), 200)
+            return respond(url, 200)
+        return respond(plain_response('Invalid filename/extension.'), 409)
     return respond(plain_response('No file sent.'), 409)
 
 
 @app.route('/post/attachment/<postid>')
 def get_post_attachment(postid):
-    filename = postid + '.' + ALLOWED_EXTENSION
-    return send_from_directory(app.config['POST_UPLOAD_FOLDER'],
-                               filename)
-
-
-@app.route('/user/pref/')
-@jwt_required
-def get_user_preference():
-    userid = get_jwt_identity()
-    prefs = UserPreference.query.filter_by(user=userid).one()
-    if prefs is None:
-        return respond(
-            plain_response("The token user ID doesn't exist. Requested resource not found."), 404)
-    return respond(prefs)
+    post = Post.query.filter_by(id=postid).scalar()
+    if post is None:
+        return respond(plain_response('No post exists with given ID. Resource not found.'), 404)
+    if post.attachment_uri == 'null':
+        respond(plain_response('No image found for post.'), 404)
+    return respond(post.attachment_uri, 200)
 
 
 @app.route('/post', methods=['POST'])
 @jwt_required
 def create_post():
     content = request.json['content']
-    location = request.json['location'] if request.json != "null" else None
+    location = request.json['location'] if "location" in request.json else None
 
     user_id = get_jwt_identity()
     post = Post(user_id, content, location=location)

@@ -11,14 +11,14 @@ class User(db.Model):
     id = db.Column(db.String, unique=True, primary_key=True)
     username = db.Column(db.String, unique=True, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False)
-    picture_path = db.Column(db.String, )
+    picture_uri = db.Column(db.String)
 
-    def __init__(self, username, email, picture_path=None):
+    def __init__(self, username, email, picture_uri=None):
         self.id = uuid.uuid4().hex
         self.username = username
         self.email = email
-        if picture_path:
-            self.picture_path = picture_path
+        if picture_uri:
+            self.picture_uri = picture_uri
 
     def generate_auth_token(self):
         expires = datetime.timedelta(weeks=1)
@@ -30,7 +30,7 @@ class User(db.Model):
             'id': self.id,
             'username': self.username,
             'email': self.email,
-            'picture': self.picture_path
+            'picture': self.picture_uri
         }
 
 
@@ -65,11 +65,13 @@ class Post(db.Model):
         temp_db.session.commit()
         
     def reaction_count(self, reaction_type):
-        sq = db.session.query(PostReaction).count(PostReaction.post_id).label('count') \
-            .group_by(PostReaction.post_id).subquery()
-        result = db.session.query(Post, sq.c.count)\
-            .join(sq, sq.c.post_id == self.id, sq.c.reaction_type == reaction_type).all()
-        return result
+        score = 0
+        reactions = self.get_reactions()
+        # Score +1 if reaction type is positive and -1 if it's negative
+        # Reaction type is an int between 0-5, with the first 3 being positive reactions.
+        for reaction in reactions:
+            score += 1 if (reaction.reaction_type == int(reaction_type)) else 0
+        return score
 
     def reaction_score(self):
         score = 0
@@ -94,6 +96,7 @@ class Post(db.Model):
             },
             'location': self.location,
             'reactions': self.serialize_reactions(user_id),
+            'attachment_uri': self.attachment_uri,
         }
 
     def serialize_reactions(self, user_id=None):
@@ -215,24 +218,52 @@ class CommentReaction(db.Model):
         }
 
 
+FEED_LENGTH = 100
+
+
 class FeedObject(db.Model):
     __tablename__ = "feed"
-    FEED_HOT = "HOT"
 
     id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
-    type = db.Column(db.String, nullable=False)
     post_id = db.Column(db.String, db.ForeignKey('post.id'), unique=True)
     post = db.relationship('Post', backref='feed')
+    score = db.Column(db.Integer, nullable=False)
+    reaction_0 = db.Column(db.Integer, nullable=True)
+    reaction_1 = db.Column(db.Integer, nullable=True)
+    reaction_2 = db.Column(db.Integer, nullable=True)
+    reaction_3 = db.Column(db.Integer, nullable=True)
+    reaction_4 = db.Column(db.Integer, nullable=True)
+    reaction_5 = db.Column(db.Integer, nullable=True)
 
     def __init__(self, post, score):
-        self.type = self.FEED_HOT
         self.post = post
         self.post_id = post.id
+        self.score = score
+        self.reaction_0 = self.post.reaction_count("0")
+        self.reaction_1 = self.post.reaction_count("1")
+        self.reaction_2 = self.post.reaction_count("2")
+        self.reaction_3 = self.post.reaction_count("3")
+        self.reaction_4 = self.post.reaction_count("4")
+        self.reaction_5 = self.post.reaction_count("5")
+
+    @staticmethod
+    def get_type_sorted_feed(feed_type):
+        feed = FeedObject.query.order_by(FeedObject.reaction_0).limit(FEED_LENGTH)
+        if feed_type == "1":
+            feed = FeedObject.query.order_by(FeedObject.reaction_1).limit(FEED_LENGTH)
+        if feed_type == "2":
+            feed = FeedObject.query.order_by(FeedObject.reaction_2).limit(FEED_LENGTH)
+        if feed_type == "3":
+            feed = FeedObject.query.order_by(FeedObject.reaction_3).limit(FEED_LENGTH)
+        if feed_type == "4":
+            feed = FeedObject.query.order_by(FeedObject.reaction_4).limit(FEED_LENGTH)
+        if feed_type == "5":
+            feed = FeedObject.query.order_by(FeedObject.reaction_5).limit(FEED_LENGTH)
+        return feed.all()
 
     def serialize(self):
         return {
             'id': self.id,
-            'type': self.type,
             'post': self.post,
         }
 
