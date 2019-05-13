@@ -15,9 +15,6 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -27,18 +24,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
-import cz.msebera.android.httpclient.Header;
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.models.FeedType;
 import se.liu.ida.tddd80.blur.models.ReactionType;
@@ -178,10 +171,9 @@ public class NetworkUtil {
     /**
      * Sends a payload data and requests JSON response from url using method (Usually POST or PUT).
      * @param url target URL. Complete URL including prefix and hostname
-     * @param method HTTP method from enum
      * @param responseListener Listener which contains actions upon success
      * @param errorListener Listener which contains actions upon failure
-     * @param data JSON data mapped in key/value format
+     * @param params JSON data mapped in key/value format
      */
     private void requestJsonObject(String url,
                                    Listener<JSONObject> responseListener,
