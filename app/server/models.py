@@ -227,27 +227,29 @@ class FeedObject(db.Model):
     post_id = db.Column(db.String, db.ForeignKey('post.id'), unique=True)
     post = db.relationship('Post', backref='feed')
     score = db.Column(db.Integer, nullable=False)
+    reaction_0 = db.Column(db.Integer, nullable=True)
     reaction_1 = db.Column(db.Integer, nullable=True)
     reaction_2 = db.Column(db.Integer, nullable=True)
     reaction_3 = db.Column(db.Integer, nullable=True)
     reaction_4 = db.Column(db.Integer, nullable=True)
     reaction_5 = db.Column(db.Integer, nullable=True)
-    reaction_6 = db.Column(db.Integer, nullable=True)
 
     def __init__(self, post, score):
         self.post = post
         self.post_id = post.id
         self.score = score
+        self.reaction_0 = self.post.reaction_count("0")
         self.reaction_1 = self.post.reaction_count("1")
         self.reaction_2 = self.post.reaction_count("2")
         self.reaction_3 = self.post.reaction_count("3")
         self.reaction_4 = self.post.reaction_count("4")
         self.reaction_5 = self.post.reaction_count("5")
-        self.reaction_6 = self.post.reaction_count("6")
 
     @staticmethod
     def get_type_sorted_feed(feed_type):
-        feed = FeedObject.query.order_by(FeedObject.reaction_1).limit(FEED_LENGTH)
+        feed = FeedObject.query.order_by(FeedObject.reaction_0).limit(FEED_LENGTH)
+        if feed_type == "1":
+            feed = FeedObject.query.order_by(FeedObject.reaction_1).limit(FEED_LENGTH)
         if feed_type == "2":
             feed = FeedObject.query.order_by(FeedObject.reaction_2).limit(FEED_LENGTH)
         if feed_type == "3":
@@ -256,8 +258,6 @@ class FeedObject(db.Model):
             feed = FeedObject.query.order_by(FeedObject.reaction_4).limit(FEED_LENGTH)
         if feed_type == "5":
             feed = FeedObject.query.order_by(FeedObject.reaction_5).limit(FEED_LENGTH)
-        if feed_type == "6":
-            feed = FeedObject.query.order_by(FeedObject.reaction_6).limit(FEED_LENGTH)
         return feed.all()
 
     def serialize(self):
