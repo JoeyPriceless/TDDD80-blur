@@ -26,7 +26,6 @@ def reset_db():
 def get_feed(feedtype):
     user_id = get_jwt_identity()
     # TODO: implement proper feed creation. Currently just returns all posts
-    create_feed()
     feed = FeedObject.get_type_sorted_feed(feedtype)
     if feed is None:
         return respond(plain_response("Feed empty! Requested resource not found."), 404)
@@ -35,30 +34,6 @@ def get_feed(feedtype):
         'type': feedtype,
         'posts': [feed_object.post.serialize(user_id) for feed_object in feed]
     })
-
-
-FEED_LENGTH = 100
-SCORE_MULTIPLIER = 10
-
-
-def create_feed():
-    with app.app_context():
-        # Score = total_vote_score * multiplier / time_since_posted
-        print(f"Generating feed...")
-        sys.stdout.flush()
-        FeedObject.query.delete()
-        posts = Post.query.order_by(Post.time_created).limit(FEED_LENGTH)
-        for post in posts:
-            feed_object = FeedObject(post, post.reaction_score() * SCORE_MULTIPLIER /
-                                     (datetime.datetime.today() - post.time_created).total_seconds())
-            print(f"{feed_object.serialize()}")
-            sys.stdout.flush()
-            db.session.add(feed_object)
-
-        db.session.commit()
-        print(f"Feed generated.")
-        sys.stdout.flush()
-        # TODO: Sort through posts and compile the top.
 
 
 @app.route('/comments/<postid>')

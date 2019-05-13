@@ -3,7 +3,7 @@ from server.models import Post, FeedObject, db, app
 import datetime
 import sys
 
-FEED_LENGTH = 100
+FEED_BUFFER = 1000
 SCORE_MULTIPLIER = 10
 
 sched = BlockingScheduler()

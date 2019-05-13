@@ -218,7 +218,7 @@ class CommentReaction(db.Model):
         }
 
 
-FEED_LENGTH = 1000
+FEED_LENGTH = 100
 
 
 class FeedObject(db.Model):
