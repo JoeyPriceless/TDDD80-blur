@@ -42,6 +42,13 @@ public class FileUtil {
         return Base64.encodeToString(imageBytes, Base64.DEFAULT);
     }
 
+    public static byte[] encodeImageFileBytes(Bitmap bitmap) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+        byte[] imageBytes = baos.toByteArray();
+        return imageBytes;
+    }
+
     public static Uri generateImageUri(Context context, Intent imageCaptureIntent) {
         Uri imageUri = null;
         // Decide where the file is to be stored. If an image URI isn't provided, we only get a

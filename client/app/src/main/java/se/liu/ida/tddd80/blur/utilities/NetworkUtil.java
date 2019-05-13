@@ -3,6 +3,7 @@ package se.liu.ida.tddd80.blur.utilities;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -14,13 +15,30 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
+import cz.msebera.android.httpclient.Header;
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.models.FeedType;
 import se.liu.ida.tddd80.blur.models.ReactionType;
@@ -200,6 +218,7 @@ public class NetworkUtil {
         addToQueue(request);
     }
 
+    @SuppressWarnings("unchecked")
     private void addToQueue(Request request) {
         Log.i(TAG, String.format("%s: %s",
                 StringUtil.MethodToString(request.getMethod()), request.getUrl()));
@@ -286,7 +305,7 @@ public class NetworkUtil {
     }
 
     public static String getPostAttachmentUrl(String postId) {
-        return Url.build(Url.POST_ATTACHMENT_GET, postId);
+        return Url.build(Url.POST_ATTACHMENT, postId);
     }
 
     public static String getUserPictureUrl(String userId) {
@@ -297,17 +316,139 @@ public class NetworkUtil {
         return Url.build(Url.USER_PICTURE_GET, userId);
     }
 
-    public void sendPostAttachment(Bitmap bitmap, String postId,
-                                   Listener<JSONObject> responseListener,
+    public void sendPostAttachment(final Uri uri, String postId,
+                                   Listener<String> responseListener,
                                    ErrorListener errorListener) {
-        String encoded = FileUtil.encodeImageFile(bitmap);
-        Map<String, String> params = new HashMap<>();
-        params.put("file", encoded);
+        String url = Url.build(Url.POST_ATTACHMENT, postId);
 
-        JsonObjectRequest request = new JsonObjectRequest(Method.POST,
-                Url.build(Url.POST_ATTACHMENT_GET, postId),
-                new JSONObject(params), responseListener, errorListener);
+//        String encoded = FileUtil.encodeImageFile(bitmap);
+//        Map<String, String> params = new HashMap<>();
+//        params.put("file", encoded);
+
+//        JsonObjectRequest request = new JsonObjectRequest(Method.POST,
+//                url,
+//                new JSONObject(params), responseListener, errorListener);
+
+        File file = new File(uri.getPath());
+        Map<String, String> stringPart = new HashMap<>();
+        stringPart.put("Content-Disposition", "form-data; name=\"file\"; filename=\"" + file.getName() + "\"");
+        String BOUNDARY = "s2retfgsGSRFsERFGHfgdfgw734yhFHW567TYHSrf4yarg"; //This the boundary which is used by the server to split the post parameters.
+        String MULTIPART_FORMDATA = "multipart/form-data;boundary=" + BOUNDARY;
+        Request<String> request = new MultipartRequest(url, errorListener, responseListener, file,
+                stringPart, getHeadersAuth(MULTIPART_FORMDATA));
         addToQueue(request);
+    }
+
+    public String multipartRequest(String postId, Bitmap file, String filepath, String filefield, String fileMimeType) {
+        String urlString = Url.build(Url.POST_ATTACHMENT, postId);
+
+        HttpURLConnection connection = null;
+        DataOutputStream outputStream = null;
+        InputStream inputStream = null;
+
+        String twoHyphens = "--";
+        String boundary = "*****" + Long.toString(System.currentTimeMillis()) + "*****";
+        String lineEnd = "\r\n";
+
+        String result = "";
+
+        int bytesRead, bytesAvailable, bufferSize;
+        byte[] buffer;
+        int maxBufferSize = 1 * 1024 * 1024;
+
+        String[] q = filepath.split("/");
+        int idx = q.length - 1;
+
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+            file.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+            inputStream = new ByteArrayInputStream(bos.toByteArray());
+
+            URL url = new URL(urlString);
+            connection = (HttpURLConnection) url.openConnection();
+
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+            connection.setUseCaches(false);
+
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Connection", "Keep-Alive");
+            connection.setRequestProperty("User-Agent", "Android Multipart HTTP Client 1.0");
+            connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+
+            outputStream = new DataOutputStream(connection.getOutputStream());
+            outputStream.writeBytes(twoHyphens + boundary + lineEnd);
+            outputStream.writeBytes("Content-Disposition: form-data; name=\"" + filefield + "\"; filename=\"" + q[idx] + "\"" + lineEnd);
+            outputStream.writeBytes("Content-Type: " + fileMimeType + lineEnd);
+            outputStream.writeBytes("Content-Transfer-Encoding: binary" + lineEnd);
+
+            outputStream.writeBytes(lineEnd);
+
+            bytesAvailable = inputStream.available();
+            bufferSize = Math.min(bytesAvailable, maxBufferSize);
+            buffer = new byte[bufferSize];
+
+            bytesRead = inputStream.read(buffer, 0, bufferSize);
+            while (bytesRead > 0) {
+                outputStream.write(buffer, 0, bufferSize);
+                bytesAvailable = inputStream.available();
+                bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                bytesRead = inputStream.read(buffer, 0, bufferSize);
+            }
+
+            outputStream.writeBytes(lineEnd);
+
+//            // Upload POST Data
+//            Iterator<String> keys = parmas.keySet().iterator();
+//            while (keys.hasNext()) {
+//                String key = keys.next();
+//                String value = parmas.get(key);
+//
+//                outputStream.writeBytes(twoHyphens + boundary + lineEnd);
+//                outputStream.writeBytes("Content-Disposition: form-data; name=\"" + key + "\"" + lineEnd);
+//                outputStream.writeBytes("Content-Type: text/plain" + lineEnd);
+//                outputStream.writeBytes(lineEnd);
+//                outputStream.writeBytes(value);
+//                outputStream.writeBytes(lineEnd);
+//            }
+
+            outputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+
+            inputStream = connection.getInputStream();
+
+            result = this.convertStreamToString(inputStream);
+
+            inputStream.close();
+            outputStream.flush();
+            outputStream.close();
+
+            return result;
+        } catch (Exception e) {
+            return "";
+        }
+
+    }
+
+    private String convertStreamToString(InputStream is) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+
+        String line = null;
+        try {
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return sb.toString();
     }
 
     public void sendProfilePicture(Bitmap bitmap, Listener<JSONObject> responseListener,
@@ -320,7 +461,7 @@ public class NetworkUtil {
      */
     private enum Url {
         FEED_GET("/feed/"),
-        POST_ATTACHMENT_GET("/post/attachment/"),
+        POST_ATTACHMENT("/post/attachment/"),
         POST_CREATE("/post"),
         POST_GET("/post/"),
         POST_REACTIONS_ADD("/post/reactions"),

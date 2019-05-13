@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
@@ -48,6 +49,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Locale;
@@ -293,13 +295,18 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
      */
     @Override
     public void onResponse(JSONObject response) {
-        String postId = GsonUtil.getInstance().parseString(response);
+        final String postId = GsonUtil.getInstance().parseString(response);
 
         if (bmFullsize == null) {
             continueToPost(postId);
         } else {
-            netUtil.sendPostAttachment(bmFullsize, postId, new ImageResponseListener(postId),
-                    new ImageErrorListener(postId));
+//            netUtil.sendPostAttachment(imageUri, postId, new ImageResponseListener(postId),
+//                    new ImageErrorListener(postId));
+            new Thread(new Runnable() {
+                public void run() {
+                    netUtil.multipartRequest(postId, bmFullsize, imageUri.getPath(), "file", "image/jpeg");
+                }
+            }).start();
         }
     }
 
@@ -309,7 +316,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
         startActivity(postIntent);
     }
 
-    private class ImageResponseListener implements Response.Listener<JSONObject> {
+    private class ImageResponseListener implements Response.Listener<String> {
         private String postId;
 
         public ImageResponseListener(String postId) {
@@ -317,7 +324,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
         }
 
         @Override
-        public void onResponse(JSONObject response) {
+        public void onResponse(String response) {
             continueToPost(postId);
         }
     }
