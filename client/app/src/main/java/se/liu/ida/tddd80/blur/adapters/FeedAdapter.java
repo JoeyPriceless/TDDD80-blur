@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
 
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.activities.PostActivity;
@@ -19,15 +20,13 @@ import se.liu.ida.tddd80.blur.models.Feed;
 import se.liu.ida.tddd80.blur.models.Post;
 import se.liu.ida.tddd80.blur.models.ReactionType;
 import se.liu.ida.tddd80.blur.models.Reactions;
-import se.liu.ida.tddd80.blur.models.User;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
-import se.liu.ida.tddd80.blur.utilities.UserImageView;
 import se.liu.ida.tddd80.blur.utilities.ViewUtil;
 
 public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public UserImageView authorImage;
+        public ImageView authorImage;
         public TextView authorName;
         public TextView timestamp;
         public TextView location;
@@ -109,13 +108,18 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder vh, int i) {
         final Post post = feed.get(i);
-        // TODO
         vh.authorName.setText(PostActivity.AUTHOR_SPACE_PADDING + post.getAuthor().getUsername());
         vh.timestamp.setText(StringUtil.formatDateTimeShort(post.getTimeCreated()));
         vh.content.setText(post.getContent());
-        vh.location.setText(post.getLocation());
+        String location = post.getLocation();
+        if (location != null) {
+            vh.location.setText(PostActivity.AUTHOR_SPACE_PADDING + location);
+            vh.location.setVisibility(View.VISIBLE);
+        } else {
+            vh.location.setText("");
+            vh.location.setVisibility(View.GONE);
+        }
         ViewUtil.refreshPostViews(vh.reactButton, post, vh.authorName, vh.location, vh.authorImage);
-        // TODO
         vh.commentButton.setText("1024");
     }
 
@@ -125,4 +129,8 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
     }
 
 
+    public void replaceFeed(Feed feed) {
+        this.feed = feed;
+        notifyDataSetChanged();
+    }
 }

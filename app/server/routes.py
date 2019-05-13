@@ -129,8 +129,8 @@ def set_profile_picture(userid):
     user = User.query.filter_by(id=userid).scalar()
     if user is None:
         return respond(plain_response('No user with given ID. Resource not found.'), 404)
-    if 'file' in request.files:
-        file = request.files['file']
+    if 'file' in request.json:
+        file = request.json['file']
         extension = get_file_extention(file.filename)
         if file and extension == ALLOWED_EXTENSION:
             url = cloudinary.uploader.upload(file)['url']
@@ -151,6 +151,11 @@ def get_profile_picture(userid):
 
 @app.route('/post/attachment/<postid>', methods=['POST'])
 def set_post_attachment(postid):
+    print('request.files[\'file\']: ' + str(request.files))
+    print('request.json ' + str(request.json))
+    print('request.forms ' + str(request.form))
+    sys.stdout.flush()
+
     post = Post.query.filter_by(id=postid).scalar()
     if post is None:
         return respond(plain_response('No user with given ID. Resource not found.'), 404)

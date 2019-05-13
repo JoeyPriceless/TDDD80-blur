@@ -25,7 +25,6 @@ import se.liu.ida.tddd80.blur.utilities.GsonUtil;
 import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
 import se.liu.ida.tddd80.blur.utilities.ResponseListeners;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
-import se.liu.ida.tddd80.blur.utilities.UserImageView;
 import se.liu.ida.tddd80.blur.utilities.ViewUtil;
 
 
@@ -40,7 +39,7 @@ public class PostActivity extends AppCompatActivity
 
 	private Button btnReact;
 	private Button btnComment;
-	private UserImageView ivAuthor;
+	private ImageView ivAuthor;
     private TextView tvLocation;
 	private TextView tvAuthor;
 
@@ -69,24 +68,27 @@ public class PostActivity extends AppCompatActivity
                 // very noticeable edge rather than fading out. The space is there to provide
                 // padding. I tried adding a layout padding but the filter still used the text's
                 // position rather than it's background.
-                tvAuthor.setText(AUTHOR_SPACE_PADDING +
-                        post.getAuthor().getUsername());
+                tvAuthor.setText(AUTHOR_SPACE_PADDING + post.getAuthor().getUsername());
                 ((TextView)findViewById(R.id.textview_post_time)).setText(
                         StringUtil.formatDateTimeLong(post.getTimeCreated()));
 
                 tvLocation = findViewById(R.id.textview_post_location);
                 String location = post.getLocation();
                 if (location != null) {
-                    tvLocation.setText(location);
+                    tvLocation.setText(AUTHOR_SPACE_PADDING + location);
                     tvLocation.setVisibility(View.VISIBLE);
+                } else {
+                    tvLocation.setText("");
+                    tvLocation.setVisibility(View.GONE);
                 }
 
                 ((TextView)findViewById(R.id.textview_post_content)).setText(post.getContent());
 
                 btnReact = findViewById(R.id.button_post_react);
+                ImageView attachment = findViewById(R.id.imageview_post_attachment);
                 ViewUtil.refreshPostViews(btnReact, post, tvAuthor, tvLocation, ivAuthor);
+
                 btnComment = findViewById(R.id.button_post_comment);
-                // TODO
                 btnComment.setText("1024");
             } catch (JsonSyntaxException ex) {
                 Log.e(TAG, ExceptionUtils.getStackTrace(ex));

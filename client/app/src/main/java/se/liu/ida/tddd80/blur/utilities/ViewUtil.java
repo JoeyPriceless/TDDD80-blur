@@ -8,14 +8,18 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.text.TextPaint;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.toolbox.NetworkImageView;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
+import com.squareup.picasso.Transformation;
+import com.vansuita.gaussianblur.GaussianBlur;
 
-import jp.wasabeef.blurry.Blurry;
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.fragments.FeedFragment;
 import se.liu.ida.tddd80.blur.fragments.ReactDialogFragment;
@@ -31,7 +35,7 @@ public class ViewUtil {
      * @param button Button which drawable/text should be updated
      */
     public static void refreshPostViews(Button button, Post post, TextView tvAuthor,
-                                        TextView tvLocation, UserImageView ivAuthor) {
+                                        TextView tvLocation, ImageView ivAuthor) {
         Context context = button.getContext();
         Reactions reactions = post.getReactions();
         button.setText(String.valueOf(reactions.getScore()));
@@ -49,11 +53,47 @@ public class ViewUtil {
             unblurTextView(tvAuthor);
             unblurTextView(tvLocation);
         }
-        ivAuthor.setBlur(post.hasBlur());
-        setImageByUrl(ivAuthor, post.getAuthorPictureUrl());
+        loadProfileImage(Picasso.get(), post.getAuthorPictureUrl(), post.hasBlur(), ivAuthor);
 
         int color = ContextCompat.getColor(context, colorId);
         button.setTextColor(color);
+    }
+
+    public static void loadProfileImage(Picasso singleton, String url, boolean hasBlur,
+                                        ImageView target) {
+        int errorRes;
+        RequestCreator picasso = singleton.load(url)
+                .noFade();
+        if (hasBlur) {
+            errorRes = R.mipmap.img_profile_default_blurred_fore;
+            picasso.transform(new BlurTransformation(target.getContext()));
+        } else {
+            errorRes = R.mipmap.img_profile_default_fore;
+        }
+        picasso.error(errorRes)
+        .into(target);
+    }
+
+    public static class BlurTransformation implements Transformation {
+        private Context context;
+
+        public BlurTransformation(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        public Bitmap transform(Bitmap source) {
+            Bitmap blurred = blurBitmap(context, source);
+
+            if (blurred != source)
+                source.recycle();
+            return blurred;
+        }
+
+        @Override
+        public String key() {
+            return "blur()";
+        }
     }
 
     /**
@@ -101,29 +141,24 @@ public class ViewUtil {
     }
 
     public static void blurTextView(TextView tv) {
+        TextPaint paint = tv.getPaint();
+        if (paint.getMaskFilter() != null) return;
         tv.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        float radius = tv.getTextSize() / (float)3.5;
+        float radius = tv.getTextSize() / (float)3;
         BlurMaskFilter filter = new BlurMaskFilter(radius, BlurMaskFilter.Blur.NORMAL);
-        tv.getPaint().setMaskFilter(filter);
+        paint.setMaskFilter(filter);
     }
 
     public static void unblurTextView(TextView tv) {
+        TextPaint paint = tv.getPaint();
+        if (paint.getMaskFilter() == null) return;
         tv.getPaint().setMaskFilter(null);
         tv.invalidate();
     }
 
-    public static void setImageByUrl(final UserImageView iv, final String url) {
-        NetworkUtil.getInstance(iv.getContext()).setImageUrl(iv, url);
-    }
 
-    public static void blurImageView(final NetworkImageView iv) {
-        // The Blurry library cannot be run on the UI thread as it often fails a race condition
-        // with the ImageView. Use iv.post() to delay it.
-        Blurry.with(iv.getContext()).radius(iv.getWidth() / 50).sampling(10).capture(iv).into(iv);
-    }
-
-    public static Bitmap blurBitmap(Bitmap bitmap) {
-        // TODO
-        return bitmap;
+    public static Bitmap blurBitmap(Context context, Bitmap bitmap) {
+        Bitmap blurred = GaussianBlur.with(context).size(200).radius(25).render(bitmap);
+        return blurred;
     }
 }

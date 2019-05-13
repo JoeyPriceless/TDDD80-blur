@@ -18,12 +18,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <se.liu.ida.tddd80.blur.utilities.UserImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/imageview_feeditem_author"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="22"
-            tools:src="@mipmap/img_profile_default" />
+            tools:src="@mipmap/img_profile_default_fore" />
 
         <LinearLayout
             android:id="@+id/linearlayout_feeditem_title"
@@ -42,22 +42,23 @@
                 android:maxLines="1"
                 android:textSize="20sp"
                 android:textStyle="bold"
+                android:paddingTop="2dp"
+                android:paddingBottom="4dp"
                 tools:text="Username can be super duper long" />
 
             <TextView
                 android:id="@+id/textview_feeditem_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
-                android:layout_marginTop="4dp"
+                android:layout_marginLeft="3dp"
                 tools:text="1 Apr 2019" />
 
             <TextView
                 android:id="@+id/textview_feeditem_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
-                android:layout_marginTop="4dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="2dp"
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:visibility="gone"
