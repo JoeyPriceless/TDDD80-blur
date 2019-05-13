@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
+import cloudinary
 import os
 
 db = SQLAlchemy()
@@ -42,6 +43,10 @@ app.config['SECRET_KEY'] = secret
 app.config['JWT_BLACKLIST_ENABLED'] = True
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 
+cloudinary.config(
+        cloud_name='de4coclvb',
+        api_key='826314483324221',
+        api_secret='PtFyJxm6yRxcxeZpVWdK4IxMgRY')
 
 with app.app_context():
     from . import routes
