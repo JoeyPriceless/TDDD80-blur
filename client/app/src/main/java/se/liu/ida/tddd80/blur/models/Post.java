@@ -56,8 +56,8 @@ public class Post {
     }
 
     public boolean hasReacted() {
-        if (reactions == null) return true;
+        if (reactions == null) return false;
         ReactionType ownReaction = reactions.getOwnReaction();
-        return ownReaction == null || ownReaction == ReactionType.NEUTRAL;
+        return ownReaction != null && ownReaction != ReactionType.NEUTRAL;
     }
 }

@@ -40,12 +40,14 @@ public class ViewUtil {
                                         TextView tvLocation, ImageView ivAuthor) {
         Context context = button.getContext();
         String currentUserId = NetworkUtil.getInstance(context).getUserId();
-        boolean hasBlur = !(post.hasReacted() || post.getAuthor().getId().equals(currentUserId));
+
+        boolean hasBlur = !post.hasReacted() && !post.getAuthor().getId().equals(currentUserId);
+
         Reactions reactions = post.getReactions();
         button.setText(String.valueOf(reactions.getScore()));
-        int colorId = R.color.neutralColor;
         Drawable buttonDrawable = reactions.getOwnReaction().getDrawable(context);
         button.setCompoundDrawablesWithIntrinsicBounds(buttonDrawable, null, null, null);
+
         ReactionType ownReaction = reactions.getOwnReaction();
         if (hasBlur) {
             blurTextView(tvAuthor);
@@ -55,7 +57,8 @@ public class ViewUtil {
             unblurTextView(tvLocation);
         }
 
-        if (!post.hasReacted()) {
+        int colorId = R.color.neutralColor;
+        if (post.hasReacted()) {
             colorId = ownReaction.ordinal() < ReactionType.DOWNVOTE_0.ordinal()
                     ? R.color.positiveColor
                     : R.color.negativeColor;
@@ -69,7 +72,12 @@ public class ViewUtil {
 
     public static void loadProfileImage(Picasso singleton, String url, boolean hasBlur,
                                         ImageView target) {
-        singleton.setLoggingEnabled(true);
+        if (url == null || url.isEmpty()) {
+            int errorRes = hasBlur ? R.mipmap.img_profile_default_blurred_fore
+                    : R.mipmap.img_profile_default_fore;
+            target.setImageResource(errorRes);
+            return;
+        }
         int errorRes;
         RequestCreator picasso = singleton.load(url)
                 .noFade();

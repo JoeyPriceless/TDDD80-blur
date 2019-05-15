@@ -298,8 +298,10 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
 
     private void continueToPost(String postId) {
         Intent postIntent = new Intent(SubmitPostActivity.this, PostActivity.class);
+        postIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         postIntent.putExtra(PostActivity.EXTRA_POST_ID, postId);
         startActivity(postIntent);
+        finish();
     }
 
     private class ImageResponseListener implements Response.Listener<String> {

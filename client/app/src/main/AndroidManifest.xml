@@ -29,8 +29,7 @@
         </provider>
 
         <activity android:name=".activities.SubmitPostActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:noHistory="true"/>
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".activities.RegisterActivity" />
         <activity
             android:name=".activities.LoginActivity"

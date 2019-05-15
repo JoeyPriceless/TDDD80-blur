@@ -32,6 +32,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
         public TextView timestamp;
         public TextView location;
         public TextView content;
+        public ImageView attachment;
         public Button reactButton;
         public Button commentButton;
 
@@ -43,6 +44,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
             timestamp = v.findViewById(R.id.textview_feeditem_time);
             location = v.findViewById(R.id.textview_feeditem_location);
             content = v.findViewById(R.id.textview_feeditem_content);
+            attachment = v.findViewById(R.id.imageview_feeditem_attachment);
             reactButton = v.findViewById(R.id.button_feeditem_react);
             reactButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -122,11 +124,12 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
         }
 
         if (post.getAttachmentUri() != null) {
-            ImageView attachment = vh.itemView.findViewById(R.id.imageview_feeditem_attachment);
             Picasso.get().load(post.getAttachmentUri())
                     .noFade()
                     .transform(new RoundedCornersTransformation(20, 0))
-                    .into(attachment);
+                    .into(vh.attachment);
+        } else {
+            vh.attachment.setImageDrawable(null);
         }
 
         ViewUtil.refreshPostViews(vh.reactButton, post, vh.authorName, vh.location, vh.authorImage);
