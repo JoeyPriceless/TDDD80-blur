@@ -45,7 +45,7 @@ def get_comments(postid):
             return respond(
                 plain_response("Given post ID doesn't exist. Requested resource not found."), 404)
         return respond(plain_response("Requested post has no comments."), 404)
-    return respond(comments)
+    return respond(serialize_list(comments))
 
 
 @app.route('/post/<postid>')
@@ -179,7 +179,7 @@ def post_comment():
     post_id = request.json['post_id']
     user_id = get_jwt_identity()
     # TODO: Needs to be able to handle posting comments without a parent comment.
-    comment = Comment(user_id, content, parent, post_id)
+    comment = Comment(user_id, content, post_id)
     db.session.add(comment)
     db.session.commit()
     return respond(plain_response(comment.id))
