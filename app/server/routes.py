@@ -46,7 +46,7 @@ def get_comments(postid):
                 plain_response("Given post ID doesn't exist. Requested resource not found."), 404)
         return respond(plain_response("Requested post has no comments."), 404)
     comments_list = serialize_list(comments)
-    print(f"{json.dumps(comments_list, indent=2)}")
+    print(comments_list)
     sys.stdout.flush()
     return respond(comments_list)
 
