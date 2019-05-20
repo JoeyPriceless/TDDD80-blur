@@ -6,10 +6,6 @@ import java.util.List;
 public class CommentList {
     private List<Comment> comments;
 
-    public CommentList(ArrayList<Comment> comments) {
-        this.comments = comments;
-    }
-
     public List<Comment> getComments() {
         return comments;
     }

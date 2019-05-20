@@ -158,6 +158,7 @@ class Comment(db.Model):
 
     def serialize(self):
         author = User.query.filter_by(id=self.author_id).one()
+        score = self.reaction_score()
         return {
             'id': self.id,
             'author': author.serialize,
@@ -165,7 +166,7 @@ class Comment(db.Model):
                 'datetime': format_datetime(self.time_created)
             },
             'content': self.content,
-            'score': self.reaction_score()
+            'score': score
         }
 
 
