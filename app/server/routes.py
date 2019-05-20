@@ -182,7 +182,7 @@ def post_comment():
     post_id = request.json['post_id']
     user_id = get_jwt_identity()
     # TODO: Needs to be able to handle posting comments without a parent comment.
-    comment = Comment(user_id, content, post_id)
+    comment = Comment(user_id, content, post_id, parent_id=parent)
     db.session.add(comment)
     db.session.commit()
     return respond(plain_response(comment.id))

@@ -154,7 +154,7 @@ class TestServerFunctions(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         comment = json.loads(r.text)
         self.assertEqual(comment['content'], content)
-        self.assertEqual(comment['author_id'], self.__class__.user_id)
+        self.assertEqual(comment['author']['id'], self.__class__.user_id)
         self.assertEqual(comment['id'], comment_id)
 
         # Test that multiple root comments can be created.
@@ -168,7 +168,7 @@ class TestServerFunctions(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         comment = json.loads(r.text)
         self.assertEqual(comment['content'], content)
-        self.assertEqual(comment['author_id'], self.__class__.user_id)
+        self.assertEqual(comment['author']['id'], self.__class__.user_id)
         self.assertEqual(comment['id'], comment_id)
 
         # Test that comment chain works.
@@ -183,7 +183,7 @@ class TestServerFunctions(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         comment = json.loads(r.text)
         self.assertEqual(comment['content'], content)
-        self.assertEqual(comment['author_id'], self.__class__.user_id)
+        self.assertEqual(comment['author']['id'], self.__class__.user_id)
         self.assertEqual(comment['id'], comment_id)
         r = requests.get(URL_ROOT + "comments/chain/" + parent_id)
         self.assertEqual(r.status_code, 200)
@@ -197,16 +197,13 @@ class TestServerFunctions(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         r = requests.get(URL_ROOT + "comment/" + comment_id)
         self.assertEqual(r.status_code, 200)
-        reactions = json.loads(r.text)['reactions']
-        self.assertEqual(reactions['own_reaction'], 1)
-        self.assertEqual(reactions['score'], 1)
 
         # Test changing reaction
         reaction = '-1'
         r = requests.post(URL_ROOT + "comment/reactions", json={'comment_id': comment_id, 'reaction': reaction},
                           headers={'Authorization': self.__class__.token})
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(-1, get_field(r, 'response')['reaction_type'])
+        self.assertEqual(-1, get_field(r, 'response'))
 
         # Test removing reaction
         r = requests.post(URL_ROOT + "comment/reactions", json={'comment_id': comment_id, 'reaction': reaction},

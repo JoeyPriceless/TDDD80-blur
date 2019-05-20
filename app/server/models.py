@@ -197,7 +197,7 @@ class PostReaction(db.Model):
 class CommentReaction(db.Model):
     id = db.Column(db.Integer, autoincrement=True, unique=True, primary_key=True)
     comment_id = db.Column(db.String, db.ForeignKey('comment.id'), unique=False, nullable=False)
-    user_id = db.Column(db.String, db.ForeignKey('user.id'), unique=True, nullable=False)
+    user_id = db.Column(db.String, db.ForeignKey('user.id'), unique=False, nullable=False)
     reaction_type = db.Column(db.Integer, nullable=False)
 
     def __init__(self, comment_id, user_id, reaction_type):

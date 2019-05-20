@@ -87,7 +87,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="TextView"
+            android:text="150"
             tools:text="150" />
 
     </LinearLayout>

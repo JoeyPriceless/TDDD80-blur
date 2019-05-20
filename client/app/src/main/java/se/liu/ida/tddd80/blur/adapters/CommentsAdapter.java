@@ -1,6 +1,7 @@
 package se.liu.ida.tddd80.blur.adapters;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
@@ -40,7 +41,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             timestamp = v.findViewById(R.id.textview_comment_time);
             content = v.findViewById(R.id.textview_comment_content);
             scoreText = v.findViewById(R.id.textview_score);
-            scoreText.setText("150");
             upvButton = v.findViewById(R.id.button_upvote);
             downvButton = v.findViewById(R.id.button_downvote);
         }
@@ -89,12 +89,13 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         vh.authorName.setText(PostActivity.AUTHOR_SPACE_PADDING + comment.getAuthor().getUsername());
         vh.timestamp.setText(StringUtil.formatDateTimeShort(comment.getTimeCreated()));
         vh.content.setText(comment.getContent());
-        vh.scoreText.setText(comment.getScore());
+        vh.scoreText.setText(String.valueOf(comment.getScore()));
+        setArrowColors(comment, vh);
         vh.upvButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (comment.getOwnReaction() == 1)
-                    comment.setOwnReaction(0);
+                    comment.setOwnReaction(-1);
                 else
                     comment.setOwnReaction(1);
                 NetworkUtil.getInstance(v.getContext()).reactToComment(comment.getId(), 1,
@@ -102,19 +103,29 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
                         new ResponseListeners.DefaultError(v.getContext()));
             }
         });
-        vh.upvButton.setOnClickListener(new View.OnClickListener() {
+        vh.downvButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (comment.getOwnReaction() == -1)
-                    comment.setOwnReaction(0);
-                else
+                if (comment.getOwnReaction() == 0)
                     comment.setOwnReaction(-1);
-                NetworkUtil.getInstance(v.getContext()).reactToComment(comment.getId(), -1,
+                else
+                    comment.setOwnReaction(0);
+                NetworkUtil.getInstance(v.getContext()).reactToComment(comment.getId(), 0,
                         new ResponseListeners.CommentReactionSuccess(CommentsAdapter.this, i),
                         new ResponseListeners.DefaultError(v.getContext()));
             }
         });
-        //ViewUtil.refreshPostViews(vh.reactButton, post, vh.authorName, vh.location, vh.authorImage);
+    }
+
+    public void setArrowColors(Comment comment, ViewHolder vh) {
+        Drawable upArrow = comment.getOwnReaction() == 1?vh.itemView.getContext().getResources().getDrawable(R.drawable.ic_keyboard_arrow_up_blue_24dp):
+                vh.itemView.getContext().getResources().getDrawable(R.drawable.ic_keyboard_arrow_up_black_24dp);
+        Drawable downArrow = comment.getOwnReaction() == 0?vh.itemView.getContext().getResources().getDrawable(R.drawable.ic_keyboard_arrow_down_orange_24dp):
+                vh.itemView.getContext().getResources().getDrawable(R.drawable.ic_keyboard_arrow_down_black_24dp);
+        upArrow.setBounds( 0, 0, 100, 100 );
+        downArrow.setBounds( 0, 0, 100, 100 );
+        vh.upvButton.setCompoundDrawables(upArrow, null, null, null);
+        vh.downvButton.setCompoundDrawables(downArrow, null, null, null);
     }
 
     public void setCommentReactions(int position, int score) {
