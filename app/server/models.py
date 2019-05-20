@@ -86,6 +86,7 @@ class Post(db.Model):
         # serialized for easier gson handling according to
         # https://stackoverflow.com/a/39320732/4400799
         author = User.query.filter_by(id=self.author_id).one()
+        comments = Comment.query.filter_by(post_id=self.id).all()
         # should probably use count_reactions
         return {
             'id': self.id,
@@ -97,6 +98,7 @@ class Post(db.Model):
             'location': self.location,
             'reactions': self.serialize_reactions(user_id),
             'attachment_uri': self.attachment_uri,
+            'number_of_comments': len(comments),
         }
 
     def serialize_reactions(self, user_id=None):
