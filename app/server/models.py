@@ -160,7 +160,7 @@ class Comment(db.Model):
         author = User.query.filter_by(id=self.author_id).one()
         return {
             'id': self.id,
-            'author': author,
+            'author': author.serialize,
             'time_created': {
                 'datetime': format_datetime(self.time_created)
             },
