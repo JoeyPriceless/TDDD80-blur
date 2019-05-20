@@ -229,7 +229,7 @@ def react_to_comment():
     comment_reaction = CommentReaction.query.filter_by(comment_id=comment_id, user_id=user_id) \
         .scalar()
     if comment_reaction:
-        if comment_reaction.reaction_type == reaction:
+        if comment_reaction.reaction_type == str(reaction):
             db.session.delete(comment_reaction)
         else:
             comment_reaction.reaction_type = reaction
