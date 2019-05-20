@@ -150,7 +150,7 @@ class Comment(db.Model):
         reactions = serialize_list(CommentReaction.query.filter_by(comment_id=self.id).all())
         # Generates the requesters own reaction type if it exists.
         # If the requester isn't logged in or hasn't reacted, the value is -1.
-        own_reaction_type = "null"
+        own_reaction_type = "0"
         if user_id:
             own_reaction = CommentReaction.query.filter_by(comment_id=self.id, user_id=user_id).scalar()
             own_reaction_type = own_reaction.reaction_type if own_reaction else "null"
