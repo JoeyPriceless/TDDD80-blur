@@ -16,6 +16,8 @@ import se.liu.ida.tddd80.blur.activities.PostActivity;
 import se.liu.ida.tddd80.blur.fragments.CommentFragment;
 import se.liu.ida.tddd80.blur.models.Comment;
 import se.liu.ida.tddd80.blur.models.CommentList;
+import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
+import se.liu.ida.tddd80.blur.utilities.ResponseListeners;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
 
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHolder> {
@@ -82,13 +84,46 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final ViewHolder vh, int i) {
+    public void onBindViewHolder(@NonNull final ViewHolder vh, final int i) {
         final Comment comment = comments.get(i);
         vh.authorName.setText(PostActivity.AUTHOR_SPACE_PADDING + comment.getAuthor().getUsername());
         vh.timestamp.setText(StringUtil.formatDateTimeShort(comment.getTimeCreated()));
         vh.content.setText(comment.getContent());
-
+        vh.scoreText.setText(comment.getScore());
+        vh.upvButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (comment.getOwnReaction() == 1)
+                    comment.setOwnReaction(0);
+                else
+                    comment.setOwnReaction(1);
+                NetworkUtil.getInstance(v.getContext()).reactToComment(comment.getId(), 1,
+                        new ResponseListeners.CommentReactionSuccess(CommentsAdapter.this, i),
+                        new ResponseListeners.DefaultError(v.getContext()));
+            }
+        });
+        vh.upvButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (comment.getOwnReaction() == -1)
+                    comment.setOwnReaction(0);
+                else
+                    comment.setOwnReaction(-1);
+                NetworkUtil.getInstance(v.getContext()).reactToComment(comment.getId(), -1,
+                        new ResponseListeners.CommentReactionSuccess(CommentsAdapter.this, i),
+                        new ResponseListeners.DefaultError(v.getContext()));
+            }
+        });
         //ViewUtil.refreshPostViews(vh.reactButton, post, vh.authorName, vh.location, vh.authorImage);
+    }
+
+    public void setCommentReactions(int position, int score) {
+        Comment comment = comments.get(position);
+        comment.setScore(score);
+        // It's important not to update a post's views directly in a RecyclerView. Rather, update
+        // the model and notify the adapter.
+        // Useful resource: https://stackoverflow.com/a/48959184/4400799
+        notifyItemChanged(position);
     }
 
     @Override

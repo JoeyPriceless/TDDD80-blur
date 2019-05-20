@@ -37,6 +37,7 @@ def get_feed(feedtype):
 
 
 @app.route('/comments/<postid>')
+@jwt_optional
 def get_comments(postid):
     comments = Comment.query.filter_by(post_id=postid).all()
     if comments is None:
@@ -45,7 +46,8 @@ def get_comments(postid):
             return respond(
                 plain_response("Given post ID doesn't exist. Requested resource not found."), 404)
         return respond(plain_response("Requested post has no comments."), 404)
-    comments_list = serialize_list(comments)
+    user_id = get_jwt_identity()
+    comments_list = [comment.serialize(user_id=user_id) for comment in comments]
     return respond({'comments': comments_list})
 
 
@@ -235,7 +237,7 @@ def react_to_comment():
         comment_reaction = CommentReaction(comment_id, user_id, reaction)
         db.session.add(comment_reaction)
     db.session.commit()
-    return respond(plain_response(comment_reaction.serialize()))
+    return respond(comment.reaction_score())
 
 
 @app.route('/post/<postid>', methods=['DELETE'])

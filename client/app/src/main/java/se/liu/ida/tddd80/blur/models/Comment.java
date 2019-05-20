@@ -12,9 +12,22 @@ public class Comment {
     @SerializedName("time_created")
     private DateTime timeCreated; // Check json compatibility
     private int score;
+    private int ownReaction;
 
     public void setScore(int score) {
         this.score = score;
+    }
+
+    public void setOwnReaction(int reaction) {
+        this.ownReaction = reaction;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public int getOwnReaction() {
+        return ownReaction;
     }
 
     public String getId() {

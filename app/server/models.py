@@ -146,7 +146,7 @@ class Comment(db.Model):
             score += 1 if reaction.reaction_type == 1 else -1
         return score
 
-    def serialize_reactions(self, user_id=None):
+    def get_user_reaction(self, user_id=None):
         reactions = serialize_list(CommentReaction.query.filter_by(comment_id=self.id).all())
         # Generates the requesters own reaction type if it exists.
         # If the requester isn't logged in or hasn't reacted, the value is -1.
@@ -156,7 +156,7 @@ class Comment(db.Model):
             own_reaction_type = own_reaction.reaction_type if own_reaction else "null"
         return own_reaction_type
 
-    def serialize(self):
+    def serialize(self, user_id=None):
         author = User.query.filter_by(id=self.author_id).one()
         score = self.reaction_score()
         return {
@@ -166,7 +166,8 @@ class Comment(db.Model):
                 'datetime': format_datetime(self.time_created)
             },
             'content': self.content,
-            'score': score
+            'score': score,
+            'ownScore': self.get_user_reaction(user_id)
         }
 
 
