@@ -295,10 +295,19 @@ public class NetworkUtil {
     public void reactToPost(String postId, ReactionType reaction,
                             Listener<JSONObject> responseListener, ErrorListener errorListener) {
         Map<String, String> params = new HashMap<>();
-                    params.put("post_id", postId);
-                    params.put("reaction", String.valueOf(reaction.ordinal()));
+        params.put("post_id", postId);
+        params.put("reaction", String.valueOf(reaction.ordinal()));
         requestJsonObject(Url.build(Url.POST_REACTIONS_ADD), Method.POST, responseListener,
                                     errorListener, params);
+    }
+
+    public void reactToComment(String commentId, int reaction,
+                               Listener<JSONObject> responseListener, ErrorListener errorListener) {
+        Map<String, String> params = new HashMap<>();
+        params.put("comment_id", commentId);
+        params.put("reaction", String.valueOf(reaction));
+        requestJsonObject(Url.build(Url.COMMENT_REACT), Method.POST, responseListener,
+                errorListener, params);
     }
 
     public void getFeed(FeedType type, Listener<JSONObject> responseListener, ErrorListener
@@ -459,6 +468,7 @@ public class NetworkUtil {
         POST_REACTIONS_GET("/post/reactions/"),
         POST_COMMENTS_GET("/comments/"),
         POST_COMMENT_ADD("/comment"),
+        COMMENT_REACT("/comment/reactions"),
         ROOT("https://tddd80-server.herokuapp.com"),
         USER_CREATE("/user"),
         USER_GET("/user/"),

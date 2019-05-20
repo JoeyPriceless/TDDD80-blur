@@ -165,8 +165,7 @@ class Comment(db.Model):
                 'datetime': format_datetime(self.time_created)
             },
             'content': self.content,
-            'score': self.reaction_score(),
-            'own_score': self.serialize_reactions(self.author_id)
+            'score': self.reaction_score()
         }
 
 
