@@ -1,10 +1,9 @@
 from flask import jsonify, request
 from server.models import *
-from flask import current_app as app, send_from_directory
+from flask import current_app as app
 from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity, get_raw_jwt
 import sys
 import json
-import os
 from cloudinary import uploader
 from server.util import serialize_list
 USERNAME_MIN_LENGTH = 3
