@@ -161,7 +161,7 @@ class Comment(db.Model):
         score = self.reaction_score()
         return {
             'id': self.id,
-            'author': author.serialize,
+            'author': author.serialize(),
             'time_created': {
                 'datetime': format_datetime(self.time_created)
             },
