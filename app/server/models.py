@@ -153,7 +153,7 @@ class Comment(db.Model):
         own_reaction_type = -1
         if user_id:
             own_reaction = CommentReaction.query.filter_by(comment_id=self.id, user_id=user_id).scalar()
-            own_reaction_type = own_reaction.reaction_type if own_reaction else "null"
+            own_reaction_type = own_reaction.reaction_type if own_reaction else -1
         return str(own_reaction_type)
 
     def serialize(self, user_id=None):
