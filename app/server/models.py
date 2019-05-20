@@ -154,21 +154,19 @@ class Comment(db.Model):
         if user_id:
             own_reaction = CommentReaction.query.filter_by(comment_id=self.id, user_id=user_id).scalar()
             own_reaction_type = own_reaction.reaction_type if own_reaction else "null"
-        return {
-            'score': self.reaction_score(),
-            'own_reaction': own_reaction_type
-        }
+        return own_reaction_type
 
     def serialize(self):
+        author = User.query.filter_by(id=self.author_id).one()
         return {
             'id': self.id,
-            'author_id': self.author_id,
+            'author': author,
             'time_created': {
                 'datetime': format_datetime(self.time_created)
             },
             'content': self.content,
-            'parent': self.parent_id,
-            'reactions': self.serialize_reactions(self.author_id)
+            'score': self.reaction_score(),
+            'own_score': self.serialize_reactions(self.author_id)
         }
 
 
