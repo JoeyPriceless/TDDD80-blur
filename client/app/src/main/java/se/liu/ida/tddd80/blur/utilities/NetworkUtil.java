@@ -304,8 +304,8 @@ public class NetworkUtil {
     public void reactToComment(String commentId, int reaction,
                                Listener<JSONObject> responseListener, ErrorListener errorListener) {
         Map<String, String> params = new HashMap<>();
-        if (reaction < 0)
-            reaction = 0;
+        if (reaction < 1)
+            reaction = 1;
         params.put("comment_id", commentId);
         params.put("reaction", String.valueOf(reaction));
         requestJsonObject(Url.build(Url.COMMENT_REACT), Method.POST, responseListener,

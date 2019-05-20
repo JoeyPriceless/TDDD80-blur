@@ -106,10 +106,10 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         vh.downvButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (comment.getOwnReaction() == 2)
+                if (comment.getOwnReaction() == 1)
                     comment.setOwnReaction(0);
                 else
-                    comment.setOwnReaction(2);
+                    comment.setOwnReaction(1);
                 NetworkUtil.getInstance(v.getContext()).reactToComment(comment.getId(), 1,
                         new ResponseListeners.CommentReactionSuccess(CommentsAdapter.this, i),
                         new ResponseListeners.DefaultError(v.getContext()));
