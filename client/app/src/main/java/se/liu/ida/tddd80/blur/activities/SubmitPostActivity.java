@@ -13,6 +13,7 @@ import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -34,6 +35,7 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -65,9 +67,14 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
 
     private Intent imageCaptureIntent;
     private Uri imageUri = null;
-    Bitmap bmFullsize = null;
+    private Bitmap bmFullsize = null;
     private FusedLocationProviderClient fusedLocation;
-    LocationCallback locationCallback;
+    private LocationCallback locationCallback;
+    private static final String[] locationPermissions = new String[] {
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_NETWORK_STATE
+    };
 
     private NetworkUtil netUtil;
     private EditText etContent;
@@ -154,32 +161,6 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
         }
     }
 
-    public void onClickSetLocation(View v) {
-        getLocationIfPermitted();
-    }
-
-    public void onClickRemoveLocation(View v) {
-        Button btnLocation = findViewById(R.id.button_submit_location);
-        btnLocation.setText("");
-        Drawable drawableLocAdd = getDrawable(R.drawable.ic_add_location_black_24dp);
-        btnLocation.setCompoundDrawablesWithIntrinsicBounds(drawableLocAdd, null, null, null);
-        btnLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickSetLocation(v);
-            }
-        });
-    }
-
-    private void getLocationIfPermitted() {
-        String locationPermission = Manifest.permission.ACCESS_COARSE_LOCATION;
-        if (checkSelfPermission(locationPermission) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[] { locationPermission }, LOCATION_REQUEST_CODE);
-        } else {
-            fusedLocation.getLastLocation().addOnSuccessListener(this);
-        }
-    }
-
     @Override public void onRequestPermissionsResult(final int requestCode,
             @NonNull final String[] permissions, @NonNull final int[] grantResults) {
         int result = grantResults[0];
@@ -252,6 +233,77 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
         tvCharCount.setText(String.format("%d/%d", editable.length(), maxLength));
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopLocationUpdates();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startLocationUpdates(false);
+    }
+
+    private boolean hasLocationPermissions() {
+        for (String permission : locationPermissions) {
+            if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED)
+                return false;
+        }
+        return true;
+    }
+
+    public void onClickSetLocation(View v) {
+        getLocationIfPermitted();
+    }
+
+    @SuppressLint("MissingPermission")
+    private void getLocationIfPermitted() {
+        if (hasLocationPermissions()) {
+            fusedLocation.getLastLocation().addOnSuccessListener(this);
+        } else {
+            requestPermissions(locationPermissions, LOCATION_REQUEST_CODE);
+        }
+    }
+
+    public void onClickRemoveLocation(View v) {
+        Button btnLocation = findViewById(R.id.button_submit_location);
+        btnLocation.setText("");
+        Drawable drawableLocAdd = getDrawable(R.drawable.ic_add_location_black_24dp);
+        btnLocation.setCompoundDrawablesWithIntrinsicBounds(drawableLocAdd, null, null, null);
+        btnLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickSetLocation(v);
+            }
+        });
+    }
+
+    @SuppressLint("MissingPermission")
+    private void startLocationUpdates(final boolean getUpdates) {
+        if (hasLocationPermissions()) {
+            locationCallback = new LocationCallback() {
+                @Override
+                public void onLocationResult(LocationResult locationResult) {
+                    if (!getUpdates) return;
+                    if (locationResult == null || locationResult.getLocations().isEmpty()) {
+                        Toast.makeText(SubmitPostActivity.this, "Location unknown",
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    startLocationProcessingTask(locationResult.getLastLocation());
+                }
+            };
+            LocationRequest locationRequest = LocationRequest.create().setNumUpdates(1);
+            fusedLocation.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+        }
+    }
+
+    private void stopLocationUpdates() {
+        if (locationCallback != null)
+            fusedLocation.removeLocationUpdates(locationCallback);
+    }
+
     /**
      * Called by fusedLocation.getLastLocation() upon success.
      */
@@ -259,26 +311,66 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
     @Override
     public void onSuccess(Location location) {
         if (location == null) {
-            locationCallback = new LocationCallback() {
-                @Override
-                public void onLocationResult(LocationResult locationResult) {
-                    if (locationResult == null || locationResult.getLocations().isEmpty()) {
-                        Toast.makeText(SubmitPostActivity.this, "Location unknown",
-                                Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    startLocationFetchTask(locationResult.getLastLocation());
-                    fusedLocation.removeLocationUpdates(locationCallback);
-                }
-            };
-            fusedLocation.requestLocationUpdates(LocationRequest.create(), locationCallback, null);
+            startLocationUpdates(true);
+            return;
         }
-        startLocationFetchTask(location);
+        startLocationProcessingTask(location);
     }
 
-    private void startLocationFetchTask(Location location) {
+
+
+    private void startLocationProcessingTask(Location location) {
         Geocoder geo = new Geocoder(this, Locale.getDefault());
         new LocationFetchTask(this).execute(location, geo);
+    }
+
+    private static class LocationFetchTask extends AsyncTask<Object, Void, String> {
+        // Using static class together with WeakReference to avoid memory leaks.
+        // See https://stackoverflow.com/a/46166223/4400799
+        private WeakReference<SubmitPostActivity> activityReference;
+
+        public LocationFetchTask(SubmitPostActivity context) {
+            this.activityReference = new WeakReference<>(context);
+        }
+
+        /**
+         * @param bundle Includes Location and Geocoder, in that order.
+         */
+        @Override protected String doInBackground(final Object... bundle) {
+            final SubmitPostActivity activity = activityReference.get();
+            if (activity == null || activity.isFinishing()) return "";
+
+            Location location = (Location) bundle[0];
+            Geocoder geo = (Geocoder) bundle[1];
+            try {
+                List<Address> addresses = geo.getFromLocation(location.getLatitude(),
+                        location.getLongitude(), 1);
+                return StringUtil.getLocationString(activity, addresses);
+            } catch (Exception ex) {
+                return null;
+            }
+        }
+
+        @Override protected void onPostExecute(final String s) {
+            // Get a strong reference to activity. Don't update button if activity was closed before
+            // execution was finished.
+            final SubmitPostActivity activity = activityReference.get();
+            if (activity == null || activity.isFinishing()) return;
+            if (s == null || s.isEmpty()) {
+                Toast.makeText(activity, activity.getString(R.string.location_unknown), Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Button btnLocation = activity.findViewById(R.id.button_submit_location);
+            btnLocation.setText(s);
+            Drawable drawableLocOff = activity.getDrawable(R.drawable.ic_location_off_black_24dp);
+            btnLocation.setCompoundDrawablesWithIntrinsicBounds(drawableLocOff, null, null, null);
+            btnLocation.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    activity.onClickRemoveLocation(v);
+                }
+            });
+        }
     }
 
     /**
@@ -346,55 +438,6 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
         @Override
         public void afterTextChanged(Editable s) {
             refreshCharCount(s);
-        }
-    }
-
-    private static class LocationFetchTask extends AsyncTask<Object, Void, String> {
-        // Using static class together with WeakReference to avoid memory leaks.
-        // See https://stackoverflow.com/a/46166223/4400799
-        private WeakReference<SubmitPostActivity> activityReference;
-
-        public LocationFetchTask(SubmitPostActivity context) {
-            this.activityReference = new WeakReference<>(context);
-        }
-
-        /**
-         * @param bundle Includes Location and Geocoder, in that order.
-         */
-        @Override protected String doInBackground(final Object... bundle) {
-            final SubmitPostActivity activity = activityReference.get();
-            if (activity == null || activity.isFinishing()) return "";
-
-            Location location = (Location) bundle[0];
-            Geocoder geo = (Geocoder) bundle[1];
-            try {
-                List<Address> addresses = geo.getFromLocation(location.getLatitude(),
-                        location.getLongitude(), 1);
-                return StringUtil.getLocationString(activity, addresses);
-            } catch (Exception ex) {
-                return "";
-            }
-        }
-
-        @Override protected void onPostExecute(final String s) {
-            // Get a strong reference to activity. Don't update button if activity was closed before
-            // execution was finished.
-            final SubmitPostActivity activity = activityReference.get();
-            if (activity == null || activity.isFinishing()) return;
-            if (s == null || s.isEmpty()) {
-                Toast.makeText(activity, activity.getString(R.string.location_unknown), Toast.LENGTH_SHORT).show();
-                return;
-            }
-            Button btnLocation = activity.findViewById(R.id.button_submit_location);
-            btnLocation.setText(s);
-            Drawable drawableLocOff = activity.getDrawable(R.drawable.ic_location_off_black_24dp);
-            btnLocation.setCompoundDrawablesWithIntrinsicBounds(drawableLocOff, null, null, null);
-            btnLocation.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    activity.onClickRemoveLocation(v);
-                }
-            });
         }
     }
 
