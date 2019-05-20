@@ -12,9 +12,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,8 +35,7 @@ public class SubmitCommentActivity extends AppCompatActivity implements Response
     private Editable contentEditable;
     private TextView tvCharCount;
     private int maxLength;
-    private ImageView ivThumbnail;
-    private Button btnLocation;
+    private String postId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +43,7 @@ public class SubmitCommentActivity extends AppCompatActivity implements Response
         setContentView(R.layout.activity_submit_comment);
 
         setupActionBar();
+        postId = getIntent().getExtras().getString("postId");
 
         imageCaptureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         netUtil = NetworkUtil.getInstance(this);
@@ -53,8 +51,6 @@ public class SubmitCommentActivity extends AppCompatActivity implements Response
 
         etContent = findViewById(R.id.edittext_submit_content);
         tvCharCount = findViewById(R.id.textview_submit_charcount);
-        ivThumbnail = findViewById(R.id.imageview_submit_thumbnail);
-        btnLocation = findViewById(R.id.button_submit_location);
         etContent.addTextChangedListener(new ContentWatcher());
         // Set content box as focused automatically.
         etContent.requestFocus();
@@ -90,6 +86,7 @@ public class SubmitCommentActivity extends AppCompatActivity implements Response
     private void continueToPost() {
         Intent postIntent = new Intent(SubmitCommentActivity.this, PostActivity.class);
         postIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        postIntent.putExtra(PostActivity.EXTRA_POST_ID, postId);
         startActivity(postIntent);
         finish();
     }

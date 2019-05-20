@@ -491,7 +491,8 @@ public class NetworkUtil {
         public static String build(Object... elements) {
             StringBuilder address = new StringBuilder(Url.ROOT.address);
             for (Object o : elements) {
-                address.append(o.toString());
+                if (o != null)
+                    address.append(o.toString());
             }
             return address.toString();
         }

@@ -61,7 +61,16 @@ public class PostActivity extends AppCompatActivity
                 new ResponseListeners.DefaultError(this));
 		tvAuthor = findViewById(R.id.textview_post_author);
 		ivAuthor = findViewById(R.id.imageview_post_author);
-
+        btnComment = findViewById(R.id.button_post_comment);
+        btnComment.setText("1024");
+        btnComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent submitCommentIntent = new Intent(PostActivity.this, SubmitCommentActivity.class);
+                submitCommentIntent.putExtra("postId", post.getId());
+                startActivity(submitCommentIntent);
+            }
+        });
 	}
 
 	private void innitComments() {
@@ -106,16 +115,6 @@ public class PostActivity extends AppCompatActivity
                         .into(attachment);
                 ViewUtil.refreshPostViews(btnReact, post, tvAuthor, tvLocation, ivAuthor);
 
-                btnComment = findViewById(R.id.button_post_comment);
-                btnComment.setText("1024");
-                btnComment.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent submitCommentIntent = new Intent(getApplicationContext(), SubmitCommentActivity.class);
-                        submitCommentIntent.putExtra("postId", post.getId());
-                        startActivity(submitCommentIntent);
-                    }
-                });
                 innitComments();
             } catch (JsonSyntaxException ex) {
                 Log.e(TAG, ExceptionUtils.getStackTrace(ex));
