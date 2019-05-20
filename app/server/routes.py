@@ -237,7 +237,7 @@ def react_to_comment():
         comment_reaction = CommentReaction(comment_id, user_id, reaction)
         db.session.add(comment_reaction)
     db.session.commit()
-    return respond(comment.reaction_score())
+    return respond(str(comment.reaction_score()))
 
 
 @app.route('/post/<postid>', methods=['DELETE'])
