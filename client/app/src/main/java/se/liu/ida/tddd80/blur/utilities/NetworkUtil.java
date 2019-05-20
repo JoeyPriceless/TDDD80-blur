@@ -307,6 +307,23 @@ public class NetworkUtil {
                 responseListener, errorListener);
     }
 
+    public void getComments(String postID, Listener<JSONObject> responseListener, ErrorListener
+            errorListener) {
+        requestJsonObject(Url.build(Url.POST_COMMENTS_GET, postID), Method.GET,
+                responseListener, errorListener);
+    }
+
+    public void createComment(String content, String authorId, String postId,
+                           Listener<JSONObject> responseListener, ErrorListener errorListener) {
+        Map<String, String> params = new HashMap<>();
+        params.put("post_id", postId);
+        params.put("content", content);
+        params.put("parent", null);
+        params.put("user_id", authorId);
+        requestJsonObject(Url.build(Url.POST_COMMENT_ADD), Method.POST, responseListener,
+                errorListener, params);
+    }
+
     public static String getPostAttachmentUrl(String postId) {
         return Url.build(Url.POST_ATTACHMENT, postId);
     }
@@ -440,6 +457,8 @@ public class NetworkUtil {
         POST_GET("/post/"),
         POST_REACTIONS_ADD("/post/reactions"),
         POST_REACTIONS_GET("/post/reactions/"),
+        POST_COMMENTS_GET("/comments/"),
+        POST_COMMENT_ADD("/comment"),
         ROOT("https://tddd80-server.herokuapp.com"),
         USER_CREATE("/user"),
         USER_GET("/user/"),

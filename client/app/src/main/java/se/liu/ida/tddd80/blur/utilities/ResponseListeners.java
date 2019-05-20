@@ -63,6 +63,21 @@ public class ResponseListeners {
         }
     }
 
+    public static class CommentReactionSuccess implements Response.Listener<JSONObject> {
+        private FeedAdapter adapter;
+        private int position;
+
+        public CommentReactionSuccess(FeedAdapter adapter, int position) {
+            this.adapter = adapter;
+            this.position = position;
+        }
+
+        @Override
+        public void onResponse(JSONObject response) {
+            adapter.setPostReactions(position, GsonUtil.getInstance().parseReactions(response));
+        }
+    }
+
     /**
      * Provides a default ErrorListener for Volley requests. Notifies the log and creates a toast.
      */

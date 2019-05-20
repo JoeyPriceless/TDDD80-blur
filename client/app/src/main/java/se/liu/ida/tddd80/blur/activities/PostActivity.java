@@ -2,6 +2,8 @@ package se.liu.ida.tddd80.blur.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -19,6 +21,7 @@ import org.json.JSONObject;
 
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 import se.liu.ida.tddd80.blur.R;
+import se.liu.ida.tddd80.blur.fragments.CommentFragment;
 import se.liu.ida.tddd80.blur.fragments.ReactDialogFragment;
 import se.liu.ida.tddd80.blur.models.Post;
 import se.liu.ida.tddd80.blur.models.ReactionType;
@@ -37,6 +40,7 @@ public class PostActivity extends AppCompatActivity
     NetworkUtil netUtil;
     GsonUtil gsonUtil;
 	private Post post;
+	private CommentFragment commentsFragment;
 
 	private Button btnReact;
 	private Button btnComment;
@@ -47,6 +51,7 @@ public class PostActivity extends AppCompatActivity
 	@Override protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_post);
+
 		Intent intent = getIntent();
 		String postId = intent.getStringExtra(EXTRA_POST_ID);
 
@@ -57,8 +62,15 @@ public class PostActivity extends AppCompatActivity
 		tvAuthor = findViewById(R.id.textview_post_author);
 		ivAuthor = findViewById(R.id.imageview_post_author);
 
-
 	}
+
+	private void innitComments() {
+        CommentFragment commentFragment = CommentFragment.newInstance(post.getId());
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.replace(R.id.fragment_commentsplaceholder, commentFragment);
+        transaction.commit();
+    }
 
 	private class GetPostResponseListener implements Response.Listener<JSONObject> {
         @Override
@@ -76,6 +88,7 @@ public class PostActivity extends AppCompatActivity
                 tvLocation = findViewById(R.id.textview_post_location);
                 String location = post.getLocation();
                 if (location != null) {
+
                     tvLocation.setText(AUTHOR_SPACE_PADDING + location);
                     tvLocation.setVisibility(View.VISIBLE);
                 } else {
@@ -95,6 +108,15 @@ public class PostActivity extends AppCompatActivity
 
                 btnComment = findViewById(R.id.button_post_comment);
                 btnComment.setText("1024");
+                btnComment.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent submitCommentIntent = new Intent(getApplicationContext(), SubmitCommentActivity.class);
+                        submitCommentIntent.putExtra("postId", post.getId());
+                        startActivity(submitCommentIntent);
+                    }
+                });
+                innitComments();
             } catch (JsonSyntaxException ex) {
                 Log.e(TAG, ExceptionUtils.getStackTrace(ex));
                 Toast.makeText(PostActivity.this, "Error when parsing response",

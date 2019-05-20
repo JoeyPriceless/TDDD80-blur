@@ -7,6 +7,7 @@ import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import se.liu.ida.tddd80.blur.models.CommentList;
 import se.liu.ida.tddd80.blur.models.Feed;
 import se.liu.ida.tddd80.blur.models.Post;
 import se.liu.ida.tddd80.blur.models.Reactions;
@@ -50,6 +51,11 @@ public class GsonUtil {
 
     public Feed parseFeed(JSONObject object) {
         return gson.fromJson(object.toString(), Feed.class);
+    }
+
+    public CommentList parseComments(JSONObject object) {
+        CommentList test = gson.fromJson(object.toString(), CommentList.class);
+        return test;
     }
 
     public Reactions parseReactions(JSONObject object) {

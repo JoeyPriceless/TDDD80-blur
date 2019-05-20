@@ -127,8 +127,8 @@
                 tools:text="1024" />
 
         </LinearLayout>
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerview_post_comments"
+        <FrameLayout
+            android:id="@+id/fragment_commentsplaceholder"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="16dp"
@@ -137,6 +137,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearlayout_post_buttons" />
+            app:layout_constraintTop_toBottomOf="@+id/linearlayout_post_buttons"/>
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

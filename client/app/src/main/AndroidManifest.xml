@@ -30,6 +30,8 @@
 
         <activity android:name=".activities.SubmitPostActivity"
             android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".activities.SubmitCommentActivity"
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".activities.RegisterActivity" />
         <activity
             android:name=".activities.LoginActivity"
