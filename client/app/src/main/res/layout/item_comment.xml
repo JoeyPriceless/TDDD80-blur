@@ -80,26 +80,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textview_comment_content">
 
+        <Button
+            android:id="@+id/button_upvote"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableLeft="@drawable/ic_keyboard_arrow_up_black_24dp" />
+
+        <Button
+            android:id="@+id/button_downvote"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableLeft="@drawable/ic_keyboard_arrow_down_black_24dp" />
+
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/textview_score"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="TextView" />
-
-        <Button
-            android:id="@+id/button_upvote"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Upvote" />
-
-        <Button
-            android:id="@+id/button_downvote"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="DownVote" />
 
     </LinearLayout>
 

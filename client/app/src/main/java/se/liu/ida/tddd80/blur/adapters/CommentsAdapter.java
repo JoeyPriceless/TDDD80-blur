@@ -38,11 +38,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             timestamp = v.findViewById(R.id.textview_comment_time);
             location = v.findViewById(R.id.textview_comment_location);
             content = v.findViewById(R.id.textview_comment_content);
-            scoreText = v.findViewById(R.id;
-            upvButton = v.findViewById(R.id.;
-            downvButton = v.findViewById(R.id.;
-
-            // TODO: Set btn listeners!
+            scoreText = v.findViewById(R.id.textview_score);
+            upvButton = v.findViewById(R.id.button_upvote);
+            downvButton = v.findViewById(R.id.button_downvote);
         }
 
         private String getCommentId() {
