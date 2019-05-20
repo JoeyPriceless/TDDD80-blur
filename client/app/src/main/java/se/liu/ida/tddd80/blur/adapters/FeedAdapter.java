@@ -133,7 +133,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
         }
 
         ViewUtil.refreshPostViews(vh.reactButton, post, vh.authorName, vh.location, vh.authorImage);
-        vh.commentButton.setText("1024");
+        vh.commentButton.setText(String.valueOf(post.getCommentCount()));
     }
 
     @Override

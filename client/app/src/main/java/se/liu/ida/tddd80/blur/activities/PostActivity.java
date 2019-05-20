@@ -62,7 +62,6 @@ public class PostActivity extends AppCompatActivity
 		tvAuthor = findViewById(R.id.textview_post_author);
 		ivAuthor = findViewById(R.id.imageview_post_author);
         btnComment = findViewById(R.id.button_post_comment);
-        btnComment.setText("1024");
         btnComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -114,7 +113,7 @@ public class PostActivity extends AppCompatActivity
                         .transform(new RoundedCornersTransformation(20, 0))
                         .into(attachment);
                 ViewUtil.refreshPostViews(btnReact, post, tvAuthor, tvLocation, ivAuthor);
-
+                btnComment.setText(String.valueOf(post.getCommentCount()));
                 innitComments();
             } catch (JsonSyntaxException ex) {
                 Log.e(TAG, ExceptionUtils.getStackTrace(ex));

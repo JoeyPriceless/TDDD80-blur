@@ -94,11 +94,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         vh.upvButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (comment.getOwnReaction() == 1)
-                    comment.setOwnReaction(-1);
-                else
-                    comment.setOwnReaction(1);
-                NetworkUtil.getInstance(v.getContext()).reactToComment(comment.getId(), 1,
+                NetworkUtil.getInstance(v.getContext()).reactToComment(comment.getId(), 2,
                         new ResponseListeners.CommentReactionSuccess(CommentsAdapter.this, i),
                         new ResponseListeners.DefaultError(v.getContext()));
             }
@@ -106,11 +102,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         vh.downvButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (comment.getOwnReaction() == 0)
-                    comment.setOwnReaction(-1);
-                else
-                    comment.setOwnReaction(0);
-                NetworkUtil.getInstance(v.getContext()).reactToComment(comment.getId(), 0,
+                NetworkUtil.getInstance(v.getContext()).reactToComment(comment.getId(), 1,
                         new ResponseListeners.CommentReactionSuccess(CommentsAdapter.this, i),
                         new ResponseListeners.DefaultError(v.getContext()));
             }
@@ -118,9 +110,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     }
 
     public void setArrowColors(Comment comment, ViewHolder vh) {
-        Drawable upArrow = comment.getOwnReaction() == 1?vh.itemView.getContext().getResources().getDrawable(R.drawable.ic_keyboard_arrow_up_blue_24dp):
+        Drawable upArrow = comment.getOwnReaction() == 2?vh.itemView.getContext().getResources().getDrawable(R.drawable.ic_keyboard_arrow_up_blue_24dp):
                 vh.itemView.getContext().getResources().getDrawable(R.drawable.ic_keyboard_arrow_up_black_24dp);
-        Drawable downArrow = comment.getOwnReaction() == 0?vh.itemView.getContext().getResources().getDrawable(R.drawable.ic_keyboard_arrow_down_orange_24dp):
+        Drawable downArrow = comment.getOwnReaction() == 1?vh.itemView.getContext().getResources().getDrawable(R.drawable.ic_keyboard_arrow_down_orange_24dp):
                 vh.itemView.getContext().getResources().getDrawable(R.drawable.ic_keyboard_arrow_down_black_24dp);
         upArrow.setBounds( 0, 0, 100, 100 );
         downArrow.setBounds( 0, 0, 100, 100 );

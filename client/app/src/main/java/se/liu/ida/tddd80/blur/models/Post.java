@@ -14,6 +14,12 @@ public class Post {
     @SerializedName("attachment_uri")
     private String attachmentUri;
     private String location;
+    @SerializedName("number_of_comments")
+    private int commentCount;
+
+    public int getCommentCount() {
+        return commentCount;
+    }
 
     public String getAuthorPictureUri() {
         return author.getPictureUri();
