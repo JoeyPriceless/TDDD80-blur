@@ -79,7 +79,7 @@
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
+            android:layout_marginLeft="32dp"
             android:layout_marginRight="16dp"
             android:background="@null"
             android:drawableLeft="@drawable/ic_add_location_black_24dp"

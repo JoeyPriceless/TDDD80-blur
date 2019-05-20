@@ -333,7 +333,7 @@ public class NetworkUtil {
     }
 
     public String getUserPictureUri() {
-        return user.getPictureUri();
+        return user == null ? null : user.getPictureUri();
     }
 
     public void sendPostAttachment(String postId, Bitmap bitmap, String filepath,
