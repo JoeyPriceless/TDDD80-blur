@@ -205,8 +205,8 @@ class CommentReaction(db.Model):
     def __init__(self, comment_id, user_id, reaction_type):
         self.comment_id = comment_id
         self.user_id = user_id
-        if int(reaction_type) > 1 or int(reaction_type) < 0:
-            self.reaction_type = 0
+        if int(reaction_type) > 2 or int(reaction_type) < 1:
+            self.reaction_type = 1
         else:
             self.reaction_type = reaction_type
 
