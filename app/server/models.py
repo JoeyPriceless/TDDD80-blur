@@ -144,6 +144,7 @@ class Comment(db.Model):
         reactions = self.get_reactions()
         # Score +1 if reaction type is positive and -1 if it's negative
         for reaction in reactions:
+            print(reaction.reaction_type)
             score += 1 if reaction.reaction_type == 2 else -1
         return score
 
