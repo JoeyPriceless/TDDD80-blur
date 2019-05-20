@@ -54,8 +54,7 @@ public class GsonUtil {
     }
 
     public CommentList parseComments(JSONObject object) {
-        CommentList test = gson.fromJson(object.toString(), CommentList.class);
-        return test;
+        return gson.fromJson(object.toString(), CommentList.class);
     }
 
     public Reactions parseReactions(JSONObject object) {

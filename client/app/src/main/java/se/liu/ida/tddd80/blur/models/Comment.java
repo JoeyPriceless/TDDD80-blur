@@ -1,14 +1,10 @@
 package se.liu.ida.tddd80.blur.models;
 
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
-
 import com.google.gson.annotations.SerializedName;
 
 import org.joda.time.DateTime;
 
-public class Comment extends RecyclerView.ViewHolder {
+public class Comment {
 
     private String id;
     private User author;
@@ -16,12 +12,6 @@ public class Comment extends RecyclerView.ViewHolder {
     @SerializedName("time_created")
     private DateTime timeCreated; // Check json compatibility
     private int score;
-    @SerializedName("own_score")
-    private int ownScore;
-
-    public Comment(@NonNull View itemView) {
-        super(itemView);
-    }
 
     public void setScore(int score) {
         this.score = score;

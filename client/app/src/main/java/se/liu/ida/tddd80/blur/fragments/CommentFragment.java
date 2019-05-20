@@ -17,8 +17,11 @@ import com.android.volley.VolleyError;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.adapters.CommentsAdapter;
+import se.liu.ida.tddd80.blur.models.Comment;
 import se.liu.ida.tddd80.blur.models.CommentList;
 import se.liu.ida.tddd80.blur.utilities.GsonUtil;
 import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
@@ -64,6 +67,11 @@ public class CommentFragment extends Fragment implements Response.Listener<JSONO
         rv.addItemDecoration(new DividerItemDecoration(rv.getContext(), lm.getOrientation()));
         rv.setHasFixedSize(true);
         rv.setNestedScrollingEnabled(false);
+        rv.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        CommentList commentList = new CommentList();
+        commentList.setComments(new ArrayList<Comment>());
+
         return inflatedView;
     }
 
@@ -87,12 +95,9 @@ public class CommentFragment extends Fragment implements Response.Listener<JSONO
     @Override
     public void onResponse(JSONObject response) {
         CommentList comments = GsonUtil.getInstance().parseComments(response);
-        if (adapter == null) {
-            adapter = new CommentsAdapter((String)getArguments().get(POSTID), comments,
-                    this, getFragmentManager());
-            rv.setAdapter(adapter);
-        } else {
-            adapter.replaceComments(comments);
-        }
+        adapter = new CommentsAdapter((String)getArguments().get(POSTID), comments,
+                this, getFragmentManager());
+        rv.setAdapter(adapter);
+        rv.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 }

@@ -122,7 +122,7 @@ class Comment(db.Model):
     children = db.relationship('Comment', backref=db.backref('parent', remote_side=[id]))
     post_id = db.Column(db.String, db.ForeignKey('post.id'), nullable=False)
 
-    def __init__(self, author, content, parent_id, post_id):
+    def __init__(self, author, content, post_id, parent_id=None):
         self.id = uuid.uuid4().hex
         self.author_id = author
         self.time_created = datetime.datetime.now()

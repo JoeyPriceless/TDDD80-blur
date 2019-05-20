@@ -20,42 +20,29 @@
 
         <LinearLayout
             android:id="@+id/linearlayout_comment_title"
-            android:layout_width="0dp"
-            android:layout_height="80dp"
-            android:layout_marginLeft="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
             android:layout_weight="78"
             android:gravity="center_vertical"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/textview_comment_author"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textSize="20sp"
+                android:textSize="15sp"
                 android:textStyle="bold"
-                android:paddingTop="2dp"
-                android:paddingBottom="4dp"
                 tools:text="Username can be super duper long" />
 
             <TextView
                 android:id="@+id/textview_comment_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="3dp"
+                android:layout_marginStart="15sp"
                 tools:text="1 Apr 2019" />
 
-            <TextView
-                android:id="@+id/textview_comment_location"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="4dp"
-                android:paddingBottom="2dp"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:visibility="gone"
-                tools:text="Ryd, Östergötlands Län, Sweden" />
         </LinearLayout>
     </LinearLayout>
 
@@ -63,8 +50,7 @@
         android:id="@+id/textview_comment_content"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:textSize="18sp"
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearlayout_comment_header"
@@ -82,6 +68,7 @@
 
         <Button
             android:id="@+id/button_upvote"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -89,6 +76,7 @@
 
         <Button
             android:id="@+id/button_downvote"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -99,7 +87,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="TextView" />
+            android:text="TextView"
+            tools:text="150" />
 
     </LinearLayout>
 

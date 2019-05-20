@@ -36,9 +36,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
             authorName = v.findViewById(R.id.textview_comment_author);
             timestamp = v.findViewById(R.id.textview_comment_time);
-            location = v.findViewById(R.id.textview_comment_location);
             content = v.findViewById(R.id.textview_comment_content);
             scoreText = v.findViewById(R.id.textview_score);
+            scoreText.setText("150");
             upvButton = v.findViewById(R.id.button_upvote);
             downvButton = v.findViewById(R.id.button_downvote);
         }
@@ -93,7 +93,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return comments.getComments().size();
+        int test = comments.getComments().size();
+        return test;
     }
 
     public void replaceComments(CommentList comments) {
