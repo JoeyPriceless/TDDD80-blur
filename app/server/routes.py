@@ -46,7 +46,7 @@ def get_comments(postid):
                 plain_response("Given post ID doesn't exist. Requested resource not found."), 404)
         return respond(plain_response("Requested post has no comments."), 404)
     comments_list = serialize_list(comments)
-    return respond({'comments': comments_list})
+    return respond(comments_list)
 
 
 @app.route('/post/<postid>')
