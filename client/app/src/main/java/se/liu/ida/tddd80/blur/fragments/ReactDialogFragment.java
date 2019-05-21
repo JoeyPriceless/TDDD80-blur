@@ -74,7 +74,7 @@ public class ReactDialogFragment extends DialogFragment {
         for (int i = 0; i < linear.getChildCount(); i++) {
             final int j = i;
             final ImageView iv = (ImageView)linear.getChildAt(j);
-            if (currentSelection == i + 1) {
+            if (currentSelection == i) {
                 setWeight(iv, 3f);
             }
             iv.setOnClickListener(new View.OnClickListener() {

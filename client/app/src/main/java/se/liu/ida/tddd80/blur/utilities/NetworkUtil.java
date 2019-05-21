@@ -314,7 +314,7 @@ public class NetworkUtil {
 
     public void getFeed(FeedType type, Listener<JSONObject> responseListener, ErrorListener
             errorListener) {
-        requestJsonObject(Url.build(Url.FEED_GET, type.toString().toLowerCase()), Method.GET,
+        requestJsonObject(Url.build(Url.FEED_GET, type.getTypeString()), Method.GET,
                 responseListener, errorListener);
     }
 

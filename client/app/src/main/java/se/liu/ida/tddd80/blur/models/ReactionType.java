@@ -8,9 +8,6 @@ import com.google.gson.annotations.SerializedName;
 import se.liu.ida.tddd80.blur.R;
 
 public enum ReactionType {
-    @SerializedName("null")
-    NEUTRAL(R.drawable.neutral_face),
-
     /**
      * Funny
      * Icon: laughing face
@@ -44,13 +41,16 @@ public enum ReactionType {
      * Icon: Confused face / face with question marks
      */
     @SerializedName("4")
-    DOWNVOTE_(R.drawable.downvote_1),
+    DOWNVOTE_1(R.drawable.downvote_1),
 
     /**
      * Irritated / Unamused
      */
     @SerializedName("5")
-    DOWNVOTE_2(R.drawable.downvote_2);
+    DOWNVOTE_2(R.drawable.downvote_2),
+
+    @SerializedName("null")
+    NEUTRAL(R.drawable.neutral_face);
 
     private int resourceId;
 
