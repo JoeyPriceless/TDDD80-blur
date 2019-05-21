@@ -99,5 +99,6 @@ public class CommentFragment extends Fragment implements Response.Listener<JSONO
                 this, getFragmentManager());
         rv.setAdapter(adapter);
         rv.setLayoutManager(new LinearLayoutManager(getActivity()));
+        swipeLayout.setRefreshing(false);
     }
 }

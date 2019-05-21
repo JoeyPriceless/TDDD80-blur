@@ -249,17 +249,20 @@ class FeedObject(db.Model):
 
     @staticmethod
     def get_type_sorted_feed(feed_type):
-        feed = FeedObject.query.order_by(FeedObject.reaction_0).limit(FEED_LENGTH)
-        if feed_type == "1":
-            feed = FeedObject.query.order_by(FeedObject.reaction_1).limit(FEED_LENGTH)
-        if feed_type == "2":
-            feed = FeedObject.query.order_by(FeedObject.reaction_2).limit(FEED_LENGTH)
-        if feed_type == "3":
-            feed = FeedObject.query.order_by(FeedObject.reaction_3).limit(FEED_LENGTH)
-        if feed_type == "4":
-            feed = FeedObject.query.order_by(FeedObject.reaction_4).limit(FEED_LENGTH)
-        if feed_type == "5":
-            feed = FeedObject.query.order_by(FeedObject.reaction_5).limit(FEED_LENGTH)
+        if feed_type == "0":
+            feed = FeedObject.query.order_by(FeedObject.reaction_0.desc()).limit(FEED_LENGTH)
+        elif feed_type == "1":
+            feed = FeedObject.query.order_by(FeedObject.reaction_1.desc()).limit(FEED_LENGTH)
+        elif feed_type == "2":
+            feed = FeedObject.query.order_by(FeedObject.reaction_2.desc()).limit(FEED_LENGTH)
+        elif feed_type == "3":
+            feed = FeedObject.query.order_by(FeedObject.reaction_3.desc()).limit(FEED_LENGTH)
+        elif feed_type == "4":
+            feed = FeedObject.query.order_by(FeedObject.reaction_4.desc()).limit(FEED_LENGTH)
+        elif feed_type == "5":
+            feed = FeedObject.query.order_by(FeedObject.reaction_5.desc()).limit(FEED_LENGTH)
+        else:
+            feed = FeedObject.query.order_by(FeedObject.score.desc()).limit(FEED_LENGTH)
         return feed.all()
 
     def serialize(self):
