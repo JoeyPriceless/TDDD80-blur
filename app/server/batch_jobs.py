@@ -4,7 +4,7 @@ import datetime
 import sys
 
 FEED_BUFFER = 1000
-SCORE_MULTIPLIER = 10
+SCORE_MULTIPLIER = 100000
 
 sched = BlockingScheduler()
 

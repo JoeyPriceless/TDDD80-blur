@@ -262,7 +262,7 @@ class FeedObject(db.Model):
         elif feed_type == "5":
             feed = FeedObject.query.order_by(FeedObject.reaction_5).limit(FEED_LENGTH)
         else:
-            feed = FeedObject.query.order_by(FeedObject.score).limit(FEED_LENGTH)
+            feed = FeedObject.query.order_by(FeedObject.score.desc()).limit(FEED_LENGTH)
         return feed.all()
 
     def serialize(self):

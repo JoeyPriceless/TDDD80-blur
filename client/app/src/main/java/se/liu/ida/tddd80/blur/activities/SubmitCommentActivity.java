@@ -1,10 +1,7 @@
 package se.liu.ida.tddd80.blur.activities;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -26,10 +23,6 @@ import se.liu.ida.tddd80.blur.utilities.ResponseListeners;
 
 public class SubmitCommentActivity extends AppCompatActivity implements Response.Listener<JSONObject>{
 
-    private Intent imageCaptureIntent;
-    private Uri imageUri = null;
-    Bitmap bmFullsize = null;
-
     private NetworkUtil netUtil;
     private EditText etContent;
     private Editable contentEditable;
@@ -44,8 +37,6 @@ public class SubmitCommentActivity extends AppCompatActivity implements Response
 
         setupActionBar();
         postId = getIntent().getExtras().getString("postId");
-
-        imageCaptureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         netUtil = NetworkUtil.getInstance(this);
         maxLength = getResources().getInteger(R.integer.post_max_length);
 
