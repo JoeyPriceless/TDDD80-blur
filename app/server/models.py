@@ -269,6 +269,7 @@ class FeedObject(db.Model):
         return {
             'id': self.id,
             'post': self.post,
+            'score': self.score,
         }
 
 
