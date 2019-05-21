@@ -26,10 +26,6 @@ import se.liu.ida.tddd80.blur.utilities.ResponseListeners;
 
 public class SubmitCommentActivity extends AppCompatActivity implements Response.Listener<JSONObject>{
 
-    private Intent imageCaptureIntent;
-    private Uri imageUri = null;
-    Bitmap bmFullsize = null;
-
     private NetworkUtil netUtil;
     private EditText etContent;
     private Editable contentEditable;
@@ -45,7 +41,6 @@ public class SubmitCommentActivity extends AppCompatActivity implements Response
         setupActionBar();
         postId = getIntent().getExtras().getString("postId");
 
-        imageCaptureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         netUtil = NetworkUtil.getInstance(this);
         maxLength = getResources().getInteger(R.integer.post_max_length);
 
@@ -80,6 +75,15 @@ public class SubmitCommentActivity extends AppCompatActivity implements Response
                 })
                 .setIcon(getDrawable(R.drawable.ic_submit_black_24dp))
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        return true;
+    }
+
+    /**
+     * Neccessary for Actionbar back button to work.
+     */
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
         return true;
     }
 

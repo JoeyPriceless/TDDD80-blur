@@ -24,12 +24,9 @@ import se.liu.ida.tddd80.blur.utilities.StringUtil;
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView authorImage;
         public TextView authorName;
         public TextView timestamp;
-        public TextView location;
         public TextView content;
-        public ImageView attachment;
         public TextView scoreText;
         public Button upvButton;
         public Button downvButton;
@@ -74,7 +71,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder vh, final int i) {
         final Comment comment = comments.get(i);
-        vh.authorName.setText(PostActivity.AUTHOR_SPACE_PADDING + comment.getAuthor().getUsername());
+        vh.authorName.setText(comment.getAuthor().getUsername());
         vh.timestamp.setText(StringUtil.formatDateTimeShort(comment.getTimeCreated()));
         vh.content.setText(comment.getContent());
         vh.scoreText.setText(String.valueOf(comment.getScore()));
