@@ -44,10 +44,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             upvButton = v.findViewById(R.id.button_upvote);
             downvButton = v.findViewById(R.id.button_downvote);
         }
-
-        private String getCommentId() {
-            return comments.get(getAdapterPosition()).getId();
-        }
     }
 
 
@@ -62,14 +58,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         this.comments = comments;
         this.fragment = fragment;
         this.fragmentManager = fragmentManager;
-    }
-
-    public void setCommentScore(int position, int score) {
-        comments.get(position).setScore(score);
-        // It's important not to update a post's views directly in a RecyclerView. Rather, update
-        // the model and notify the adapter.
-        // Useful resource: https://stackoverflow.com/a/48959184/4400799
-        notifyItemChanged(position);
     }
 
     @NonNull
@@ -141,10 +129,5 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     public int getItemCount() {
         int test = comments.getComments().size();
         return test;
-    }
-
-    public void replaceComments(CommentList comments) {
-        this.comments = comments;
-        notifyDataSetChanged();
     }
 }
