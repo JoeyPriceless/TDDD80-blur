@@ -1,6 +1,7 @@
 package se.liu.ida.tddd80.blur.fragments;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
@@ -32,7 +33,6 @@ public class CommentFragment extends Fragment implements Response.Listener<JSONO
     private final String TAG = getClass().getSimpleName();
     private static final String POSTID = "postid";
 
-    private CommentsAdapter adapter;
     private NetworkUtil networkUtil;
     private RecyclerView rv;
     private SwipeRefreshLayout swipeLayout;
@@ -49,11 +49,13 @@ public class CommentFragment extends Fragment implements Response.Listener<JSONO
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         networkUtil = NetworkUtil.getInstance(getContext());
-        networkUtil.getComments((String)getArguments().get(POSTID), this, this);
+        if (getArguments() != null) {
+            networkUtil.getComments((String)getArguments().get(POSTID), this, this);
+        }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View inflatedView = inflater.inflate(R.layout.fragment_comments, container, false);
@@ -77,7 +79,9 @@ public class CommentFragment extends Fragment implements Response.Listener<JSONO
 
     @Override
     public void onRefresh() {
-        networkUtil.getComments((String)getArguments().get(POSTID), this, this);
+        if (getArguments() != null) {
+            networkUtil.getComments((String)getArguments().get(POSTID), this, this);
+        }
     }
 
     @Override
@@ -87,7 +91,7 @@ public class CommentFragment extends Fragment implements Response.Listener<JSONO
             Log.e(TAG, StringUtil.parsePlainJsonResponse(error));
             Toast.makeText(getContext(), statusCode + " Failed to fetch comments.", Toast.LENGTH_LONG).show();
         } catch (Exception ex) {
-            //Ignore
+            // Ignore
         }
         swipeLayout.setRefreshing(false);
     }
@@ -95,9 +99,11 @@ public class CommentFragment extends Fragment implements Response.Listener<JSONO
     @Override
     public void onResponse(JSONObject response) {
         CommentList comments = GsonUtil.getInstance().parseComments(response);
-        adapter = new CommentsAdapter((String)getArguments().get(POSTID), comments,
-                this, getFragmentManager());
-        rv.setAdapter(adapter);
+        if (getArguments() != null) {
+            CommentsAdapter adapter = new CommentsAdapter((String) getArguments().get(POSTID), comments,
+                    this, getFragmentManager());
+            rv.setAdapter(adapter);
+        }
         rv.setLayoutManager(new LinearLayoutManager(getActivity()));
         swipeLayout.setRefreshing(false);
     }
