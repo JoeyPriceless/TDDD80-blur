@@ -48,6 +48,7 @@ class TestServerFunctions(unittest.TestCase):
         r = requests.post(URL_ROOT + "post/reactions", json={'post_id': post_id, 'reaction': reaction},
                           headers={'Authorization': self.__class__.token})
         self.assertEqual(r.status_code, 200)
+        requests.get(URL_ROOT + "picture/reactions/" + post_id)
         print(requests.get(URL_ROOT + "feed/" + "1").text)
         print(requests.get(URL_ROOT + "feed/" + "2").text)
 

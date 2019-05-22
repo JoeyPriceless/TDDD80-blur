@@ -1,10 +1,7 @@
 package se.liu.ida.tddd80.blur.activities;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -40,7 +37,6 @@ public class SubmitCommentActivity extends AppCompatActivity implements Response
 
         setupActionBar();
         postId = getIntent().getExtras().getString("postId");
-
         netUtil = NetworkUtil.getInstance(this);
         maxLength = getResources().getInteger(R.integer.post_max_length);
 
