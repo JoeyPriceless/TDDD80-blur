@@ -33,3 +33,6 @@ Create a virtual environment and run
 _\>\>\>pip install -r requirements.txt_
 
 in your shell.
+
+##Coverage
+An export of the coverage report can be found in app/coverage. Run index.html to view the report.
