@@ -172,25 +172,6 @@ class TestServerFunctions(unittest.TestCase):
         self.assertEqual(comment['author']['id'], self.__class__.user_id)
         self.assertEqual(comment['id'], comment_id)
 
-        # Test that comment chain works.
-        parent_id = comment_id
-        content = 'Mannen som inte är barn'
-        r = requests.post(URL_ROOT + "comment", json={'content': content, 'parent': parent_id, 'post_id': post_id},
-                          headers={'Authorization': self.__class__.token})
-        self.assertEqual(r.status_code, 200)
-        comment_id = get_field(r, 'response')
-        comment_ids.append(comment_id)
-        r = requests.get(URL_ROOT + "comment/" + comment_id)
-        self.assertEqual(r.status_code, 200)
-        comment = json.loads(r.text)
-        self.assertEqual(comment['content'], content)
-        self.assertEqual(comment['author']['id'], self.__class__.user_id)
-        self.assertEqual(comment['id'], comment_id)
-        r = requests.get(URL_ROOT + "comments/chain/" + parent_id)
-        self.assertEqual(r.status_code, 200)
-        comments = json.loads(r.text)
-        self.assertEqual(comments[0]['id'], comment_id)
-
         # Test reacting to comment
         reaction = '1'
         r = requests.post(URL_ROOT + "comment/reactions", json={'comment_id': comment_id, 'reaction': reaction},
@@ -224,52 +205,7 @@ class TestServerFunctions(unittest.TestCase):
                             headers={'Authorization': self.__class__.token})
         self.assertEqual(r.status_code, 200)
 
-    def test_4_combo_scenario(self):
-        if self.__class__.token is None:
-            self.test_0_login()
-
-        post_ids = []
-        comment_ids = []
-
-        # Create a post
-        content = 'Mannen myten legenden.'
-        r = requests.post(URL_ROOT + "post", json={'content': content},
-                          headers={'Authorization': self.__class__.token})
-        post_id = get_field(r, 'response')
-        post_ids.append(post_id)
-
-        # Create a comment
-        content = 'Mannen myten legenden.'
-        r = requests.post(URL_ROOT + "comment", json={'content': content, 'parent': None, 'post_id': post_id},
-                          headers={'Authorization': self.__class__.token})
-        comment_id = r.text
-        comment_ids.append(r.text)
-        content = 'Mannen myten legenden.2'
-        r = requests.post(URL_ROOT + "comment", json={'content': content, 'parent': None, 'post_id': post_id},
-                          headers={'Authorization': self.__class__.token})
-        comment_ids.append(r.text)
-        content = 'Mannen myten legenden.3'
-        r = requests.post(URL_ROOT + "comment", json={'content': content, 'parent': None, 'post_id': post_id},
-                          headers={'Authorization': self.__class__.token})
-        comment_ids.append(r.text)
-        r = requests.post(URL_ROOT + "comment", json={'content': content, 'parent': comment_id, 'post_id': post_id},
-                          headers={'Authorization': self.__class__.token})
-        comment_ids.append(r.text)
-        comment_id = r.text
-        r = requests.post(URL_ROOT + "comment", json={'content': content, 'parent': comment_id, 'post_id': post_id},
-                          headers={'Authorization': self.__class__.token})
-        comment_ids.append(r.text)
-
-        # React to post and comment
-        reaction = '1'
-        requests.post(URL_ROOT + "comment/react", json={'comment_id': comment_id, 'reaction': reaction},
-                      headers={'Authorization': self.__class__.token})
-        requests.post(URL_ROOT + "post/reactions", json={'post_id': post_id, 'reaction': reaction},
-                      headers={'Authorization': self.__class__.token})
-
-        r = requests.get(URL_ROOT + "post/extras/" + post_id)
-
-    def test_5_unauthorization(self):
+    def test_4_unauthorization(self):
         if self.__class__.token is None:
             self.test_0_login()
 

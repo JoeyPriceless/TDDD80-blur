@@ -11,6 +11,9 @@ sched = BlockingScheduler()
 
 @sched.scheduled_job('interval', minutes=2)
 def create_feed():
+    """
+    Backround batch job that generates a new feed from the latest posts that can easily be sorted after need.
+    """
     with app.app_context():
         # Score = total_vote_score * multiplier / time_since_posted
         print(f"Generating feed...")
@@ -26,7 +29,6 @@ def create_feed():
         db.session.commit()
         print(f"Feed generated.")
         sys.stdout.flush()
-        # TODO: Sort through posts and compile the top.
 
-
+# Start the timed worker
 sched.start()

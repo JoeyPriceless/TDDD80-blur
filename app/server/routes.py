@@ -62,7 +62,7 @@ def get_comments(postid):
 @jwt_optional
 def get_post(postid):
     """
-    Returns the post object with the given postID.
+    Returns the post object with the given ID.
     """
     post = Post.query.filter_by(id=postid).scalar()
     user_id = get_jwt_identity()
@@ -75,7 +75,7 @@ def get_post(postid):
 @app.route('/comment/<commentid>')
 def get_comment(commentid):
     """
-
+    Returns the comment object with given ID.
     """
     comment = Comment.query.filter_by(id=commentid).scalar()
     if comment:
@@ -84,21 +84,11 @@ def get_comment(commentid):
         return respond(plain_response("Given comment ID doesn't exist. Requested resource not found."), 404)
 
 
-@app.route('/comments/chain/<commentid>')
-def get_comment_chain(commentid):
-    comment = Comment.query.filter_by(id=commentid).one()
-    if comment is None:
-        return respond(plain_response(
-            "The given comment ID doesn't exist. Requested resource not found."), 404)
-    comments = comment.children
-    if len(comments) == 0:
-        return respond(
-            plain_response("The given comment has no children. Requested resource not found."), 404)
-    return respond(serialize_list(comments))
-
-
 @app.route('/post/reactions/<postid>')
 def get_reactions(postid):
+    """
+    Returns a list with all reaction objects that are children to the post with the given ID.
+    """
     reactions = PostReaction.query.filter_by(post_id=postid).all()
     if reactions is None:
         return respond(
@@ -108,6 +98,9 @@ def get_reactions(postid):
 
 @app.route('/user/<userid>')
 def get_user(userid):
+    """
+    Returns the user object with the given ID.
+    """
     user = User.query.filter_by(id=userid).one()
     if user is None:
         return respond(
@@ -117,6 +110,9 @@ def get_user(userid):
 
 @app.route('/user/picture/<userid>', methods=['POST'])
 def set_profile_picture(userid):
+    """
+    Takes the attached image and uploads it to cloudinary before saving the URL to the user object with the given ID.
+    """
     user = User.query.filter_by(id=userid).scalar()
     if user is None:
         return respond(plain_response('No user with given ID. Resource not found.'), 404)
@@ -124,6 +120,7 @@ def set_profile_picture(userid):
         file = request.files['file']
         extension = get_file_extention(file.filename)
         if file and extension == ALLOWED_EXTENSION:
+            # Upload the image to cloudinary and store the URL in the user object.
             url = uploader.upload(file)['url']
             user.picture_uri = url
             db.session.commit()
@@ -134,6 +131,9 @@ def set_profile_picture(userid):
 
 @app.route('/user/picture/<userid>')
 def get_profile_picture(userid):
+    """
+    Returns the cloudinary URL to the user's profile picture.
+    """
     user = User.query.filter_by(id=userid).scalar()
     if user is None:
         return respond(plain_response('No user exists with given ID. Resource not found.'), 404)
@@ -144,6 +144,9 @@ def get_profile_picture(userid):
 
 @app.route('/post/attachment/<postid>', methods=['POST'])
 def set_post_attachment(postid):
+    """
+    Uploads the image to cloudinary and stores the url in the post object with the given ID.
+    """
     print('request.files[\'file\']: ' + str(request.files))
     print('request.json ' + str(request.json))
     print('request.forms ' + str(request.form))
@@ -156,6 +159,7 @@ def set_post_attachment(postid):
         file = request.files['file']
         extension = get_file_extention(file.filename)
         if file and extension == ALLOWED_EXTENSION:
+            # Upload the image to cloudinary and store the URL in the post object.
             url = uploader.upload(file)['url']
             post.attachment_uri = url
             db.session.commit()
@@ -166,6 +170,9 @@ def set_post_attachment(postid):
 
 @app.route('/post/attachment/<postid>')
 def get_post_attachment(postid):
+    """
+    Returns the cloudinary URL for the post's attached image.
+    """
     post = Post.query.filter_by(id=postid).scalar()
     if post is None:
         return respond(plain_response('No post exists with given ID. Resource not found.'), 404)
@@ -177,6 +184,9 @@ def get_post_attachment(postid):
 @app.route('/post', methods=['POST'])
 @jwt_required
 def create_post():
+    """
+    Creates a new post object in the database and returns its ID.
+    """
     content = request.json['content']
     location = request.json['location'] if "location" in request.json else None
 
@@ -190,11 +200,13 @@ def create_post():
 @app.route('/comment', methods=['POST'])
 @jwt_required
 def post_comment():
+    """
+    Creates a new comment object in the database and returns its ID.
+    """
     content = request.json['content']
     parent = request.json['parent']
     post_id = request.json['post_id']
     user_id = get_jwt_identity()
-    # TODO: Needs to be able to handle posting comments without a parent comment.
     comment = Comment(user_id, content, post_id, parent_id=parent)
     db.session.add(comment)
     db.session.commit()
@@ -204,6 +216,9 @@ def post_comment():
 @app.route('/post/reactions', methods=['POST'])
 @jwt_required
 def react_to_post():
+    """
+    Creates a new reaction object of the specified type as a child to the post with the given ID.
+    """
     reaction = int(request.json['reaction'])
     post_id = request.json['post_id']
     post = Post.query.filter_by(id=post_id).scalar()
@@ -229,7 +244,9 @@ def react_to_post():
 @app.route('/comment/reactions', methods=['POST'])
 @jwt_required
 def react_to_comment():
-    # TODO change from reaction type to binary reaction
+    """
+    Creates a new reaction object of the specified type as a child to the comment with the given ID.
+    """
     reaction = request.json['reaction']
     comment_id = request.json['comment_id']
     comment = Comment.query.filter_by(id=comment_id).scalar()
@@ -237,8 +254,8 @@ def react_to_comment():
         return respond(plain_response(
             "The given comment ID doesn't exist. Requested resource not found"), 404)
     user_id = get_jwt_identity()
-    # Check if CommentReaction already exists. If so update its type. Otherwise, create a new
-    # reaction.
+    # Check if CommentReaction already exists. If so update its type. If it's of the same type then remove the reaction.
+    # Otherwise, create a new reaction.
     comment_reaction = CommentReaction.query.filter_by(comment_id=comment_id, user_id=user_id) \
         .scalar()
     if comment_reaction:
@@ -256,6 +273,9 @@ def react_to_comment():
 @app.route('/post/<postid>', methods=['DELETE'])
 @jwt_required
 def delete_post(postid):
+    """
+    Removes the post with the given ID from the database.
+    """
     post = Post.query.filter_by(id=postid).scalar()
     if post is None:
         return respond(
@@ -272,6 +292,9 @@ def delete_post(postid):
 @app.route('/comment/<commentid>', methods=['DELETE'])
 @jwt_required
 def delete_comment(commentid):
+    """
+    Removes the comment with the given ID from the database.
+    """
     comment = Comment.query.filter_by(id=commentid).one()
     if comment is None:
         return respond(
@@ -287,6 +310,9 @@ def delete_comment(commentid):
 
 @app.route('/user', methods=["POST"])
 def create_user():
+    """
+    Creates a new user object and returns a token for the new user.
+    """
     username = request.json['username']
     email = request.json['email']
     password = request.json['password']
@@ -315,6 +341,9 @@ def create_user():
 
 @app.route('/user/login', methods=["POST"])
 def login():
+    """
+    Checks credentials, creates and returns a token upon sucess.
+    """
     email = request.json['email']
     password = request.json['password']
     if len(password) < PASSWORD_MIN_LENGTH:
@@ -323,17 +352,20 @@ def login():
     if user is not None:
         credentials = UserCredentials.query.filter_by(user_id=user.id).scalar()
     else:
-        return respond(plain_response('Incorrect password or email'), 409)
+        return respond(plain_response('Incorrect email.'), 409)
 
     if credentials is None:
-        return respond(plain_response('Could not find credentials for existing user'), 500)
+        return respond(plain_response('Could not find credentials for existing user.'), 500)
     elif credentials.check_password(password):
         return respond(get_user_token(user))
     else:
-        return respond(plain_response('Incorrect password or email'), 409)
+        return respond(plain_response('Incorrect password or email.'), 409)
 
 
 def get_user_token(user):
+    """
+    Returns a fresh token for the user.
+    """
     value = user.generate_auth_token()
     value['user_id'] = user.id
     return value
@@ -342,6 +374,9 @@ def get_user_token(user):
 @app.route('/user/logout', methods=["POST"])
 @jwt_required
 def logout():
+    """
+    Blacklists the users current token.
+    """
     jti = get_raw_jwt()['jti']
     blacklisted = Blacklisted(jti)
     db.session.add(blacklisted)
@@ -350,15 +385,24 @@ def logout():
 
 
 def plain_response(string):
+    """
+    Adds an extra layer of JSON for consistancy and ease of handling on the client side.
+    """
     return {"response": string}
 
 
 def respond(response, status=200):
+    """
+    Logs the info about the response and formats it correctly for responding.
+    """
     print(f"{status}: {json.dumps(response, indent=2)}")
     sys.stdout.flush()
     return jsonify(response), status
 
 
 def get_file_extention(filename):
+    """
+    Returns only the file extension from the file name.
+    """
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower()

@@ -52,9 +52,15 @@ class Post(db.Model):
             self.attachment_uri = attachment_uri
 
     def get_reactions(self):
+        """
+        Returns the number of reaction objects children of this post.
+        """
         return PostReaction.query.filter_by(post_id=self.id).all()
 
     def kill_children(self, temp_db):
+        """
+        Removes all the child objects(Comments, PostReactions, FeedObjects) of this post.
+        """
         comments = Comment.query.filter_by(post_id=self.id).all()
         for comment in comments:
             comment.kill_children(temp_db)
@@ -65,6 +71,9 @@ class Post(db.Model):
         temp_db.session.commit()
         
     def reaction_count(self, reaction_type):
+        """
+        Returns the number of reactions to this post of specified type.
+        """
         score = 0
         reactions = self.get_reactions()
         # Score +1 if reaction type is positive and -1 if it's negative
@@ -74,6 +83,9 @@ class Post(db.Model):
         return score
 
     def reaction_score(self):
+        """
+        Sums all the types of reactions into a total score for this post.
+        """
         score = 0
         reactions = self.get_reactions()
         # Score +1 if reaction type is positive and -1 if it's negative
@@ -102,9 +114,10 @@ class Post(db.Model):
         }
 
     def serialize_reactions(self, user_id=None):
-        reactions = serialize_list(PostReaction.query.filter_by(post_id=self.id).all())
-        # Generates the requesters own reaction type if it exists.
-        # If the requester isn't logged in or hasn't reacted, the value is -1.
+        """
+        Generates the requesters own reaction type if it exists.
+        If the requester isn't logged in or hasn't reacted, the value is -1.
+        """
         own_reaction_type = "null"
         if user_id:
             own_reaction = PostReaction.query.filter_by(post_id=self.id, user_id=user_id).scalar()
@@ -149,7 +162,6 @@ class Comment(db.Model):
         return score
 
     def get_user_reaction(self, user_id=None):
-        reactions = serialize_list(CommentReaction.query.filter_by(comment_id=self.id).all())
         # Generates the requesters own reaction type if it exists.
         # If the requester isn't logged in or hasn't reacted, the value is -1.
         own_reaction_type = 0
@@ -249,6 +261,9 @@ class FeedObject(db.Model):
 
     @staticmethod
     def get_type_sorted_feed(feed_type):
+        """
+        Returns a list of feed objects sorted by specified reaction type in integer form.
+        """
         if feed_type == "0":
             feed = FeedObject.query.order_by(FeedObject.reaction_0).limit(FEED_LENGTH)
         elif feed_type == "1":

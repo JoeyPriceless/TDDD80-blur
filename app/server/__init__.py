@@ -10,6 +10,9 @@ jwt = JWTManager()
 
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):
+    """
+    Checks if the user's token exists in the Blacklist table.
+    """
     jti = decrypted_token['jti']
     from .models import Blacklisted
     result = Blacklisted.query.filter_by(token_identifier=jti).scalar()
