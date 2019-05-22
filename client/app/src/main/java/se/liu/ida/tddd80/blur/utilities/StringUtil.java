@@ -2,6 +2,7 @@ package se.liu.ida.tddd80.blur.utilities;
 
 import android.content.Context;
 import android.location.Address;
+import android.widget.TextView;
 
 import com.android.volley.VolleyError;
 
@@ -15,7 +16,6 @@ import org.json.JSONObject;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 import se.liu.ida.tddd80.blur.R;
 
@@ -145,6 +145,15 @@ public class StringUtil {
     public static boolean isValidPassword(Context context, String password) {
         int minLength = context.getResources().getInteger(R.integer.password_min_length);
         return password.length() >= minLength && !StringUtils.containsWhitespace(password);
+    }
+
+    /* If there isn't some horizontal padding around blurred text, the blur ends with a
+    * very noticeable edge rather than fading out. The space is there to provide
+    * padding. I tried adding a layout padding but the filter still used the text's
+    * position rather than it's background.
+    */
+    public static String padString(String s) {
+        return "  " + s;
     }
 
     /**

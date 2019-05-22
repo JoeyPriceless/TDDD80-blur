@@ -21,6 +21,9 @@ public enum FeedType {
         return StringUtils.capitalize(name().toLowerCase());
     }
 
+    /**
+     * Used by server to determine which feed type to send.
+     */
     public String getTypeString() {
         return typeString;
     }

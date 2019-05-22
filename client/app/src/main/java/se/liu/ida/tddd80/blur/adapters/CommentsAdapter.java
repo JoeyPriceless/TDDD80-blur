@@ -9,11 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import se.liu.ida.tddd80.blur.R;
-import se.liu.ida.tddd80.blur.activities.PostActivity;
 import se.liu.ida.tddd80.blur.fragments.CommentFragment;
 import se.liu.ida.tddd80.blur.models.Comment;
 import se.liu.ida.tddd80.blur.models.CommentList;

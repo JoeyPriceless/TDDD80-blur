@@ -46,7 +46,6 @@ pip-log.txt
 pip-delete-this-directory.txt
 
 # Unit test / coverage reports
-htmlcov/
 .tox/
 .nox/
 .coverage
@@ -328,5 +327,4 @@ fabric.properties
 *.idea/
 *.db
 *.jpg
-.secret
 steviewonder*

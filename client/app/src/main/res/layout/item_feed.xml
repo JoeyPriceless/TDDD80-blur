@@ -29,7 +29,6 @@
             android:id="@+id/linearlayout_feeditem_title"
             android:layout_width="0dp"
             android:layout_height="80dp"
-            android:layout_marginLeft="10dp"
             android:layout_weight="78"
             android:gravity="center_vertical"
             android:orientation="vertical">
@@ -40,26 +39,27 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textSize="20sp"
-                android:textStyle="bold"
                 android:paddingTop="2dp"
                 android:paddingBottom="4dp"
-                tools:text="Username can be super duper long" />
+                android:textSize="20sp"
+                android:textStyle="bold"
+                tools:text="  Username can be super duper long" />
 
             <TextView
                 android:id="@+id/textview_feeditem_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="3dp"
+                android:layout_marginLeft="11dp"
                 tools:text="1 Apr 2019" />
 
             <TextView
                 android:id="@+id/textview_feeditem_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:ellipsize="end"
                 android:paddingTop="4dp"
                 android:paddingBottom="2dp"
-                android:ellipsize="end"
                 android:singleLine="true"
                 android:visibility="gone"
                 tools:text="Ryd, Östergötlands Län, Sweden" />

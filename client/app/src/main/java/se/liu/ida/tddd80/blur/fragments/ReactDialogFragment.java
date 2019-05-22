@@ -1,8 +1,5 @@
 package se.liu.ida.tddd80.blur.fragments;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,12 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import se.liu.ida.tddd80.blur.R;
-import se.liu.ida.tddd80.blur.models.ReactionType;
 
 public class ReactDialogFragment extends DialogFragment {
     public static String KEY_POST_ID = "POST_ID";

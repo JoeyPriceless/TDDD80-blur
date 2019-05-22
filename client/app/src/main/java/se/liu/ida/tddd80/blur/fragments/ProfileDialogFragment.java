@@ -143,6 +143,7 @@ public class ProfileDialogFragment extends DialogFragment implements Response.Li
             if (resultCode == RESULT_OK) {
                 try {
                     Uri uri = null;
+                    // Decide if picture is from camera or camera roll.
                     if (data != null && data.getData() != null) {
                         uri = data.getData();
                     } else if (imageUri != null) {

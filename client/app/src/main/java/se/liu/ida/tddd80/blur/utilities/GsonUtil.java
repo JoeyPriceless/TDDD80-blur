@@ -61,6 +61,9 @@ public class GsonUtil {
         return gson.fromJson(object.toString(), Reactions.class);
     }
 
+    /**
+     * When server sends single values, those are serialized as JSONObjects with the key "response"
+     */
     public String parseString(JSONObject object) {
         try {
             return object.getString("response");
@@ -69,6 +72,9 @@ public class GsonUtil {
         }
     }
 
+    /**
+     * When server sends single values, those are serialized as JSONObjects with the key "response"
+     */
     public int parseInt(JSONObject object) {
         try {
             return object.getInt("response");

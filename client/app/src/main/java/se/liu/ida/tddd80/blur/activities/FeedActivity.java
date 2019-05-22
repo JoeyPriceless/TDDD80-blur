@@ -1,7 +1,6 @@
 package se.liu.ida.tddd80.blur.activities;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
@@ -15,6 +14,11 @@ import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+
+import org.json.JSONObject;
+
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.adapters.SpinnerAdapter;
 import se.liu.ida.tddd80.blur.fragments.FeedFragment;
@@ -22,8 +26,7 @@ import se.liu.ida.tddd80.blur.fragments.ProfileDialogFragment;
 import se.liu.ida.tddd80.blur.models.FeedType;
 import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
 
-public class FeedActivity extends AppCompatActivity
-        implements FeedFragment.OnFragmentInteractionListener, AdapterView.OnItemSelectedListener {
+public class FeedActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private Menu menu;
     FloatingActionButton fab;
     private NetworkUtil netUtil = NetworkUtil.getInstance(this);
@@ -67,8 +70,9 @@ public class FeedActivity extends AppCompatActivity
     private void setupActionBar() {
         Toolbar toolbar = findViewById(R.id.toolbar_feed);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        // Replace the title with a spinner which controls feed type.
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         Spinner toolbarSpinner = findViewById(R.id.spinner_toolbar_feed);
         String[] strings = getResources().getStringArray(R.array.spinner_items);
         Integer[] drawables = new Integer[] { R.drawable.top, R.drawable.upvote_0,
@@ -83,6 +87,7 @@ public class FeedActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 	    this.menu = menu;
+	    // Creates a different options menu depending on if user is logged in or not.
 	    if (netUtil.isUserLoggedIn())
 	        setLoggedInMenu();
         else
@@ -125,17 +130,35 @@ public class FeedActivity extends AppCompatActivity
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
                     netUtil = NetworkUtil.getInstance(FeedActivity.this);
-                    netUtil.logout();
-                    invalidateOptionsMenu();
-                    fab.hide();
-                    Toast.makeText(FeedActivity.this, "Logged out successfully",
-                            Toast.LENGTH_SHORT).show();
+                    netUtil.logout(new LogoutResponse(), new LogoutErrorResponse());
                     return true;
                 }
             }
         );
     }
 
+    private class LogoutResponse implements Response.Listener<JSONObject> {
+        @Override
+        public void onResponse(JSONObject response) {
+            netUtil.clearUser();
+            invalidateOptionsMenu();
+            fab.hide();
+            Toast.makeText(FeedActivity.this, "Logged out successfully",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private class LogoutErrorResponse implements Response.ErrorListener {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            Toast.makeText(FeedActivity.this, "Failed to log out",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Listener for toolbar spinner
+     */
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         FeedType selectedType = FeedType.values()[position];
@@ -143,10 +166,5 @@ public class FeedActivity extends AppCompatActivity
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
-
-    @Override public void onFragmentInteraction(final Uri uri) {
-   	}
+    public void onNothingSelected(AdapterView<?> parent) {}
 }

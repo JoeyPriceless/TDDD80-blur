@@ -10,7 +10,7 @@ public class Comment {
     private User author;
     private String content;
     @SerializedName("time_created")
-    private DateTime timeCreated; // Check json compatibility
+    private DateTime timeCreated;
     private int score;
     private int ownReaction;
 

@@ -31,7 +31,7 @@ import se.liu.ida.tddd80.blur.models.Reactions;
 
 public class ViewUtil {
     /**
-     * Update a given reaction button according to a post's reactions.
+     * Update the necessary UI components of a post to reflect reactions and blur status.
      * Sets the color of the icon and text according to the user's vote.
      * Also blurs/unblurs author's name and image.
      * @param button Button which drawable/text should be updated
@@ -41,6 +41,7 @@ public class ViewUtil {
         Context context = button.getContext();
         String currentUserId = NetworkUtil.getInstance(context).getUserId();
 
+        // User's own posts are not blurred.
         boolean hasBlur = !post.hasReacted() && !post.getAuthor().getId().equals(currentUserId);
 
         Reactions reactions = post.getReactions();
@@ -70,6 +71,10 @@ public class ViewUtil {
         button.setTextColor(color);
     }
 
+    /**
+     * Uses picasso to load an image from a URL into an ImageView. Blurs the bitmap if hasBlur is
+     * true.
+     */
     public static void loadProfileImage(Picasso singleton, String url, boolean hasBlur,
                                         ImageView target) {
         if (url == null || url.isEmpty()) {
@@ -114,30 +119,6 @@ public class ViewUtil {
     }
 
     /**
-     * Private message run by the public methods.
-     */
-    private static void pShowReactionDialog(Context context, FragmentManager fragmentManager,
-                                          String postId, ReactionType ownReaction,
-                                            @Nullable FeedFragment targetFragment,
-                                            @Nullable Integer adapterPosition) {
-        if (!NetworkUtil.getInstance(context).isUserLoggedIn()) {
-            Toast.makeText(context, "You must be logged in to react",
-                    Toast.LENGTH_SHORT).show();
-            return;
-        }
-        ReactDialogFragment dialog = new ReactDialogFragment();
-        Bundle args = new Bundle();
-        args.putString(ReactDialogFragment.KEY_POST_ID, postId);
-        args.putInt(ReactDialogFragment.KEY_CURRENT_SELECTION, ownReaction.ordinal());
-        if (targetFragment != null && adapterPosition != null) {
-            args.putInt(ReactDialogFragment.KEY_ADAPTER_POSITION, adapterPosition);
-            dialog.setTargetFragment(targetFragment, FeedFragment.DIALOG_FRAGENT);
-        }
-        dialog.setArguments(args);
-        dialog.show(fragmentManager, context.getClass().getSimpleName());
-    }
-
-    /**
      * Shows an ReactDialog displaying each of the votes a user can select for a post. This overload
      * is used by FeedFragments which need to specify the post's adapter position.
      */
@@ -157,6 +138,30 @@ public class ViewUtil {
         pShowReactionDialog(context, fragmentManager, postId, ownReaction, null, null);
     }
 
+    /**
+     * Private method that is run by the public methods.
+     */
+    private static void pShowReactionDialog(Context context, FragmentManager fragmentManager,
+                                            String postId, ReactionType ownReaction,
+                                            @Nullable FeedFragment targetFragment,
+                                            @Nullable Integer adapterPosition) {
+        if (!NetworkUtil.getInstance(context).isUserLoggedIn()) {
+            Toast.makeText(context, "You must be logged in to react",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+        ReactDialogFragment dialog = new ReactDialogFragment();
+        Bundle args = new Bundle();
+        args.putString(ReactDialogFragment.KEY_POST_ID, postId);
+        args.putInt(ReactDialogFragment.KEY_CURRENT_SELECTION, ownReaction.ordinal());
+        if (targetFragment != null && adapterPosition != null) {
+            args.putInt(ReactDialogFragment.KEY_ADAPTER_POSITION, adapterPosition);
+            dialog.setTargetFragment(targetFragment, FeedFragment.DIALOG_FRAGENT);
+        }
+        dialog.setArguments(args);
+        dialog.show(fragmentManager, context.getClass().getSimpleName());
+    }
+
     public static void blurTextView(TextView tv) {
         TextPaint paint = tv.getPaint();
         if (paint.getMaskFilter() != null) return;
@@ -174,8 +179,7 @@ public class ViewUtil {
     }
 
     public static Bitmap blurBitmap(Context context, Bitmap bitmap) {
-        Bitmap blurred = GaussianBlur.with(context).size(200).radius(25).render(bitmap);
-        return blurred;
+        return GaussianBlur.with(context).size(200).radius(25).render(bitmap);
     }
 
     public static RoundedBitmapDrawable roundCorners(Context context, Bitmap bitmap, float radius) {

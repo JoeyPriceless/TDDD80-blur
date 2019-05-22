@@ -9,7 +9,7 @@ public class Post {
     private User author;
     private String content;
     @SerializedName("time_created")
-    private DateTime timeCreated; // Check json compatibility
+    private DateTime timeCreated;
     private Reactions reactions;
     @SerializedName("attachment_uri")
     private String attachmentUri;

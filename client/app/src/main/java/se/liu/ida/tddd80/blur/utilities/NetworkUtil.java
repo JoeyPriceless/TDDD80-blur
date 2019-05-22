@@ -37,8 +37,8 @@ import se.liu.ida.tddd80.blur.models.User;
 import static android.content.SharedPreferences.Editor;
 
 /**
- * Singleton utility class that handles requests to the server. Also keeps track of user
- * authentication token.
+ * Singleton utility class that handles requests to the server. Also keeps track of app user's
+ * object and authentication.
  */
 public class NetworkUtil {
     private final String TAG = getClass().getSimpleName();
@@ -56,7 +56,7 @@ public class NetworkUtil {
         storeLogin(userId);
     }
 
-    public void logout() {
+    public void clearUser() {
         token = null;
         user = null;
         storeLogin(null);
@@ -100,6 +100,9 @@ public class NetworkUtil {
         return instance;
     }
 
+    /**
+     * Stores user authentication token persistently in SharedPreferences.
+     */
     private void storeLogin(String userId) {
         SharedPreferences prefs = appContext.getSharedPreferences(appContext.getPackageName(),
                 Context.MODE_PRIVATE);
@@ -109,6 +112,9 @@ public class NetworkUtil {
         editor.apply();
     }
 
+    /**
+     * Loads user authentication token from SharedPreferences
+     */
     private void loadLogin() {
         SharedPreferences prefs = appContext.getSharedPreferences(appContext.getPackageName(),
                 Context.MODE_PRIVATE);
@@ -120,7 +126,6 @@ public class NetworkUtil {
     }
 
     public boolean isUserLoggedIn() {
-        // TODO: update logic to deal with expired tokens
         return token != null;
     }
 
@@ -175,48 +180,6 @@ public class NetworkUtil {
         addToQueue(request);
     }
 
-    /**
-     * Sends a payload data and requests JSON response from url using method (Usually POST or PUT).
-     * @param url target URL. Complete URL including prefix and hostname
-     * @param responseListener Listener which contains actions upon success
-     * @param errorListener Listener which contains actions upon failure
-     * @param params JSON data mapped in key/value format
-     */
-    private void requestJsonObject(String url,
-                                   Listener<JSONObject> responseListener,
-                                   ErrorListener errorListener,
-                                   final Map<String, String> params) {
-        JsonObjectRequest request = new JsonObjectRequest(Method.POST, url, null,
-                responseListener, errorListener) {
-            @Override
-            public Map<String, String> getHeaders() {
-                return getHeadersAuth("multipart/form-data");
-            }
-            @Override
-            protected Map<String, String> getParams() {
-                return params;
-            }
-        };
-        addToQueue(request);
-    }
-
-    /**
-     * Request JSON response from url using method (Usually GET or DELETE).
-     * @param url target URL. Complete URL including prefix and hostname
-     * @param method HTTP method from enum
-     * @param responseListener Listener which contains actions upon success
-     * @param errorListener Listener which contains actions upon failure
-     */
-    private void requestJsonArray(String url, int method, Listener<JSONArray> responseListener,
-                                   ErrorListener errorListener) {
-        JsonArrayRequest request = new JsonArrayRequest(method, url, null,
-                responseListener, errorListener) {
-            @Override
-            public Map<String, String> getHeaders() { return getHeadersAuth("application/json"); }
-        };
-        addToQueue(request);
-    }
-
     @SuppressWarnings("unchecked")
     public void addToQueue(Request request) {
         Log.i(TAG, String.format("%s: %s",
@@ -237,10 +200,6 @@ public class NetworkUtil {
 
         requestJsonObject(Url.build(Url.USER_LOGIN), Method.POST, responseListener, errorListener,
                 params);
-    }
-
-    public void setUserPictureUrl() {
-
     }
 
     /**
@@ -362,6 +321,10 @@ public class NetworkUtil {
                 .execute();
     }
 
+    /**
+     * Since Volley's image sending capabilities are so poor we decided to encode and send images
+     * manually.
+     */
     public static class SendImageTask extends AsyncTask<Void, Void, Void> {
         private String urlString;
         private Bitmap image;
@@ -383,15 +346,15 @@ public class NetworkUtil {
 
         @Override
         protected Void doInBackground(Void... Voids) {
-            HttpURLConnection connection = null;
-            DataOutputStream outputStream = null;
-            InputStream inputStream = null;
+            HttpURLConnection connection;
+            DataOutputStream outputStream;
+            InputStream inputStream;
 
             String twoHyphens = "--";
-            String boundary = "*****" + Long.toString(System.currentTimeMillis()) + "*****";
+            String boundary = "*****" + System.currentTimeMillis() + "*****";
             String lineEnd = "\r\n";
 
-            String result = "";
+            String result;
 
             int bytesRead, bytesAvailable, bufferSize;
             byte[] buffer;
@@ -486,7 +449,7 @@ public class NetworkUtil {
 
 
         /**
-         * Concatinates elements of different types to build a URL
+         * Concatinates elements of different types to the root address in order to build a URL
          * @param elements Objects to be concatinated. Uses their toString representation.
          * @return build URL.
          */
