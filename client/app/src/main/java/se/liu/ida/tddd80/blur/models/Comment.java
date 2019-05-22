@@ -12,22 +12,22 @@ public class Comment {
     @SerializedName("time_created")
     private DateTime timeCreated;
     private int score;
-    private int ownReaction;
+    private int ownScore;
 
     public void setScore(int score) {
         this.score = score;
     }
 
-    public void setOwnReaction(int reaction) {
-        this.ownReaction = reaction;
+    public void setOwnScore(int reaction) {
+        this.ownScore = reaction;
     }
 
     public int getScore() {
         return score;
     }
 
-    public int getOwnReaction() {
-        return ownReaction;
+    public int getOwnScore() {
+        return ownScore;
     }
 
     public String getId() {

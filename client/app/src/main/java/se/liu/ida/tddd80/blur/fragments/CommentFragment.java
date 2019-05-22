@@ -28,6 +28,9 @@ import se.liu.ida.tddd80.blur.utilities.GsonUtil;
 import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
 
+/**
+ * Fragment for containing the comment section to a parent post object.
+ */
 public class CommentFragment extends Fragment implements Response.Listener<JSONObject>, Response.ErrorListener,
         SwipeRefreshLayout.OnRefreshListener{
     private final String TAG = getClass().getSimpleName();
@@ -100,8 +103,7 @@ public class CommentFragment extends Fragment implements Response.Listener<JSONO
     public void onResponse(JSONObject response) {
         CommentList comments = GsonUtil.getInstance().parseComments(response);
         if (getArguments() != null) {
-            CommentsAdapter adapter = new CommentsAdapter((String) getArguments().get(POSTID), comments,
-                    this, getFragmentManager());
+            CommentsAdapter adapter = new CommentsAdapter(comments);
             rv.setAdapter(adapter);
         }
         rv.setLayoutManager(new LinearLayoutManager(getActivity()));

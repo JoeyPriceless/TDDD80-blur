@@ -108,7 +108,7 @@ public abstract class SubmitActivity extends AppCompatActivity implements Respon
         }
         int length = contentEditable.length();
         if (length > maxLength || length == 0) {
-            Toast.makeText(this, "Submission must be between 1 and 240 characters.",
+            Toast.makeText(this, "Text must be between 1 and 240 characters.",
                     Toast.LENGTH_SHORT).show();
             return false;
         }
