@@ -51,7 +51,6 @@ public abstract class AbstractLoginActivity extends AppCompatActivity {
 
     protected void continueToTarget() {
         Intent intent = new Intent(getBaseContext(), targetActivity);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         startActivity(intent);
         finish();
     }

@@ -16,6 +16,9 @@ import se.liu.ida.tddd80.blur.adapters.CommentsAdapter;
 import se.liu.ida.tddd80.blur.adapters.FeedAdapter;
 import se.liu.ida.tddd80.blur.models.Post;
 
+/**
+ * Includes some commonly used responselisteners.
+ */
 public class ResponseListeners {
 
     /**
@@ -82,7 +85,6 @@ public class ResponseListeners {
     /**
      * Provides a default ErrorListener for Volley requests. Notifies the log and creates a toast.
      */
-    // TODO fix parsing for both JSON and raw responses
     public static class DefaultError implements Response.ErrorListener {
         Context context;
 

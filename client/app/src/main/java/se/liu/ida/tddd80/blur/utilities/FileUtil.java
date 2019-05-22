@@ -4,15 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v4.content.FileProvider;
-import android.util.Base64;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,8 +35,6 @@ public class FileUtil {
 
     public static Uri generateImageUri(Context context, Intent imageCaptureIntent) {
         Uri imageUri = null;
-        // Decide where the file is to be stored. If an image URI isn't provided, we only get a
-        // low quality ivThumbnail in the result.
         File imageFile = null;
         try {
             imageFile = FileUtil.createImageFile(context);

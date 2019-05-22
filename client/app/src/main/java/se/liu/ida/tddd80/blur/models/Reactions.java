@@ -1,7 +1,5 @@
 package se.liu.ida.tddd80.blur.models;
 
-import android.util.Pair;
-
 import com.google.gson.annotations.SerializedName;
 
 import java.util.EnumMap;
@@ -19,26 +17,7 @@ public class Reactions {
         return ownReaction;
     }
 
-
     public int getScore() {
         return score;
-    }
-
-    public void setScore(int score) {
-        this.score = score;
-    }
-
-    /**
-     * @param type The type of reaction
-     * @return The number of reactions of type
-     */
-    public int getReactionCount(ReactionType type) {
-        Integer value = map.get(type);
-        if (value == null) {
-            map.put(type, 0);
-            return 0;
-        } else {
-            return value;
-        }
     }
 }

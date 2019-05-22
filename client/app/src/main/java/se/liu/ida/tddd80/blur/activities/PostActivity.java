@@ -36,11 +36,9 @@ public class PostActivity extends AppCompatActivity
         implements ReactDialogFragment.ReactDialogListener {
     private final String TAG = getClass().getSimpleName();
     public static final String EXTRA_POST_ID = "POST_ID";
-    public static final Character AUTHOR_SPACE_PADDING = ' ';
     NetworkUtil netUtil;
     GsonUtil gsonUtil;
 	private Post post;
-	private CommentFragment commentsFragment;
 
 	private Button btnReact;
 	private Button btnComment;
@@ -72,7 +70,7 @@ public class PostActivity extends AppCompatActivity
         });
 	}
 
-	private void innitComments() {
+	private void initializeComments() {
         CommentFragment commentFragment = CommentFragment.newInstance(post.getId());
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
@@ -85,11 +83,7 @@ public class PostActivity extends AppCompatActivity
         public void onResponse(JSONObject response) {
             try {
                 post = gsonUtil.parsePost(response);
-                // If there isn't some horizontal padding around the text, the blur ends with a
-                // very noticeable edge rather than fading out. The space is there to provide
-                // padding. I tried adding a layout padding but the filter still used the text's
-                // position rather than it's background.
-                tvAuthor.setText(AUTHOR_SPACE_PADDING + post.getAuthor().getUsername());
+                tvAuthor.setText(StringUtil.padString(post.getAuthor().getUsername()));
                 ((TextView)findViewById(R.id.textview_post_time)).setText(
                         StringUtil.formatDateTimeLong(post.getTimeCreated()));
 
@@ -97,7 +91,7 @@ public class PostActivity extends AppCompatActivity
                 String location = post.getLocation();
                 if (location != null) {
 
-                    tvLocation.setText(AUTHOR_SPACE_PADDING + location);
+                    tvLocation.setText(StringUtil.padString(location));
                     tvLocation.setVisibility(View.VISIBLE);
                 } else {
                     tvLocation.setText("");
@@ -114,7 +108,7 @@ public class PostActivity extends AppCompatActivity
                         .into(attachment);
                 ViewUtil.refreshPostViews(btnReact, post, tvAuthor, tvLocation, ivAuthor);
                 btnComment.setText(String.valueOf(post.getCommentCount()));
-                innitComments();
+                initializeComments();
             } catch (JsonSyntaxException ex) {
                 Log.e(TAG, ExceptionUtils.getStackTrace(ex));
                 Toast.makeText(PostActivity.this, "Error when parsing response",

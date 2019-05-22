@@ -15,7 +15,6 @@ import com.squareup.picasso.Picasso;
 
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 import se.liu.ida.tddd80.blur.R;
-import se.liu.ida.tddd80.blur.activities.PostActivity;
 import se.liu.ida.tddd80.blur.fragments.FeedFragment;
 import se.liu.ida.tddd80.blur.models.Feed;
 import se.liu.ida.tddd80.blur.models.Post;
@@ -111,12 +110,12 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder vh, int i) {
         final Post post = feed.get(i);
-        vh.authorName.setText(PostActivity.AUTHOR_SPACE_PADDING + post.getAuthor().getUsername());
+        vh.authorName.setText(StringUtil.padString(post.getAuthor().getUsername()));
         vh.timestamp.setText(StringUtil.formatDateTimeShort(post.getTimeCreated()));
         vh.content.setText(post.getContent());
         String location = post.getLocation();
         if (location != null) {
-            vh.location.setText(PostActivity.AUTHOR_SPACE_PADDING + location);
+            vh.location.setText(StringUtil.padString(location));
             vh.location.setVisibility(View.VISIBLE);
         } else {
             vh.location.setText("");
