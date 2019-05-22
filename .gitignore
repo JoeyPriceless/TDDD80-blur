@@ -328,5 +328,4 @@ fabric.properties
 *.idea/
 *.db
 *.jpg
-.secret
 steviewonder*
