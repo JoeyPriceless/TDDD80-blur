@@ -13,6 +13,9 @@ ALLOWED_EXTENSION = 'jpg'
 
 
 def reset_db():
+    """
+    Used for testing purposes. NEVER in deployment enviroment!
+    """
     print("Dropping all tables")
     db.drop_all()
     print("Initializing all tables")
@@ -23,8 +26,10 @@ def reset_db():
 @app.route('/feed/<feedtype>')
 @jwt_optional
 def get_feed(feedtype):
+    """
+    Returns the pregenerated feed list ordered by the given feed type.
+    """
     user_id = get_jwt_identity()
-    # TODO: implement proper feed creation. Currently just returns all posts
     feed = FeedObject.get_type_sorted_feed(feedtype)
     if feed is None:
         return respond(plain_response("Feed empty! Requested resource not found."), 404)
@@ -38,6 +43,9 @@ def get_feed(feedtype):
 @app.route('/comments/<postid>')
 @jwt_optional
 def get_comments(postid):
+    """
+    Returns all comments for the post specified by given postID.
+    """
     comments = Comment.query.filter_by(post_id=postid).all()
     if comments is None:
         post = Post.query.filter_by(id=postid).one()
@@ -53,6 +61,9 @@ def get_comments(postid):
 @app.route('/post/<postid>')
 @jwt_optional
 def get_post(postid):
+    """
+    Returns the post object with the given postID.
+    """
     post = Post.query.filter_by(id=postid).scalar()
     user_id = get_jwt_identity()
     if post:
@@ -63,6 +74,9 @@ def get_post(postid):
 
 @app.route('/comment/<commentid>')
 def get_comment(commentid):
+    """
+    
+    """
     comment = Comment.query.filter_by(id=commentid).scalar()
     if comment:
         return respond(comment.serialize())

@@ -70,13 +70,17 @@ public class SubmitPostActivity extends SubmitActivity implements Response.Liste
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_submit_post);
 
         imageCaptureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         fusedLocation = LocationServices.getFusedLocationProviderClient(this);
         ivThumbnail = findViewById(R.id.imageview_submit_thumbnail);
         btnLocation = findViewById(R.id.button_submit_location);
 
+    }
+
+    @Override
+    void setView() {
+        setContentView(R.layout.activity_submit_post);
     }
 
     public void onClickImageButton(View v) {

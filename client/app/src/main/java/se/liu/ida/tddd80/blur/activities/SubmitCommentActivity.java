@@ -17,8 +17,12 @@ public class SubmitCommentActivity extends SubmitActivity implements Response.Li
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_submit_comment);
         postId = getIntent().getExtras().getString("postId");
+    }
+
+    @Override
+    void setView() {
+        setContentView(R.layout.activity_submit_comment);
     }
 
     protected void continueToPost() {

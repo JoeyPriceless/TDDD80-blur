@@ -30,6 +30,7 @@ public abstract class SubmitActivity extends AppCompatActivity implements Respon
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setView();
 
         setupActionBar();
         netUtil = NetworkUtil.getInstance(this);
@@ -44,6 +45,8 @@ public abstract class SubmitActivity extends AppCompatActivity implements Respon
 
         refreshCharCount(contentEditable);
     }
+
+    abstract void setView();
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -64,9 +67,11 @@ public abstract class SubmitActivity extends AppCompatActivity implements Respon
         setSupportActionBar(toolbar);
         // Enable ActionBar back button.
         ActionBar ab = getSupportActionBar();
-        ab.setDisplayHomeAsUpEnabled(true);
-        ab.setDisplayShowHomeEnabled(true);
-        ab.setHomeAsUpIndicator(getDrawable(R.drawable.ic_close_black_24dp));
+        if (ab != null) {
+            ab.setDisplayHomeAsUpEnabled(true);
+            ab.setDisplayShowHomeEnabled(true);
+            ab.setHomeAsUpIndicator(getDrawable(R.drawable.ic_close_black_24dp));
+        }
     }
 
     private void refreshCharCount(Editable editable) {
