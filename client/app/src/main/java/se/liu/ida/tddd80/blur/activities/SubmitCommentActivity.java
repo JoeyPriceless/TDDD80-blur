@@ -74,6 +74,15 @@ public class SubmitCommentActivity extends AppCompatActivity implements Response
         return true;
     }
 
+    /**
+     * Neccessary for Actionbar back button to work.
+     */
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
     private void continueToPost() {
         Intent postIntent = new Intent(SubmitCommentActivity.this, PostActivity.class);
         postIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
