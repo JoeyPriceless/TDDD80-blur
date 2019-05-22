@@ -18,6 +18,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.text.Editable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -43,7 +44,7 @@ import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.fragments.SubmitImageDialogFragment;
 import se.liu.ida.tddd80.blur.utilities.FileUtil;
 import se.liu.ida.tddd80.blur.utilities.GsonUtil;
-import se.liu.ida.tddd80.blur.utilities.ImageUtil;
+import se.liu.ida.tddd80.blur.utilities.ImageRotator;
 import se.liu.ida.tddd80.blur.utilities.ResponseListeners;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
 import se.liu.ida.tddd80.blur.utilities.ViewUtil;
@@ -83,28 +84,8 @@ public class SubmitPostActivity extends SubmitActivity implements Response.Liste
         setContentView(R.layout.activity_submit_post);
     }
 
-    public void onClickImageButton(View v) {
-        openCameraIfPermitted();
-    }
-
-    private void openCameraIfPermitted() {
-        String cameraPermission = Manifest.permission.CAMERA;
-        if (checkSelfPermission(cameraPermission) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[] { cameraPermission }, IMAGE_REQUEST_CODE);
-        } else {
-            // Check if there is any activity registered to open the camera intent.
-            if (imageCaptureIntent.resolveActivity(getPackageManager()) == null)
-                Toast.makeText(this, "Could not find a camera app to launch.",
-                        Toast.LENGTH_SHORT).show();
-
-                imageUri = FileUtil.generateImageUri(this, imageCaptureIntent);
-                imageCaptureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                startActivityForResult(imageCaptureIntent, IMAGE_REQUEST_CODE);
-        }
-    }
-
     @Override public void onRequestPermissionsResult(final int requestCode,
-            @NonNull final String[] permissions, @NonNull final int[] grantResults) {
+             @NonNull final String[] permissions, @NonNull final int[] grantResults) {
         int result = grantResults[0];
         if (result == PackageManager.PERMISSION_GRANTED) {
             switch (requestCode) {
@@ -129,25 +110,55 @@ public class SubmitPostActivity extends SubmitActivity implements Response.Liste
         }
     }
 
-    public void onClickImageThumbnail(View v) {
-        SubmitImageDialogFragment fragment = new SubmitImageDialogFragment();
-        fragment.show(getSupportFragmentManager(), this.getClass().getSimpleName());
+    public void onClickImageButton(View v) {
+        openCameraIfPermitted();
     }
 
+    /**
+     * Starts a camera activity for result if app has camera persmission. Otherwise, ask for
+     * permission.
+     */
+    private void openCameraIfPermitted() {
+        String cameraPermission = Manifest.permission.CAMERA;
+        if (checkSelfPermission(cameraPermission) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[] { cameraPermission }, IMAGE_REQUEST_CODE);
+        } else {
+            // Check if there is any activity registered to open the camera intent.
+            if (imageCaptureIntent.resolveActivity(getPackageManager()) == null)
+                Toast.makeText(this, "Could not find a camera app to launch.",
+                        Toast.LENGTH_SHORT).show();
+
+            // ACTION_IMAGE_CAPTURE returns a low quality thumbnail by default. In order to get the
+            // image in full quality, EXTRA_OUTPUT has to be saved on the device.
+            imageUri = FileUtil.generateImageUri(this, imageCaptureIntent);
+            imageCaptureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+            startActivityForResult(imageCaptureIntent, IMAGE_REQUEST_CODE);
+        }
+    }
+
+    /**
+     * Handles the picture from the camera activity on finish.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == IMAGE_REQUEST_CODE && resultCode == RESULT_OK) {
             try {
-                 bmFullsize = ImageUtil.getImageAndRotate(this, imageUri);
+                 bmFullsize = ImageRotator.getImageAndRotate(this, imageUri);
             } catch (IOException ex) {
                 Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
             }
+            // Scale down and maintain aspect ratio
             double aspectRatio = (double)bmFullsize.getWidth() / bmFullsize.getHeight();
             int width = (int)Math.round(THUMBNAIL_HEIGHT * aspectRatio);
             Bitmap bmThumbnail = ThumbnailUtils.extractThumbnail(bmFullsize, width,
                     THUMBNAIL_HEIGHT);
             ivThumbnail.setImageDrawable(ViewUtil.roundCorners(this, bmThumbnail, 15));
         }
+    }
+
+    public void onClickImageThumbnail(View v) {
+        SubmitImageDialogFragment fragment = new SubmitImageDialogFragment();
+        fragment.show(getSupportFragmentManager(), this.getClass().getSimpleName());
     }
 
     @Override
@@ -163,16 +174,25 @@ public class SubmitPostActivity extends SubmitActivity implements Response.Liste
         return true;
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        stopLocationUpdates();
+    private void refreshCharCount(Editable editable) {
+        tvCharCount.setText(String.format("%d/%d", editable.length(), maxLength));
     }
 
+    /**
+     * If permitted, starts looking for location as soon as activity is resumed in order to speed up
+     * eventual geotagging.
+     */
     @Override
     protected void onResume() {
         super.onResume();
         startLocationUpdates(false);
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopLocationUpdates();
     }
 
     private boolean hasLocationPermissions() {
@@ -209,13 +229,18 @@ public class SubmitPostActivity extends SubmitActivity implements Response.Liste
         });
     }
 
+    /**
+     * Tries to find current location. If successful, post is geotagged.
+     * @param actOnUpdates True if the UI/post should be updated when location is found. False is
+     *                     to simply get a location for future use.
+     */
     @SuppressLint("MissingPermission")
-    private void startLocationUpdates(final boolean getUpdates) {
+    private void startLocationUpdates(final boolean actOnUpdates) {
         if (hasLocationPermissions()) {
             locationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
-                    if (!getUpdates) return;
+                    if (!actOnUpdates) return;
                     if (locationResult == null || locationResult.getLocations().isEmpty()) {
                         Toast.makeText(SubmitPostActivity.this, "Location unknown",
                                 Toast.LENGTH_SHORT).show();
@@ -236,6 +261,7 @@ public class SubmitPostActivity extends SubmitActivity implements Response.Liste
 
     /**
      * Called by fusedLocation.getLastLocation() upon success.
+     * Last known location may be null, in which case it requests the current location.
      */
     @SuppressLint("MissingPermission")
     @Override
@@ -255,7 +281,7 @@ public class SubmitPostActivity extends SubmitActivity implements Response.Liste
     }
 
     private static class LocationFetchTask extends AsyncTask<Object, Void, String> {
-        // Using static class together with WeakReference to avoid memory leaks.
+        // Using WeakReference to avoid memory leaks.
         // See https://stackoverflow.com/a/46166223/4400799
         private WeakReference<SubmitPostActivity> activityReference;
 

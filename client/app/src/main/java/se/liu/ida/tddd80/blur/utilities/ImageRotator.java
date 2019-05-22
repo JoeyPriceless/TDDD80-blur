@@ -17,11 +17,10 @@ import java.io.InputStream;
  * Methods to figure out if an image needs to be rotated after capture.
  * Class copied from https://stackoverflow.com/a/31720143/4400799
  */
-public class ImageUtil {
+public class ImageRotator {
     /**
-     * This method is responsible for solving the rotation issue if exist. Also scale the images to
-     * 1024x1024 resolution
-     *
+     * Bitmaps are not oriented correctly by default. This method tries to fix this.
+     * Also scale the images to 1024x1024 resolution
      * @param context       The current context
      * @param selectedImage The Image URI
      * @return Bitmap image results

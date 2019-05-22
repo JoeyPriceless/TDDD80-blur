@@ -75,7 +75,7 @@ def get_post(postid):
 @app.route('/comment/<commentid>')
 def get_comment(commentid):
     """
-    
+
     """
     comment = Comment.query.filter_by(id=commentid).scalar()
     if comment:
