@@ -18,24 +18,14 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -54,12 +44,11 @@ import se.liu.ida.tddd80.blur.fragments.SubmitImageDialogFragment;
 import se.liu.ida.tddd80.blur.utilities.FileUtil;
 import se.liu.ida.tddd80.blur.utilities.GsonUtil;
 import se.liu.ida.tddd80.blur.utilities.ImageUtil;
-import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
 import se.liu.ida.tddd80.blur.utilities.ResponseListeners;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
 import se.liu.ida.tddd80.blur.utilities.ViewUtil;
 
-public class SubmitPostActivity extends AppCompatActivity implements Response.Listener<JSONObject>,
+public class SubmitPostActivity extends SubmitActivity implements Response.Listener<JSONObject>,
         OnSuccessListener<Location>, SubmitImageDialogFragment.SubmitImageDialogListener {
     private static final int IMAGE_REQUEST_CODE = 78;
     private static final int LOCATION_REQUEST_CODE = 99;
@@ -75,12 +64,6 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.ACCESS_NETWORK_STATE
     };
-
-    private NetworkUtil netUtil;
-    private EditText etContent;
-    private Editable contentEditable;
-    private TextView tvCharCount;
-    private int maxLength;
     private ImageView ivThumbnail;
     private Button btnLocation;
 
@@ -89,56 +72,11 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_submit_post);
 
-        setupActionBar();
-
         imageCaptureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         fusedLocation = LocationServices.getFusedLocationProviderClient(this);
-        netUtil = NetworkUtil.getInstance(this);
-        maxLength = getResources().getInteger(R.integer.post_max_length);
-
-        etContent = findViewById(R.id.edittext_submit_content);
-        tvCharCount = findViewById(R.id.textview_submit_charcount);
         ivThumbnail = findViewById(R.id.imageview_submit_thumbnail);
         btnLocation = findViewById(R.id.button_submit_location);
-        etContent.addTextChangedListener(new ContentWatcher());
-        // Set content box as focused automatically.
-        etContent.requestFocus();
-        contentEditable = etContent.getText();
 
-        refreshCharCount(contentEditable);
-    }
-
-    private void setupActionBar() {
-        Toolbar toolbar = findViewById(R.id.toolbar_submit);
-        setSupportActionBar(toolbar);
-        // Enable ActionBar back button.
-        ActionBar ab = getSupportActionBar();
-        ab.setDisplayHomeAsUpEnabled(true);
-        ab.setDisplayShowHomeEnabled(true);
-        ab.setHomeAsUpIndicator(getDrawable(R.drawable.ic_close_black_24dp));
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, 0, 0, "Submit").setOnMenuItemClickListener(
-                new MenuItem.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        return submitPost();
-                    }
-        })
-        .setIcon(getDrawable(R.drawable.ic_submit_black_24dp))
-        .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        return true;
-    }
-
-    /**
-     * Neccessary for Actionbar back button to work.
-     */
-    @Override
-    public boolean onSupportNavigateUp() {
-        onBackPressed();
-        return true;
     }
 
     public void onClickImageButton(View v) {
@@ -208,29 +146,17 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
         }
     }
 
-    private boolean submitPost() {
-        if (!netUtil.isUserLoggedIn()) {
-            Toast.makeText(this, "Submission unsuccessful. You are not logged in.",
-                    Toast.LENGTH_SHORT).show();
+    @Override
+    protected boolean submit() {
+        if (!super.checkTextLength()) {
             return false;
         }
-        int length = contentEditable.length();
-        if (length > maxLength || length == 0) {
-            Toast.makeText(this, "Submission must be between 1 and 240 characters.",
-                    Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
         String locationString = btnLocation.getText().toString();
         // Return null rather than empty string.
         locationString = locationString.isEmpty() ? null : locationString;
         netUtil.createPost(contentEditable.toString(), netUtil.getUserId(), locationString, this,
                 new ResponseListeners.DefaultError(this));
         return true;
-    }
-
-    private void refreshCharCount(Editable editable) {
-        tvCharCount.setText(String.format("%d/%d", editable.length(), maxLength));
     }
 
     @Override
@@ -329,7 +255,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
         // See https://stackoverflow.com/a/46166223/4400799
         private WeakReference<SubmitPostActivity> activityReference;
 
-        public LocationFetchTask(SubmitPostActivity context) {
+        private LocationFetchTask(SubmitPostActivity context) {
             this.activityReference = new WeakReference<>(context);
         }
 
@@ -388,7 +314,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
         }
     }
 
-    private void continueToPost(String postId) {
+    protected void continueToPost(String postId) {
         Intent postIntent = new Intent(SubmitPostActivity.this, PostActivity.class);
         postIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         postIntent.putExtra(PostActivity.EXTRA_POST_ID, postId);
@@ -399,7 +325,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
     private class ImageResponseListener implements Response.Listener<String> {
         private String postId;
 
-        public ImageResponseListener(String postId) {
+        private ImageResponseListener(String postId) {
             this.postId = postId;
         }
 
@@ -412,7 +338,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
     private class ImageErrorListener implements Response.ErrorListener {
         private String postId;
 
-        public ImageErrorListener(String postId) {
+        private ImageErrorListener(String postId) {
             this.postId = postId;
         }
 
@@ -421,25 +347,7 @@ public class SubmitPostActivity extends AppCompatActivity implements Response.Li
             continueToPost(postId);
         }
     }
-    /**
-     * Watches changes to etContent in order to update character counter
-     */
-    private class ContentWatcher implements TextWatcher {
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            refreshCharCount(s);
-        }
-    }
 
     /**
      * Listener for SubmitImageDialogFragment
