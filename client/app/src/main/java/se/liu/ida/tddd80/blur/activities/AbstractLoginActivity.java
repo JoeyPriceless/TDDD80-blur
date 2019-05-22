@@ -23,6 +23,9 @@ import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
 import se.liu.ida.tddd80.blur.utilities.StringUtil;
 
+/**
+ * Contains common logic for LoginActivity and RegisterActivity
+ */
 public abstract class AbstractLoginActivity extends AppCompatActivity {
     protected final String TAG = getClass().getSimpleName();
     protected Class targetActivity = FeedActivity.class;
@@ -48,10 +51,9 @@ public abstract class AbstractLoginActivity extends AppCompatActivity {
 
     protected void continueToTarget() {
         Intent intent = new Intent(getBaseContext(), targetActivity);
-        // TODO: might need to adjust these.
-        // Documentation: https://developer.android.com/reference/android/content/Intent.html#FLAG_ACTIVITY_CLEAR_TOP
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         startActivity(intent);
+        finish();
     }
 
     protected boolean isEmailValid() {

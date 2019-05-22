@@ -27,7 +27,7 @@ import java.io.IOException;
 
 import se.liu.ida.tddd80.blur.R;
 import se.liu.ida.tddd80.blur.utilities.FileUtil;
-import se.liu.ida.tddd80.blur.utilities.ImageUtil;
+import se.liu.ida.tddd80.blur.utilities.ImageRotator;
 import se.liu.ida.tddd80.blur.utilities.NetworkUtil;
 import se.liu.ida.tddd80.blur.utilities.ViewUtil;
 
@@ -148,7 +148,7 @@ public class ProfileDialogFragment extends DialogFragment implements Response.Li
                     } else if (imageUri != null) {
                         uri = imageUri;
                     }
-                    imageBitmap = ImageUtil.getImageAndRotate(getContext(), uri);
+                    imageBitmap = ImageRotator.getImageAndRotate(getContext(), uri);
                 } catch (IOException ex) {
                     Toast.makeText(getContext(), "Failed to load image\n" + ex.getMessage(),
                             Toast.LENGTH_SHORT).show();

@@ -24,25 +24,16 @@ import java.util.List;
 import se.liu.ida.tddd80.blur.R;
 
 public class FileUtil {
-    public static final int IMAGE_QUALITY = 70;
-
-    public static File createImageFile(Context context) throws IOException {
+    private static File createImageFile(Context context) throws IOException {
         String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String extension = ".jpg";
         return createImageFile(context, timestamp, extension);
     }
 
-    public static File createImageFile(Context context, String filename, String extension)
+    private static File createImageFile(Context context, String filename, String extension)
             throws IOException {
         File directory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         return File.createTempFile(filename, extension, directory);
-    }
-
-    public static String encodeImageFile(Bitmap bitmap) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
-        byte[] imageBytes = baos.toByteArray();
-        return Base64.encodeToString(imageBytes, Base64.DEFAULT);
     }
 
     public static Uri generateImageUri(Context context, Intent imageCaptureIntent) {
@@ -78,7 +69,7 @@ public class FileUtil {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
 
-        String line = null;
+        String line;
         try {
             while ((line = reader.readLine()) != null) {
                 sb.append(line);
