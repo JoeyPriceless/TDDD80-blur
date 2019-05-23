@@ -34,8 +34,9 @@ pip: 10.0.1
 SQLite: 3.28
 
 The remaining dependencies are specified in requirements.txt
+
 Create a virtual environment and run
 
->>>pip install -r requirements.txt
+\>\>\>pip install -r requirements.txt
 
 in your shell.
