@@ -37,6 +37,9 @@ The remaining dependencies are specified in requirements.txt
 
 Create a virtual environment and run
 
-\>\>\>pip install -r requirements.txt
+_\>\>\>pip install -r requirements.txt_
 
 in your shell.
+
+<h2>Coverage</h2>
+A coverage report for the server has been exported and can be found under app/coverage. Open index.html to view the report.
